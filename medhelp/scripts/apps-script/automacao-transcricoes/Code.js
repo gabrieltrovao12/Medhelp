@@ -487,3 +487,31 @@ function listarFilaPendente() {
   if (count === 0) console.log('  [vazia]');
   console.log(`[FILA] Total: ${count} arquivo(s) aguardando processamento.`);
 }
+
+/**
+ * Receptor de Webhook (HTTP POST).
+ * Acionado diretamente pelo Google Colab quando a transcrição termina.
+ * 
+ * @param {Object} e - Evento de post do Apps Script
+ * @returns {TextOutput} Resposta em formato JSON
+ */
+function doPost(e) {
+  console.log("[WEBHOOK] Acionador recebido. Iniciando processamento de resumos...");
+  
+  try {
+    processarNovasTranscricoes();
+    
+    return ContentService.createTextOutput(JSON.stringify({
+      status: "sucesso",
+      mensagem: "Processamento de transcrições concluído com sucesso."
+    })).setMimeType(ContentService.MimeType.JSON);
+    
+  } catch (err) {
+    console.error(`[WEBHOOK ERRO] Falha no processamento: ${err.message}`);
+    
+    return ContentService.createTextOutput(JSON.stringify({
+      status: "erro",
+      mensagem: err.message
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+}
