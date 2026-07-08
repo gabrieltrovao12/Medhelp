@@ -1,5 +1,9 @@
 {
   "dependencies": {
-    "@modelcontextprotocol/server-gdrive": "^2025.1.14"
+    "@modelcontextprotocol/server-gdrive": "^2025.1.14",
+    "notebooklm-mcp-server": "^3.0.7"
+  },
+  "devDependencies": {
+    "dommatrix": "^1.0.3"
   }
 }
