@@ -49,3 +49,10 @@ Ao analisar, depurar ou evoluir qualquer código na estrutura do projeto, siga a
     *   Antes de propor o deploy final das automações (como `clasp push` no Apps Script), execute testes unitários e simulações com dados sintéticos no diretório temporário para comprovar a estabilidade do fluxo de dados.
     *   Verifique sempre a efetivação física de salvamento dos arquivos no disco rígido local (eliminando pendências visuais no editor com Ctrl+S) e force o recarregamento do espaço de trabalho (Reload Window) ao modificar drivers, tokens de credenciais ou arquivos `mcp_config.json`.
     *   **Polimento dos "Dez Por Cento"**: Entenda que testes automatizados cobrem apenas a estabilidade de backend. Para a experiência de visualização final (seja em emails em HTML ou cards de Obsidian), realize o polimento fino de layouts sobrepostos, espaçamentos, chaves monetárias (R$) e fluidez de navegação.
+
+---
+
+## 4. Política de Acesso a Arquivos (MCP vs Overgrive)
+* **Regra de Ouro:** É terminantemente proibido utilizar a pasta local mapeada pelo Overgrive para procurar arquivos como padrão no ambiente Medhelp. 
+* **Padrão de Busca:** Utilize SEMPRE as ferramentas do MCP (como o MCP do Google Drive e outros servidores configurados) para interações e buscas na nuvem.
+* **Exceções Permitidas:** O uso da sincronização local (Overgrive) só está autorizado exclusivamente para os projetos pessoais de **Flashcards** e do **Fazedor de Questões**. Para todo o restante do ecossistema, o uso do MCP é obrigatório.
