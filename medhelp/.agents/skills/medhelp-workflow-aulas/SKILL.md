@@ -76,3 +76,51 @@ Após geração de todos os subprodutos:
 ## 5. Troubleshooting Comum
 - Se uma aula não gerou, verifique se o arquivo `.txt` caiu na pasta correta ou foi barrado por acentuação (Unicode issue em nomes de arquivo).
 - Se arquivos de áudio não forem reconhecidos, cheque o charset no Python do Colab.
+
+---
+
+## 6. Geração do Bloco Python (Célula 3 - Colab) & Manipulação de Arquivos
+
+Sempre que o usuário enviar imagens de diretórios contendo gravações de aulas, ou uma lista textual de arquivos brutos, e solicitar a Célula 3 do Colab ou manipulações de documentos (Ghostscript e Pandoc), siga este protocolo:
+
+### A. Geração do Bloco Python (Célula 3 - Google Colab)
+1. **Extração e concatenação:** Extraia o nome exato com extensão de cada arquivo visível e concatene com `PREFIXO_AUDIO = "/content/drive/MyDrive/Áudios aulas/"` (usando o caminho da raiz do Google Drive).
+2. **Agrupamento:** Se uma aula for dividida em partes (ex: Parte 1 e Parte 2), agrupe-as em uma única entrada, declarando os arquivos em uma lista em `caminhos_audios`.
+3. **Nomenclatura da Saída (`nome_saida`):** Infira dinamicamente com base na Convenção de Nomenclatura do `gemini.md`: `[Matéria/Área] - [Nome da Aula] - [Tipo (Teórica/Prática)] - Parte [01/02]`. Remova underscores, timestamps ou prefixos numéricos do nome do arquivo original.
+4. **Caminho do PDF (`caminho_pdf`):** Defina como `None` por padrão, a menos que o usuário forneça o caminho do slide correspondente.
+5. **Geração do Prompt do Whisper (`prompt_whisper`):** Deve ser iniciado por `Aula de Medicina: `. Deve conter exatamente **40 termos médicos de alta complexidade** (fármacos, patologias, semiologia, latim, etc.) diretamente associados ao tema da aula, garantindo priming fonético perfeito para o Whisper. Nunca deixe vazio ou com menos de 40 termos.
+6. **Comentários Estruturais:** Preceda cada bloco de aula com o comentário `# ── AULA N ──` (onde N é o índice incremental a partir de 1).
+7. **Formato de Saída:** Retorne **estritamente o bloco de código Python** (uma lista de dicionários Python atribuída à variável `aulas_para_processar`), sem saudações ou explicações adjacentes.
+
+#### Exemplo de Output:
+```python
+aulas_para_processar = [
+    # ── AULA 1 ──
+    {
+        "nome_saida": "Cardiologia - Betabloqueadores - Teórica - Parte 01",
+        "caminhos_audios": [
+            PREFIXO_AUDIO + "cardio_beta_teorica_p1.m4a",
+        ],
+        "caminho_pdf": None,
+        "prompt_whisper": "Aula de Medicina: carvedilol, metoprolol, propranolol, atenolol, nebivolol, cronotropismo negativo, inotropismo negativo, bradicardia, broncoespasmo, asma brônquica, DPOC, bloqueio atrioventricular, insuficiência cardíaca congestiva, fração de ejeção, receptor beta-1, receptor beta-2, vasoconstrição periférica, hipertensão arterial, angina de peito, infarto agudo do miocárdio, taquiarritmia, rebote adrenérgico, claudicação intermitente, disfunção erétil, hipoglicemia mascarada, choque cardiogênico, remodelamento cardíaco, estimulação simpática, norepinefrina, epinefrina, cardioproteção, seletividade cardíaca, lipossolubilidade, depuração hepática, excreção renal, efeito de primeira passagem, posologia, descontinuação abrupta, hipotensão ortostática, intolerância ao exercício, tonus simpático...",
+    },
+]
+```
+
+### B. Manipulação de Arquivos via Ghostscript (Terminal Linux)
+Sempre que solicitado recorte ou compressão de PDF, retorne a instrução pronta usando Ghostscript (`gs`):
+- **Recortar páginas:**
+  `gs -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -dFirstPage=[PAG_INICIAL] -dLastPage=[PAG_FINAL] -sOutputFile=[SAIDA.pdf] [ENTRADA.pdf]`
+- **Comprimir PDF:**
+  `gs -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/[QUALIDADE] -sOutputFile=[SAIDA.pdf] [ENTRADA.pdf]`
+  *Qualidades (PDFSETTINGS):*
+  - `/prepress` (alta qualidade)
+  - `/printer` (qualidade de impressão)
+  - `/ebook` (equilíbrio médio)
+  - `/screen` (menor tamanho)
+
+### C. Conversão de Documentos via Pandoc (Terminal Linux)
+Sempre que solicitada a conversão de formatos de arquivos documentais, retorne o comando Pandoc direto:
+- **PDF para Word (.docx):** `pandoc entrada.pdf -o saida.docx`
+- **PDF para Markdown (.md):** `pandoc entrada.pdf -o saida.md`
+- **Markdown para Word (.docx):** `pandoc entrada.md -o saida.docx`

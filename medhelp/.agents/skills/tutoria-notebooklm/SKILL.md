@@ -170,13 +170,18 @@ OBJETIVOS DE APRENDIZAGEM
 
 ## 5. ETAPA 2 — Prompt de Conversão para config.json (Gemini/Claude)
 
-Após receber o roteiro do NotebookLM, este prompt é usado para converter o roteiro em JSON estruturado para o Colab. Os offsets dos livros e o roteiro devem ser inseridos nos placeholders correspondentes.
+Após receber o roteiro do NotebookLM, este prompt é usado para converter o roteiro em JSON estruturado para o Colab. Quando o próprio Antigravity for solicitado a fazer essa conversão localmente, ele deve atuar exatamente sob estas regras e usar os offsets armazenados abaixo.
 
 ```
 Você vai converter um roteiro de leitura acadêmico para JSON pronto para uso no Google Colab.
 
 ARQUIVOS DISPONÍVEIS NO DRIVE E SEUS OFFSETS:
-[INSERIR TABELA DE OFFSETS AQUI]
+
+  - 31102342-intoxicacao-exogena-guia-de-vigilancia-em-saude.pdf  offset: -1064  (13 págs.)
+  - MA - Boletim_Informativo_VSPEA_2025.pdf                        offset: +0     (8 págs.)
+  - MANUAL DE TOXICOLOGIA CLÍNICA - COVISA 2017.pdf               offset: +9     (475 págs.)
+  - MS - diretrizes-brasileiras-para-o-diagnostico-e-tratamento-de-intoxicacao-por-agrotoxicos.pdf  offset: +1     (127 págs.)
+  - Protocolo de Intoxicação.pdf                                 offset: -259   (13 págs.)
 
 ════════════════════════════════════
 REGRA DE FUSÃO DE OBJETIVOS
@@ -241,10 +246,10 @@ REGRAS DE CAMPOS
 ════════════════════════════════════
 
 * "objetivo" → número com dois dígitos ("01", "02"...)
-* "titulo" → texto do objetivo sem o número. Se houve fusão, crie um título unificado
+* "titulo" → texto do objetivo sem o número. Se houve fusão, crie um título unificado que abranja os dois objetivos
 * "fusao" → lista de strings, uma por objetivo fundido, no formato "Obj. XX — título completo exatamente como enunciado". Inclua apenas se dois ou mais objetivos foram fundidos
 * "ordem_motivo" → inclua apenas se a ordenação não for óbvia
-* "arquivo" → use exatamente o nome do arquivo conforme tabela acima
+* "arquivo" → use exatamente o nome do arquivo conforme a tabela de offsets acima
 * "capitulo" → copie exatamente como está no roteiro
 * "secao" → subtítulo ou seção citada no roteiro. Se o roteiro citar o capítulo completo, deixe ""
 * "nivel" → classifique cada corte como "conceito", "mecanismo" ou "clinica"
@@ -254,6 +259,8 @@ REGRAS DE CAMPOS
    PASSO 2 — Expanda o intervalo do roteiro para lista completa ANTES de aplicar offset
               Ex: pp. 246–251 → [246, 247, 248, 249, 250, 251]
    PASSO 3 — Some o offset a CADA número individualmente
+              Offset +9: 246 → 255, 247 → 256...
+              Offset -259: 260 → 1, 261 → 2...
    PASSO 4 — Verifique se todos os resultantes são ≥ 1
               Se algum for ≤ 0, coloque "VERIFICAR_OFFSET" no campo paginas
    PASSO 5 — O campo "paginas" recebe APENAS os números já convertidos
@@ -270,17 +277,17 @@ ESTRUTURA OBRIGATÓRIA
     "objetivo": "01",
     "titulo": "Título unificado se houve fusão, ou título original",
     "fusao": [
-      "Obj. 01 — Título completo do primeiro objetivo",
-      "Obj. 03 — Título completo do terceiro objetivo"
+      "Obj. 01 — Título completo do primeiro objetivo exatamente como foi enunciado",
+      "Obj. 03 — Título completo do terceiro objetivo exatamente como foi enunciado"
     ],
     "ordem_motivo": "Conceito base antes do mecanismo",
     "cortes": [
       {
-        "arquivo": "Parte_1_Saito.pdf",
-        "capitulo": "Cap. 13: Invasão Tumoral e Metástase",
-        "secao": "Processo Metastático",
-        "nivel": "conceito",
-        "paginas": [261, 262, 263]
+        "arquivo": "MANUAL DE TOXICOLOGIA CLÍNICA - COVISA 2017.pdf",
+        "capitulo": "Capítulo 4: Intoxicação por Antidepressivos Tricíclicos",
+        "secao": "Quadro Clínico",
+        "nivel": "clinica",
+        "paginas": [255, 256, 257]
       }
     ]
   }
@@ -290,6 +297,7 @@ ESTRUTURA OBRIGATÓRIA
 ROTEIRO PARA CONVERTER
 ════════════════════════════════════
 [COLE O ROTEIRO AQUI]
+```
 ```
 
 ---
