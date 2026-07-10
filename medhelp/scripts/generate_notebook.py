@@ -8,7 +8,7 @@ notebook = {
             "metadata": {},
             "source": [
                 "# Orquestrador Automático de Tutoria (PBL)\n",
-                "Este notebook extrai sumários de livros de medicina em PDF do Google Drive, mapeia objetivos usando a inteligência do Gemini (Antigravity SDK), e gera PDFs consolidados com capas premium."
+                "Este notebook extrai sumários de livros de medicina em PDF do Google Drive, mapeia objetivos usando a inteligência do Gemini (Google GenAI SDK), e gera PDFs consolidados com capas premium."
             ]
         },
         {
@@ -18,8 +18,7 @@ notebook = {
             "outputs": [],
             "source": [
                 "# 1. Instalação de Dependências\n",
-                "!pip install pymupdf pypdf reportlab pydantic python-dotenv google-antigravity \"protobuf>=5.29.1,<6.0.0\" --quiet\n",
-                "!pip install httpx==0.28.1 --quiet"
+                "!pip install pymupdf pypdf reportlab pydantic python-dotenv google-genai --quiet"
             ]
         },
         {
@@ -60,8 +59,8 @@ notebook = {
                 "import io\n",
                 "import pydantic\n",
                 "import fitz\n",
-                "os.environ[\"PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION\"] = \"python\"\n",
-                "from google.antigravity import Agent, LocalAgentConfig\n",
+                "from google import genai\n",
+                "from google.genai import types\n",
                 "from pypdf import PdfReader, PdfWriter, PageObject\n",
                 "from reportlab.pdfgen import canvas\n",
                 "from reportlab.lib.pagesizes import A4\n",
@@ -204,10 +203,17 @@ notebook = {
                 "2. pagina_final é a página da próxima seção menos 1.\n",
                 "3. Nível didático: 'conceito', 'mecanismo' ou 'clinica'.\"\"\"\n",
                 "    api_key = os.environ.get(\"GEMINI_API_KEY\")\n",
-                "    config = LocalAgentConfig(response_schema=RoteiroTutoria, system_instructions=system_prompt, model=\"gemini-1.5-pro\", api_key=api_key)\n",
-                "    async with Agent(config) as agent:\n",
-                "        resp = await agent.chat(f\"{contexto}\\n\\nOBJETIVOS:\\n{objetivos_text}\")\n",
-                "        return await resp.structured_output()\n",
+                "    client = genai.Client(api_key=api_key)\n",
+                "    response = await client.aio.models.generate_content(\n",
+                "        model='gemini-1.5-pro',\n",
+                "        contents=f\"{contexto}\\n\\nOBJETIVOS:\\n{objetivos_text}\",\n",
+                "        config=types.GenerateContentConfig(\n",
+                "            system_instruction=system_prompt,\n",
+                "            response_mime_type=\"application/json\",\n",
+                "            response_schema=RoteiroTutoria,\n",
+                "        )\n",
+                "    )\n",
+                "    return response.parsed\n",
                 "\n",
                 "async def run_medhelp(objetivos_text, refs_dir, out_dir):\n",
                 "    tocs = get_pdfs_tocs(refs_dir)\n",
@@ -255,7 +261,7 @@ notebook = {
     "nbformat_minor": 4
 }
 
-out_path = '/home/vvgfilhos/Gdrive/Logística - Drive/Tutoria/Orquestrador_Automatico.ipynb'
+out_path = '/home/vvgfilhos/medhelp/scripts/colab/Orquestrador_Automatico.ipynb'
 with open(out_path, 'w', encoding='utf-8') as f:
     json.dump(notebook, f, indent=2, ensure_ascii=False)
 print(f"Notebook salvo em {out_path}")
