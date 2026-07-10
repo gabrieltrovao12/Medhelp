@@ -20,3 +20,6 @@
 ### 3. Diretrizes de Coesão e Alinhamento
 - As respostas dos flashcards devem conter **Verdade Terrestre Estendida** (referências consagradas incorporadas de forma a trazer detalhes de dosagens, mecanismos fisiopatológicos e condutas completas).
 - Mantenha conformidade absoluta com o plugin **Obsidian Spaced Repetition** (linha `?` como delimitador, perguntas na linha superior, respostas em tópicos nas linhas seguintes, sem espaços em branco no corpo de resposta de um único card, e um pulo de linha simples entre cards).
+
+### 4. Estrutura de Diretórios e Versionamento
+- **Projetos Pessoais**: Todos os scripts, estudos e projetos pessoais (ex: análises em R, faculdade, etc.) estão agora unificados e versionados dentro de `~/medhelp/pessoal`. Esta decisão arquitetural evita problemas de sincronização e bagunça causados pelo Overgrive, centralizando o backup e o controle de versão diretamente no GitHub do projeto Medhelp.
