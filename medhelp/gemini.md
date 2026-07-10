@@ -1,48 +1,22 @@
-# Arquitetura e Esquema de Dados - Medhelp
+# Configurações Ativas e Regras de Negócio - Medhelp
 
-## Fluxo de Processamento de Aulas
-O sistema processa gravações de áudio e slides de apoio para gerar resumos em Markdown estruturados no formato Obsidian e flashcards no estilo Anki.
+## Fábrica de Flashcards por Subagentes
 
-```
-[0. Renomeação Inteligente (Gemini)] ◄── (Áudios salvos com nome rápido no celular)
-       │
-       ▼ (Renomeia fisicamente no Drive para padrão definitivo)
-[1. Colab / Whisper GPU] 
-       │
-       ▼ (Salva .txt com transcrição no Drive)
-[2. Colab Trigger] 
-       │
-       ▼ (HTTP POST Webhook)
-[3. Apps Script (doPost)]
-       │
-       ▼ (Chama Gemini 2.5 Flash + Aplica OCANES)
-[4. Geração de Arquivos] ──► [Resumo .md] ──► [Drive (Resumos_Prontos)]
-                         ──► [Flashcards .md] ──► [Drive (Flashcards)] ──► [Subpastas por Disciplina]
-       │
-       ▼ (Movimentação física de arquivos no Drive)
-[5. Limpeza de Áudio] ──► Move .txt para Arquivados, remove áudio de Entrada
-       │
-       ▼ (Sincronização via Overgrive)
-[6. Obsidian Local] ──► Arquivos aparecem prontos na máquina local
-```
+### 1. Parâmetros do Modelo (Simulação Local)
+- **Modelo de Simulação**: Gemini 3.5 Flash (utilizado via ambiente do chat ide de alta performance).
+- **Target Quantitativo**: 55 a 60 flashcards por problema de forma a cobrir exaustivamente todos os objetivos.
+- **Distribuição de Importância**: Ajustar a densidade de flashcards por objetivo baseado na relevância do tema (ex: no P4, calendário vacinal e ESAVI terão mais densidade do que conceitos gerais de imunização).
 
-## Convenção de Nomenclatura Final (Áudios)
-`[Matéria/Área] - [Nome da Aula] - [Tipo (Teórica/Prática)] - Parte [01/02]`
-*Exemplos de mapeamento por IA:*
-- `cardio - beta - pratica` ──► `LHM - Beta-bloqueadores - Prática - Parte 01.m4a`
-- `cirurgia hernia teorica p2` ──► `Cirurgia - Hérnias da Parede Abdominal - Teórica - Parte 02.m4a`
+### 2. Mapeamento de Metadados e Arquivos Locais
+- **Vault Obsidian Base**: `/home/vvgfilhos/Gdrive/Obsidian/Faculdade de Medicina1`
+- **Subpasta de Saída**: `📈Negócio/Flashcards`
+- **Arquivos a Criar**:
+  1. `Problema 01 - Triagem Neonatal, Icterícia e Puericultura - Flashcards.md`
+  2. `Problema 02 - Aleitamento Materno, Introdução Alimentar e Suplementação - Flashcards.md`
+  3. `Problema 03 - Crescimento, Desenvolvimento e Vigilância Infantil - Flashcards.md`
+  4. `Problema 04 - Vacinação, Calendários e ESAVI - Flashcards.md`
+  5. `Problema 05 - Adolescência, Puberdade e Saúde do Adolescente - Flashcards.md`
 
-## Configurações Ativas
-- **IDs de Pastas**:
-  - Entrada: `1qRBLRtpsNRUDiOn99mg2wA5qhwLvRJIh`
-  - Resumos: `1QnAfngespsRRQfEHouqcXq1x2MTxgPa6`
-  - Arquivados: `1R58WOeO0p3U51T05g-d-N9svziLSf9fL`
-  - Áudios: `1rXV-eovjzQvAQxVNWQtROIh7L_1oNAEC`
-- **Novos Caminhos Colab**:
-  - Base Tutoria: `/content/drive/MyDrive/Logística - Drive/Tutoria`
-  - Áudios Aulas: `/content/drive/MyDrive/Logística - Drive/Transcrições/Áudios aulas/`
-  - Transcrições Medicina: `/content/drive/MyDrive/Logística - Drive/Transcrições/Transcricoes_Medicina`
-  - Semestre letivo: `2026.2 - M6` (antigo `2026.1`)
-- **Modelo Utilizado**: `gemini-2.5-flash`
-- **Tempo Limite**: 4.5 minutos (270.000 ms) por execução do lote.
-
+### 3. Diretrizes de Coesão e Alinhamento
+- As respostas dos flashcards devem conter **Verdade Terrestre Estendida** (referências consagradas incorporadas de forma a trazer detalhes de dosagens, mecanismos fisiopatológicos e condutas completas).
+- Mantenha conformidade absoluta com o plugin **Obsidian Spaced Repetition** (linha `?` como delimitador, perguntas na linha superior, respostas em tópicos nas linhas seguintes, sem espaços em branco no corpo de resposta de um único card, e um pulo de linha simples entre cards).

@@ -1,24 +1,37 @@
-# Pesquisas e Limites Técnicos - Medhelp
+# Pesquisas e Limites Técnicos - Geração de Flashcards por Subagentes
 
-## 1. Webhooks no Google Apps Script (GAS)
-- **Método**: Funções `doPost(e)` ou `doGet(e)` são reservadas para responder a requisições HTTP externas quando o script é publicado como um **Aplicativo da Web** (Web App).
-- **Publicação**: 
-  - Executar no editor: *Implantar > Nova implantação*.
-  - Tipo: *Aplicativo da Web*.
-  - Executar como: *Eu (seu e-mail)*.
-  - Quem tem acesso: *Qualquer pessoa* (necessário para que o Colab consiga acessar sem login Google complexo).
-- **Retorno**: Deve retornar um objeto `TextOutput` formatado em JSON para que o cliente (Python) possa ler a resposta de forma estruturada.
+## 1. Mapeamento de Destinos
+- **Vault Local do Obsidian**: `/home/vvgfilhos/Gdrive/Obsidian/Faculdade de Medicina1`
+- **Pasta de Flashcards do Negócio**: `/home/vvgfilhos/Gdrive/Obsidian/Faculdade de Medicina1/📈Negócio/Flashcards`
+- **Lógica de Sincronização**: O Overgrive sincroniza a pasta local com o Google Drive `/Obsidian/faculdadedemedician1/negócio/Flashcards` na nuvem.
 
-## 2. Limites do Google Apps Script
-- **Runtime máximo**: 6 minutos por execução (4.5 min definidos no `CONFIG` por segurança).
-- **Chamadas de rede simultâneas**: Se múltiplas requisições chegarem ao mesmo tempo, o GAS as colocará em fila automaticamente, mas é recomendável rodar em lote sequencial ou ter trava de concorrência.
-- **Tratamento de exceções**: A função `doPost` deve envelopar a lógica em `try/catch` para retornar `status: "erro"` com status HTTP adequado em vez de lançar um erro de execução silencioso.
+## 2. Parâmetros de Estilo dos Flashcards (Obsidian Spaced Repetition)
+- **Pergunta / Resposta**:
+  ```markdown
+  Qual o marco do desenvolvimento motor com 2 meses?
+  ?
+  - **Controle cefálico**: mantém a cabeça erguida quando em decúbito ventral.
+  - Alerta: ==não deve apresentar hipotonia global persistente==.
+  ```
+- **Proibições Rígidas**:
+  - Emojis de qualquer tipo nas perguntas ou respostas.
+  - Qualquer tag HTML (ex: `<div>`, `<span>`, `<br>`).
+  - Linhas em branco intermediárias na resposta de um mesmo card.
+- **Marcações Visuais Obrigatórias**:
+  - Conceitos-chave em **negrito** (ex: **Hipotireoidismo Congênito**).
+  - Fármacos, doses e valores críticos em `código` (ex: `Levotiroxina`, `10 a 15 mcg/kg/dia`).
+  - Pontos de atenção crítica em realce duplo de igual (ex: ==realizar teste do pezinho entre o 3º e 5º dia de vida==).
+  - Cascatas causais e processos com `->` ou `=>`.
 
-## 3. Serviços Avançados do Drive API (v2)
-- **Descrição**: O script usa `Drive.Files.insert` para criar um Google Doc temporário a partir de um PDF de slide (OCR/conversão de formato).
-- **Ativação**: No editor do Google Apps Script, na barra lateral esquerda, clique no sinal de **+** ao lado de **Serviços**, selecione **Drive API** e clique em **Adicionar**. Sem isso, o script falhará com `ReferenceError: Drive is not defined`.
-
-## 4. Cotas do Gemini 2.5 Flash
-- **Limites**: O modelo `gemini-2.5-flash` tem uma cota padrão de 15 requisições por minuto (RPM).
-- **Tratamento**: Adicionar throttle (`Utilities.sleep(6000)`) entre processamento de arquivos para evitar erros de HTTP 429.
-
+## 3. Escopo por Problema (Subagentes)
+1. **Subagente P1 (Triagem Neonatal, Icterícia, Puericultura, 1100 dias)**
+   - Curadoria baseada no PDF 3 (Orelhinha, Olhinho, Teste do Pezinho, Bilirrubina/Icterícia, 1100 dias, Puericultura).
+   - Foco na identificação de problemas materno-fetais, cronograma de consultas, classificação do RN, icterícias neonatal (ABO, Rh, aleitamento, leite materno) e testes de triagem.
+2. **Subagente P2 (Aleitamento Materno, Micronutrientes, Suplementações)**
+   - Curadoria baseada no PDF 2 (Micronutrientes, suplementações obrigatórias de ferro/Vit D/Vit A/zinco em prematuros e a termo, intercorrências na amamentação, introdução alimentar).
+3. **Subagente P3 (Crescimento e Desenvolvimento, Curvas, Baixa Estatura, M-CHAT-R)**
+   - Curadoria baseada no PDF 4 (Crescimento e desenvolvimento, fatores de influência, vigilância do crescimento, percentis, escore Z, alvo estatural, baixa estatura constitucional vs patológica, marcos do neurodesenvolvimento de 0-2 anos, M-CHAT-R).
+4. **Subagente P4 (Vacinação, Princípios, Calendários, ESAVI)**
+   - Curadoria baseada no PDF 1 (Conceitos de vacinação, vacinas atenuadas vs inativadas, PNI vs SBP/SBIm, calendário de prematuros e a termo, contraindicações, precauções, ESAVI - vigilância e notificação).
+5. **Subagente P5 (Adolescência e Puberdade, Tanner, HEADSS, Saúde do Adolescente)**
+   - Curadoria baseada no PDF 5 (Adolescência vs Puberdade, sigilo médico/ética/lei, anamnese e HEADSS, estadiamento de Tanner, desenvolvimento psicossocial e neurodesenvolvimento, medidas de promoção de saúde - vacinas, exercícios, sono, alimentação).
