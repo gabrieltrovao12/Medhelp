@@ -60,6 +60,7 @@ notebook = {
                 "import io\n",
                 "import pydantic\n",
                 "import fitz\n",
+                "os.environ[\"PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION\"] = \"python\"\n",
                 "from google.antigravity import Agent, LocalAgentConfig\n",
                 "from pypdf import PdfReader, PdfWriter, PageObject\n",
                 "from reportlab.pdfgen import canvas\n",
