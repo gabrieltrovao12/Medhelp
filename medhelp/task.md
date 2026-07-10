@@ -1,19 +1,18 @@
-# Tarefas do Projeto - Medhelp (Fábrica de Flashcards por Subagentes)
+# Tarefas do Projeto - Medhelp
 
-- [x] [V.L.A.E.G.] Geração dos Flashcards por Subagentes Individuais
-  - [x] **Visão**: Mapear os objetivos e os mapas mentais anexados de cada problema (P1 a P5)
-  - [x] **Link**: Definir o caminho de destino local dos flashcards em `/home/vvgfilhos/Gdrive/Obsidian/Faculdade de Medicina1/📈Negócio/Flashcards/`
-  - [x] **Arquitetura**: Projetar e simular 5 subagentes especialistas estruturados, um para cada problema, aplicando as regras de estilização da skill `criar-flashcards-obsidian`
-  - [x] **Estilo**: Formatar cada arquivo com 55-60 flashcards atômicos de alta qualidade (conceitos em **negrito**, fármacos/doses em `código`, alertas em ==marcação dupla==, setas lógicas `->` ou `=>`, lista com `-` compacta)
-  - [x] **Gatilho**: Escrever fisicamente os arquivos no diretório de destino do vault local do Obsidian
+## FASE ATUAL: Integração do Vigia Local (Antigravity SDK) - [CANCELADA]
 
-- [x] Detalhamento das Etapas de Execução:
-  - [x] Executar Subagente do **Problema 01** (Triagem Neonatal, Icterícia, Puericultura, 1100 dias) -> Gerar 55-60 cards
-  - [x] Executar Subagente do **Problema 02** (Aleitamento Materno, Micronutrientes, Suplementações) -> Gerar 55-60 cards
-  - [x] Executar Subagente do **Problema 03** (Crescimento e Desenvolvimento, Curvas, Baixa Estatura, M-CHAT-R) -> Gerar 55-60 cards
-  - [x] Executar Subagente do **Problema 04** (Vacinação, Princípios, Calendários PNI/SBP, ESAVI) -> Gerar 55-60 cards
-  - [x] Executar Subagente do **Problema 05** (Adolescência e Puberdade, Tanner, HEADSS, Saúde do Adolescente) -> Gerar 55-60 cards
+- [x] Definir regras de negócio (pasta de entrada, roteamento de cadernos e auth) com o usuário.
+- [x] Cancelamento: Usuário percebeu que a automação em background (Vigia) não atende a necessidade de velocidade do fluxo de tutoria.
 
-- [x] Verificação e Validação:
-  - [x] Validar a quantidade exata de cards gerados (55-60 por arquivo)
-  - [x] Auditar a formatação sintática do Obsidian Spaced Repetition (sem tags HTML, sem emojis, linha `?` isolada, sem linhas em branco intermediárias na resposta)
+## FASE ATUAL: Orquestrador Acadêmico com Subagentes (SDK)
+
+- [x] Criar `scripts/orquestrador_academico.py` com schemas Pydantic e lógica de subagentes.
+- [x] Criar ou atualizar `requirements.txt` com `google-antigravity`.
+- [x] Refatorar a skill `criar-flashcards/SKILL.md` para acionar o orquestrador localmente.
+- [x] Refatorar a skill `elaborar-questoes-prova/SKILL.md` para acionar o orquestrador localmente.
+- [ ] Realizar teste laboratorial do script (a ser feito pelo usuário ao demandar a skill).
+
+## FASE ATUAL: Estrutura e Organização do Repositório
+
+- [x] Migrar pasta de projetos pessoais para `~/medhelp/pessoal` (fora da sincronização problemática do Overgrive e agora sob versionamento direto no GitHub do projeto).
