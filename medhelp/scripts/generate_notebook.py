@@ -18,7 +18,7 @@ notebook = {
             "outputs": [],
             "source": [
                 "# 1. Instalação de Dependências\n",
-                "!pip install pymupdf pypdf reportlab pydantic python-dotenv google-antigravity --quiet\n",
+                "!pip install pymupdf pypdf reportlab pydantic python-dotenv google-antigravity protobuf --upgrade --quiet\n",
                 "!pip install httpx==0.27.0 --quiet"
             ]
         },
