@@ -124,7 +124,7 @@ notebook = {
                 "    draw_wrapped_text(c, objetivo_titulo, width - 120, 60, height - 230, \\\"Helvetica-Bold\\\", 22, 30, colors.white)\\n",
                 "    c.setFont(\\\"Helvetica-Oblique\\\", 10)\\n",
                 "    c.setFillColorRGB(0.4, 0.4, 0.4)\\n",
-                "    c.drawString(60, 40, \\\"Gerado por Medhelp AI\\\")\\n",
+                "    c.drawString(60, 40, \\\"© Conteúdo Autoral • João Gabriel R. Trovão\\\")\\n",
                 "    c.save()\\n",
                 "    packet.seek(0)\\n",
                 "    return PdfReader(packet).pages[0]\\n",
