@@ -285,12 +285,19 @@ notebook = {
                 "            await asyncio.sleep(5)\n",
                 "    return None\n",
                 "\n",
-                "async def run_medhelp(objetivos_text, refs_dir, out_dir):\n",
+                "async def gerar_esboco(objetivos_text, refs_dir):\n",
+                "    print(\"Analisando sumários e consultando a API do Gemini...\")\n",
                 "    tocs = get_pdfs_tocs(refs_dir)\n",
-                "    data = await process_roteiro(objetivos_text, tocs)\n",
-                "    if data:\n",
-                "        gerar_pdfs(data, refs_dir, out_dir)\n",
-                "        print('✅ Processamento 100% Finalizado!')\n"
+                "    roteiro = await process_roteiro(objetivos_text, tocs)\n",
+                "    if roteiro:\n",
+                "        with open('roteiro_revisao.json', 'w', encoding='utf-8') as f:\n",
+                "            f.write(roteiro.model_dump_json(indent=4))\n",
+                "        print(\"✅ Esboço gerado com sucesso!\")\n",
+                "        print(\"👉 Dê um clique duplo no arquivo 'roteiro_revisao.json' no menu de Arquivos à esquerda.\")\n",
+                "        print(\"👉 Revise as páginas e os cortes. Se algo estiver errado, altere os números e salve (Ctrl+S).\")\n",
+                "        print(\"👉 Depois de salvar, rode a célula '6. EXPORTAR PDFs FINAIS'.\")\n",
+                "    else:\n",
+                "        print(\"❌ Falha ao gerar o roteiro.\")\n"
             ]
         },
         {
@@ -299,8 +306,8 @@ notebook = {
             "metadata": {},
             "outputs": [],
             "source": [
-                "# 5. EXECUÇÃO DA TUTORIA\n",
-                "# =========================\n",
+                "# 5. INSERIR OBJETIVOS E GERAR ESBOÇO\n",
+                "# ===================================\n",
                 "PASTA_LIVROS = \"/content/drive/MyDrive/Logística - Drive/Tutoria/Referências - MEDICINA\"\n",
                 "PASTA_SAIDA = \"/content/drive/MyDrive/Logística - Drive/Tutoria/saida/Tutoria_Teste\"\n",
                 "\n",
@@ -313,7 +320,35 @@ notebook = {
                 "nest_asyncio.apply()\n",
                 "import asyncio\n",
                 "\n",
-                "asyncio.run(run_medhelp(OBJETIVOS, PASTA_LIVROS, PASTA_SAIDA))\n"
+                "asyncio.run(gerar_esboco(OBJETIVOS, PASTA_LIVROS))\n"
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": None,
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "# 6. EXPORTAR PDFs FINAIS (Após sua revisão!)\n",
+                "# ==========================================\n",
+                "import json\n",
+                "import os\n",
+                "\n",
+                "def exportar_pdfs_finais():\n",
+                "    print(\"Lendo roteiro_revisao.json...\")\n",
+                "    if not os.path.exists('roteiro_revisao.json'):\n",
+                "        print(\"❌ Erro: Arquivo roteiro_revisao.json não encontrado. Rode a célula 5 primeiro.\")\n",
+                "        return\n",
+                "        \n",
+                "    with open('roteiro_revisao.json', 'r', encoding='utf-8') as f:\n",
+                "        dados = json.load(f)\n",
+                "        \n",
+                "    roteiro = RoteiroTutoria.model_validate(dados)\n",
+                "    print(\"Roteiro carregado com sucesso. Agrupando e gerando PDFs...\")\n",
+                "    gerar_pdfs(roteiro, PASTA_LIVROS, PASTA_SAIDA)\n",
+                "    print(\"✅ Todos os PDFs foram gerados e salvos no Drive!\")\n",
+                "\n",
+                "exportar_pdfs_finais()\n"
             ]
         }
     ],
