@@ -273,6 +273,7 @@ notebook = {
                 "- NEGATIVO: NUNCA invente páginas ou subseções que não estão no texto do sumário.\n",
                 "- POSITIVO: Busque cortes cirúrgicos de 2 a 10 páginas. O foco é a precisão absoluta.\n\n",
                 "[E] - EXEMPLOS (FEW-SHOT)\n",
+                "Exemplo 1 (Sucesso):\n",
                 "Objetivo: \"Efeitos da Maconha e Cocaína\".\n",
                 "Sumário Disponível:\n",
                 "Nível 1: Drogas\n",
@@ -284,6 +285,13 @@ notebook = {
                 "Cortes Gerados: \n",
                 "- Corte 1: \"Cocaína\" (p.50 até 59).\n",
                 "- Corte 2: \"Maconha\" (p.70 até 79).\n\n",
+                "Exemplo 2 (Inexistente no Sumário - Evitando Alucinação):\n",
+                "Objetivo: \"Fisiopatologia do Câncer de Mama\".\n",
+                "Sumário Disponível:\n",
+                "Nível 1: Psiquiatria\n",
+                "Nível 2: Depressão (p.10)\n\n",
+                "Raciocínio: O objetivo trata de Oncologia (Câncer de Mama). O sumário fornecido trata de Psiquiatria. Eu não posso inventar livros ou páginas que não estão no sumário. O corte será vazio.\n",
+                "Cortes Gerados: [] (lista vazia)\n\n",
                 "[S] - SAÍDA\n",
                 "Retorne OBRIGATORIAMENTE os dados estruturados conforme o JSON Schema exigido pela API (`RoteiroTutoria`). NÃO encapsule a resposta em blocos de código Markdown (como ```json). Retorne o JSON puro e direto.\"\"\"\n",
                 "    api_key = os.environ.get(\"GEMINI_API_KEY\")\n",
@@ -442,11 +450,7 @@ notebook = {
                 "2. Confrontar os conceitos clínicos e neurobiológicos...\n",
                 "\"\"\"\n",
                 "\n",
-                "import nest_asyncio\n",
-                "nest_asyncio.apply()\n",
-                "import asyncio\n",
-                "\n",
-                "asyncio.run(gerar_esboco(OBJETIVOS, PASTA_LIVROS))\n"
+                "await gerar_esboco(OBJETIVOS, PASTA_LIVROS)\n"
             ]
         },
         {
