@@ -16,3 +16,10 @@
 ## FASE ATUAL: Estrutura e Organização do Repositório
 
 - [x] Migrar pasta de projetos pessoais para `~/medhelp/pessoal` (fora da sincronização problemática do Overgrive e agora sob versionamento direto no GitHub do projeto).
+
+## FASE ATUAL: Unificação do Sistema de Flashcards no Apps Script (VLAEG)
+
+- [x] Desenhar a arquitetura de unificação (Monolito Modular).
+- [x] Criar os arquivos utilitários base: `Config.js`, `DriveUtils.js`, `NamingUtils.js`, `GeminiAPI.js`.
+- [x] Criar os gatilhos independentes: `Trigger_Resumos.js` e `Trigger_Tutoria.js`.
+- [ ] Revisão, testes de sintaxe e submissão dos novos scripts pelo painel web do Apps Script (Ação do Usuário).
