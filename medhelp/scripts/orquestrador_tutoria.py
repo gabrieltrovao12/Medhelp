@@ -40,6 +40,14 @@ class Objetivo(pydantic.BaseModel):
 class RoteiroTutoria(pydantic.BaseModel):
     objetivos: list[Objetivo]
 
+class TocItem(pydantic.BaseModel):
+    nivel: int
+    titulo: str
+    pagina: int
+
+class TocExtracted(pydantic.BaseModel):
+    itens: list[TocItem]
+
 # ==============================================================================
 # ESTÉTICA E REPORTLAB (Capas Premium)
 # ==============================================================================
@@ -128,7 +136,56 @@ def create_separator_page(livro: str, capitulo: str) -> PageObject:
 # PDF PROCESSING
 # ==============================================================================
 
-def get_pdfs_tocs(folder_path: str):
+async def extract_toc_with_gemini(pdf_path: str) -> list:
+    """Extrai o sumário das primeiras 40 páginas do PDF via LLM"""
+    try:
+        doc = fitz.open(pdf_path)
+        text = ""
+        for i in range(min(40, len(doc))):
+            text += f"\n--- PÁGINA {i+1} ---\n"
+            text += doc[i].get_text("text")
+        doc.close()
+        
+        if not text.strip():
+            return []
+            
+        sys_prompt = """Você é um especialista em estruturação de metadados de PDFs de medicina.
+Sua missão é extrair o Sumário (Table of Contents - TOC) do texto fornecido.
+O texto fornecido representa as primeiras páginas do livro.
+REGRAS OCANES:
+1. Encontre a seção "Sumário" ou "Índice".
+2. Extraia CADA item do sumário.
+3. Para cada item, determine o Nível Hierárquico (ex: Parte I = 1, Capítulo 1 = 2, Subseção = 3).
+4. Para cada item, extraia o Título.
+5. Para cada item, extraia a PÁGINA. Tente retornar a página REAL do PDF (ex: página do sumário + deslocamento das páginas iniciais).
+6. Retorne estritamente o Schema JSON exigido."""
+
+        api_key = os.environ.get("GEMINI_API_KEY")
+        if not api_key: return []
+
+        config = LocalAgentConfig(
+            response_schema=TocExtracted,
+            system_instructions=sys_prompt,
+            model="gemini-3.5-flash",
+            api_key=api_key
+        )
+        
+        async with Agent(config) as agent:
+            logging.info(f"Extraindo TOC de {os.path.basename(pdf_path)} via LLM...")
+            prompt = f"TEXTO DO INÍCIO DO LIVRO:\n{text}"
+            response = await agent.chat(prompt)
+            data = await response.structured_output()
+            
+            toc = []
+            if data and data.itens:
+                for item in data.itens:
+                    toc.append([item.nivel, item.titulo, item.pagina])
+            return toc
+    except Exception as e:
+        logging.error(f"Erro na extração de TOC via LLM para {pdf_path}: {e}")
+        return []
+
+async def get_pdfs_tocs(folder_path: str):
     """Lê a pasta de referências e extrai o sumário de todos os PDFs."""
     tocs = {}
     for filename in os.listdir(folder_path):
@@ -137,11 +194,13 @@ def get_pdfs_tocs(folder_path: str):
             try:
                 doc = fitz.open(filepath)
                 toc = doc.get_toc()
-                if not toc:
-                    logging.warning(f"O arquivo {filename} não possui um sumário (TOC) digital válido. "
-                                    f"Este arquivo será ignorado pelo orquestrador. Adicione um OCR/Bookmarks nele se precisar usá-lo.")
-                tocs[filename] = toc
                 doc.close()
+                if not toc or len(toc) < 15:
+                    logging.warning(f"O arquivo {filename} não possui um sumário (TOC) digital válido. Iniciando extração via IA...")
+                    toc = await extract_toc_with_gemini(filepath)
+                    if not toc:
+                        logging.warning(f"A IA também falhou ao extrair TOC de {filename}.")
+                tocs[filename] = toc
             except Exception as e:
                 logging.error(f"Erro ao ler TOC de {filename}: {e}")
     return tocs
@@ -224,6 +283,36 @@ def gerar_pdfs(roteiro: RoteiroTutoria, pdfs_dir: str, output_dir: str):
 # AGENT RUNNERS
 # ==============================================================================
 
+async def call_agent_with_fallback(system_prompt, prompt, response_schema, max_retries=6):
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        raise ValueError("GEMINI_API_KEY não foi encontrada no ambiente ou arquivo .env!")
+
+    models = ['gemini-3.5-flash', 'gemini-2.5-flash', 'gemini-1.5-flash']
+    
+    for tentativa in range(max_retries):
+        model_to_use = models[min(tentativa, len(models)-1)]
+        try:
+            config = LocalAgentConfig(
+                response_schema=response_schema,
+                system_instructions=system_prompt,
+                model=model_to_use,
+                api_key=api_key
+            )
+            async with Agent(config) as agent:
+                response = await agent.chat(prompt)
+                data = await response.structured_output()
+                if not data:
+                    raise ValueError("O modelo não retornou um JSON válido.")
+                return data
+        except Exception as e:
+            wait_time = 4 * (2 ** tentativa)
+            logging.error(f"Erro na API do Gemini com {model_to_use} (Tentativa {tentativa+1}/{max_retries}): {e}")
+            logging.info(f"Aguardando {wait_time}s antes da próxima tentativa com backoff exponencial...")
+            await asyncio.sleep(wait_time)
+            
+    return None
+
 async def process_roteiro(objetivos_text: str, tocs: dict):
     contexto_tocs = "SUMÁRIOS DISPONÍVEIS NAS REFERÊNCIAS:\n\n"
     has_valid_toc = False
@@ -252,23 +341,10 @@ REGRAS (OCANES):
 4. Classifique o nível didático rigorosamente como 'conceito', 'mecanismo' ou 'clinica'.
 5. Retorne os dados EXATAMENTE no schema JSON solicitado."""
 
-    api_key = os.environ.get("GEMINI_API_KEY")
-    if not api_key:
-        raise ValueError("GEMINI_API_KEY não foi encontrada no ambiente ou arquivo .env!")
-
-    config = LocalAgentConfig(
-        response_schema=RoteiroTutoria,
-        system_instructions=system_prompt,
-        model="gemini-3.5-flash",
-        api_key=api_key
-    )
-    
-    async with Agent(config) as agent:
-        logging.info("Solicitando mapeamento estruturado ao Gemini 3.5 Pro...")
-        prompt = f"{contexto_tocs}\n\nOBJETIVOS DE APRENDIZAGEM A MAPEAR:\n{objetivos_text}"
-        response = await agent.chat(prompt)
-        data = await response.structured_output()
-        return data
+    logging.info("Solicitando mapeamento estruturado via Fallback/Backoff...")
+    prompt = f"{contexto_tocs}\n\nOBJETIVOS DE APRENDIZAGEM A MAPEAR:\n{objetivos_text}"
+    data = await call_agent_with_fallback(system_prompt, prompt, RoteiroTutoria)
+    return data
 
 # ==============================================================================
 # MAIN ENTRYPOINT
@@ -289,7 +365,7 @@ async def main():
         objetivos_text = f.read()
 
     logging.info(f"Lendo PDFs da pasta: {args.refs}")
-    tocs = get_pdfs_tocs(args.refs)
+    tocs = await get_pdfs_tocs(args.refs)
     
     data = await process_roteiro(objetivos_text, tocs)
     
