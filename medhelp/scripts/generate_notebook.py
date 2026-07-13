@@ -18,7 +18,7 @@ notebook = {
             "outputs": [],
             "source": [
                 "# 1. Instalação de Dependências\n",
-                "!pip install pymupdf pypdf reportlab pydantic python-dotenv google-genai --quiet"
+                "!pip install pymupdf pypdf reportlab pydantic python-dotenv google-genai --quiet\n"
             ]
         },
         {
@@ -29,7 +29,7 @@ notebook = {
             "source": [
                 "# 2. Montagem do Google Drive\n",
                 "from google.colab import drive\n",
-                "drive.mount('/content/drive')"
+                "drive.mount('/content/drive')\n"
             ]
         },
         {
@@ -42,7 +42,7 @@ notebook = {
                 "import os\n",
                 "from google.colab import userdata\n",
                 "os.environ['GEMINI_API_KEY'] = userdata.get('GEMINI_API_KEY')\n",
-                "print('Chave configurada com sucesso!')"
+                "print('Chave configurada com sucesso!')\n"
             ]
         },
         {
@@ -68,6 +68,7 @@ notebook = {
                 "from reportlab.lib.units import inch\n",
                 "\n",
                 "logging.basicConfig(level=logging.INFO, format=\"%(levelname)s: %(message)s\")\n",
+                "logging.getLogger(\"pypdf\").setLevel(logging.ERROR)\n",
                 "\n",
                 "import typing\n",
                 "class Corte(pydantic.BaseModel):\n",

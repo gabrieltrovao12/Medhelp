@@ -17,6 +17,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+logging.getLogger("pypdf").setLevel(logging.ERROR)
 
 # Carrega variáveis de ambiente, incluindo GEMINI_API_KEY
 load_dotenv()
@@ -331,15 +332,29 @@ async def process_roteiro(objetivos_text: str, tocs: dict):
         logging.error("Nenhum livro fornecido possui Sumário (TOC) válido. Abortando processo de LLM.")
         return None
 
-    system_prompt = """Você é um Orquestrador de Roteiros de Tutoria Médica.
-Sua missão é mapear os Objetivos de Aprendizagem fornecidos para os capítulos corretos dos livros disponíveis.
+    system_prompt = """[O]
+Atuar como Orquestrador de Tutoria Médica (PBL), mapeando Objetivos de Aprendizagem para os capítulos cirurgicamente precisos dentro das literaturas disponíveis.
 
-REGRAS (OCANES):
-1. Use APENAS as páginas fornecidas nos sumários (TOCs) do contexto. Nunca invente capítulos ou livros.
-2. Como você tem o sumário completo com a página inicial de cada capítulo, defina a `pagina_final` do corte como a página inicial do capítulo/seção SEGUINTE menos 1. Se for o último do livro, estime +15 páginas.
-3. Se um objetivo abranger múltiplas doenças, crie cortes separados para cada doença/livro.
-4. Classifique o nível didático rigorosamente como 'conceito', 'mecanismo' ou 'clinica'.
-5. Retorne os dados EXATAMENTE no schema JSON solicitado."""
+[C]
+Você receberá os SUMÁRIOS DISPONÍVEIS e os OBJETIVOS DE APRENDIZAGEM A MAPEAR.
+O sumário contém o título do capítulo e a página inicial real do PDF.
+
+[A]
+1. Analise o objetivo de aprendizagem.
+2. Identifique na literatura qual(is) capítulo(s) o abordam perfeitamente.
+3. Defina a `pagina_inicial` como a página exata em que o capítulo inicia (fornecida no sumário).
+4. Calcule rigorosamente a `pagina_final`: localize o capítulo IMEDIATAMENTE subsequente no sumário do mesmo nível e subtraia 1 da página dele. 
+5. Se for o último capítulo do livro, calcule `pagina_final` como pagina_inicial + 15.
+6. Classifique o nível didático em 'conceito', 'mecanismo' ou 'clinica'.
+
+[N]
+- NUNCA iguale a pagina_final com a pagina_inicial. Um capítulo sempre tem extensão de múltiplas páginas.
+- NÃO invente capítulos, use APENAS os do sumário.
+- Retorne EXATAMENTE os dados no schema JSON, sem blocos markdown ao redor.
+
+[E]
+Se o sumário tem: "- Metástase (Página real: 252)" e logo depois "- Biomarcadores (Página real: 270)"
+Seu corte deve ser pagina_inicial: 252 e pagina_final: 269."""
 
     logging.info("Solicitando mapeamento estruturado via Fallback/Backoff...")
     prompt = f"{contexto_tocs}\n\nOBJETIVOS DE APRENDIZAGEM A MAPEAR:\n{objetivos_text}"
