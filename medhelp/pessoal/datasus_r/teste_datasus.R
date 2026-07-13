@@ -14,7 +14,7 @@ tryCatch({
     month_start = 1, 
     month_end = 1, 
     uf = "RR", 
-    information_system = "SINASC-DN"
+    information_system = "SINASC"
   )
   
   message("✓ Download concluído! Registros obtidos: ", nrow(dados_rr))
