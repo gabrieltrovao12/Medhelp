@@ -1,5 +1,13 @@
 # Tarefas do Projeto - Medhelp
 
+## FASE ATUAL: Refatoração Profissional - Automação de Transcrições (VLAEG)
+
+- [x] Dividir `Code.js` em múltiplos módulos funcionais (`Config.js`, `Prompt.js`, `GeminiClient.js`, `DriveManager.js`, `Main.js`).
+- [x] Aplicar padrões de JSDoc, Logging Avançado e tratamento de bordas (Exponential Backoff e Pausa Preditiva).
+- [x] Configurar `.clasp.json` (mantido o existente do usuário).
+- [x] Excluir o antigo monolito `Code.js`.
+- [x] O usuário fará o push final e revisão via `clasp push`.
+
 ## FASE ATUAL: Integração do Vigia Local (Antigravity SDK) - [CANCELADA]
 
 - [x] Definir regras de negócio (pasta de entrada, roteamento de cadernos e auth) com o usuário.
@@ -17,7 +25,7 @@
 
 - [x] Migrar pasta de projetos pessoais para `~/medhelp/pessoal` (fora da sincronização problemática do Overgrive e agora sob versionamento direto no GitHub do projeto).
 
-## FASE ATUAL: Unificação do Sistema de Flashcards no Apps Script (VLAEG)
+## FASE ANTERIOR: Unificação do Sistema de Flashcards no Apps Script (VLAEG)
 
 - [x] Desenhar a arquitetura de unificação (Monolito Modular).
 - [x] Criar os arquivos utilitários base: `Config.js`, `DriveUtils.js`, `NamingUtils.js`, `GeminiAPI.js`.

@@ -19,9 +19,17 @@ const CONFIG = {
   
   // Mapeamento de Disciplinas (usado principalmente pelos Resumos)
   DISCIPLINAS: {
-    'radiologia': 'LMF - Radiologia',
-    'rastreio':   'LMF - Radiologia',
-    'torax':      'LMF - Radiologia',
+    // Básicas
+    'anatomia':   'Anatomia',
+    'histologia': 'Histologia',
+    'fisiologia': 'Fisiologia',
+    'bioquimica': 'Bioquímica',
+    'genetica':   'Genética',
+    'embriologia':'Embriologia',
+    'imuno':      'Imunologia',
+    'microbio':   'Microbiologia',
+    
+    // Herdadas / Específicas antigas
     'patologia':  'Patologia',
     'parasito':   'Parasitologia',
     'amebias':    'Parasitologia',
@@ -29,6 +37,34 @@ const CONFIG = {
     'farmaco':    'Farmacologia',
     'antimetab':  'Farmacologia',
     'antineopla': 'Farmacologia',
+    
+    // Clínicas
+    'cardio':     'Cardiologia',
+    'pneumo':     'Pneumologia',
+    'nefro':      'Nefrologia',
+    'gastro':     'Gastroenterologia',
+    'endrocrino': 'Endocrinologia',
+    'neuro':      'Neurologia',
+    'hemato':     'Hematologia',
+    'infecto':    'Infectologia',
+    'reumato':    'Reumatologia',
+    'dermato':    'Dermatologia',
+    'onco':       'Oncologia',
+
+    // Cirúrgicas e Grandes Áreas
+    'cirurgia':   'Cirurgia',
+    'pedia':      'Pediatria',
+    'gineco':     'Ginecologia e Obstetrícia',
+    'psiquiatria':'Psiquiatria',
+    'preventiva': 'Medicina Preventiva',
+    'ortopedia':  'Ortopedia',
+    'oftalmo':    'Oftalmologia',
+    'otorrino':   'Otorrinolaringologia',
+
+    // Especiais (LMF / LHM) herdados do original
+    'radiologia': 'LMF - Radiologia',
+    'rastreio':   'LMF - Radiologia',
+    'torax':      'LMF - Radiologia',
     'clinica':    'LHM - Clínica',
     'fetal':      'LHM - Clínica',
     'obstetri':   'LHM - Clínica'
@@ -83,7 +119,7 @@ Qual a fisiopatologia da formação de **ascite** na cirrose?
 - Separar um flashcard do outro com EXATAMENTE uma linha em branco.
 
 ### CONTEÚDO PARA PROCESSAR:
-\${content}
+${content}
 `.trim();
   },
 
@@ -91,17 +127,17 @@ Qual a fisiopatologia da formação de **ascite** na cirrose?
     const minFlashcards = Math.max(5, limite - 2);
     return `
 ### [O] - Objetivo
-Converter o PDF de tutoria fornecido em exatamente entre \${minFlashcards} e \${limite} flashcards de revisão no formato de Pergunta e Resposta (Q&A) otimizados para o Obsidian Spaced Repetition, utilizando uma arquitetura visual de micro-tópicos hierárquicos.
+Converter os objetivos de aprendizado extraídos do PDF de tutoria em exatamente entre ${minFlashcards} e ${limite} flashcards de revisão no formato de Pergunta e Resposta (Q&A), otimizados para o Obsidian Spaced Repetition, utilizando uma arquitetura visual de micro-tópicos hierárquicos.
 
 ### [C] - Contexto
-- **Arquivo de Origem:** \${nomeArquivo}
-- **Fidelidade e Escopo:** O PDF dita o escopo e os objetivos a serem estudados.
-- **Enriquecimento Científico (Verdade Terrestre Estendida):** Use o PDF como mapa, mas é OBRIGATÓRIO enriquecer as respostas consultando literatura médica consagrada (UpToDate, Harrison, etc.). Detalhe mecanismos fisiopatológicos, doses e cascatas que o PDF apenas cita superficialmente.
+- **Arquivo de Origem:** ${nomeArquivo}
+- **Escopo Restrito (ANTOLHO):** LEIA APENAS A CAPA / PÁGINA 1 do PDF fornecido para extrair os "Objetivos de Aprendizado" ou o tema central do problema. IGNORE SUMARIAMENTE todo o restante do conteúdo escrito pelos alunos no PDF.
+- **Verdade Terrestre Externa:** Após identificar os objetivos na capa, É OBRIGATÓRIO formular as respostas dos flashcards utilizando **exclusivamente** literatura médica consagrada (ex: Harrison, Robbins, Guyton, UpToDate). Não confie nem reproduza o texto das anotações dos alunos. Detalhe mecanismos fisiopatológicos, doses e cascatas com rigor acadêmico.
 - **Idioma:** Português (Brasil).
 
 ### [A] - Ações
-1. **Identificação e Ordenação:** Varra o PDF e mapeie os objetivos de aprendizado declarados.
-2. **Geração Proporcional:** Distribua os \${limite} flashcards de forma equilibrada, seguindo a ordem dos objetivos.
+1. **Extração Cirúrgica:** Varra APENAS a primeira página do PDF e mapeie os objetivos de aprendizado declarados. Aborte a leitura das páginas seguintes.
+2. **Geração Científica:** Responda aos objetivos mapeados cruzando com sua base acadêmica de mais alto nível. Distribua os ${limite} flashcards de forma equilibrada, seguindo a ordem dos objetivos.
 3. **Atomização:** Cada pergunta deve testar um conceito específico.
 4. **Hierarquia Visual (Design do Card):** 
    - Estruture a resposta com listas de marcadores (\`-\`).
@@ -112,6 +148,7 @@ Converter o PDF de tutoria fornecido em exatamente entre \${minFlashcards} e \${
    - Use setas (\`->\`) para descrever fluxos e reações.
 
 ### [N] - Normas (Guardrails)
+- **PROIBIDO** utilizar as anotações do corpo do PDF (páginas seguintes) para embasar as respostas. O PDF serve única e exclusivamente para apontar quais são os objetivos.
 - **PROIBIDO** pular linhas (deixar linhas vazias) dentro da resposta de um mesmo card. Isso quebra o plugin.
 - **PROIBIDO** usar HTML ou respostas em formato de parágrafos densos. Use apenas tópicos curtos e diretos.
 - **PROIBIDO** emitir explicações, preâmbulos ou notas. Retorne apenas o conteúdo em Markdown puro.
