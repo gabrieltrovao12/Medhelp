@@ -59,8 +59,12 @@ function processarNovasTranscricoes() {
 
     if (resumoGerado) {
       try {
+        // Limpa a string "(Resumo)" ou variações do nome do arquivo para usar como título H1
+        const tituloLimpo = nomeLimpo.replace(/\s*\(Resumo\)\s*/gi, '').trim();
+        const resumoFinal = `# ${tituloLimpo}\n\n${resumoGerado}`;
+
         // Cria o resumo em Markdown na pasta destino
-        pastaResumos.createFile(nomeLimpo + '.md', resumoGerado, MimeType.PLAIN_TEXT);
+        pastaResumos.createFile(nomeLimpo + '.md', resumoFinal, MimeType.PLAIN_TEXT);
 
         arquivo.moveTo(pastaArquivados);
         
