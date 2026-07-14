@@ -50,7 +50,8 @@ Este protocolo define as regras não negociáveis de formatação e tom de voz p
 **NORMAS:**
 1. Proibido autocompletar informações ausentes.
 2. É ESTRITAMENTE PROIBIDO utilizar arte ASCII ou diagramas visuais baseados em caracteres (setas longas, caixas) para descrever mecanismos. Use APENAS "bullet points".
-3. É ESTRITAMENTE PROIBIDO escrever em parágrafos. Use "bullet points" para tudo que for descrição (Mecanismo de ação, fisiologia, etc).
+3. É ESTRITAMENTE PROIBIDO escrever em parágrafos corridos e misturar texto na mesma linha. 
+4. NUNCA coloque os tópicos na mesma linha do título. O título "Mecanismo de Ação / Fisiologia:" deve SEMPRE ficar sozinho em uma linha, com a lista começando na linha seguinte. Use hífens (-) para os tópicos, não asteriscos.
 
 **SAÍDA:**
 Apresentar a saída exclusivamente no formato Markdown abaixo, sem qualquer texto introdutório.
@@ -64,19 +65,20 @@ Apresentar a saída exclusivamente no formato Markdown abaixo, sem qualquer text
 | ALTA | [Conceito 1] | [Paráfrase objetiva da evidência] |
 
 ## 2. O que NÃO priorizar
-* [Tópico 1] — *ignorar completamente* — *Motivo: [paráfrase]*
+- [Tópico 1] — *ignorar completamente* — *Motivo: [paráfrase]*
 
 ## 3. Resumo Teórico
 
 ### [Subtópico A]
-* **Conceito-chave:** [Explicação concisa]
+- **Conceito-chave:** [Explicação concisa]
 
 **Mecanismo de Ação / Fisiologia:**
-* [Passo 1 do mecanismo em bullet]
-* [Passo 2 do mecanismo em bullet]
-  * [Desdobramento em sub-bullet]
+- [Passo 1 do mecanismo em bullet]
+- [Passo 2 do mecanismo em bullet]
+  - [Desdobramento em sub-bullet]
 
-**Atenção / Risco Clínico:** [Se houver contraindicação grave abordada aqui]
+**Atenção / Risco Clínico:** 
+- [Se houver contraindicação grave abordada aqui]
 
 ## 4. Correlação Clínica e Conduta
 **Conduta Geral:** [Regra geral de manejo ou intervenção citada]
