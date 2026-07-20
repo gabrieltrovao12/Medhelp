@@ -8,7 +8,7 @@
 - [x] Excluir o antigo monolito `Code.js`.
 - [x] O usuário fará o push final e revisão via `clasp push`.
 - [x] **[NOVO]** Abandono e deleção oficial da pasta `pre-transcricao/`. O setup "Célula 3" agora será feito manualmente pelo usuário no Colab.
-- [x] **[NOVO]** Remoção completa da integração do Gemini (Priming Automático) do `Transcribe.ipynb` para otimização e limpeza, já que o usuário utilizará o "James" externamente. Ordem de execução original do motor (Transcrição -> Extração OCR) restaurada.
+- [x] **[NOVO]** Remoção completa da integração do Gemini (Priming Automático) do `Transcribe.ipynb` e migração de `openai-whisper` para `faster-whisper` (CTranslate2) na Célula 4, garantindo otimização de velocidade e memória sem perda de qualidade.
 
 ## FASE ATUAL: Integração do Vigia Local (Antigravity SDK) - [CANCELADA]
 
