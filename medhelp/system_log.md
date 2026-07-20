@@ -1,5 +1,13 @@
 # Log de Sistema - Medhelp
 
+## 2026-07-20 — Correção Arquitetural Crítica no Transcribe.ipynb (Fim do pré-transcrição)
+- **Arquivos:** `scripts/colab/Transcribe.ipynb` e exclusão de `scripts/apps-script/pre-transcricao/`
+- **Descrição:** Abandono oficial do script de pré-transcrição no Google Apps Script após deliberação conjunta. O usuário optou por montar a Célula 3 manualmente para ter mais controle.
+- **Remoção do Priming Automático:** O usuário solicitou a remoção completa da função de "Priming Automático via Gemini" de dentro do notebook, pois essa etapa já é realizada manualmente com maior precisão usando a persona "James" no chat nativo do Gemini.
+- **Correções Aplicadas:** 
+  1. Deleção completa do Apps Script legado (`pre-transcricao/`).
+  2. Limpeza da Célula 4 do `Transcribe.ipynb`, removendo as integrações com a API do Gemini e retornando à ordem de execução original e otimizada (Transcrição -> Extração OCR) para máxima economia de VRAM na GPU do Colab.
+
 ## 2026-07-08 — Otimização de Prompts de Tutoria (PDF) e Meta de 55 Flashcards
 - **Arquivos:** `scripts/apps-script/flashcards/Código.js` e `scripts/apps-script/Código.js`
 - **Descrição:** Refatoração do prompt `buildPromptPDF` utilizando o framework OCANES estrito para priorizar a ordenação de objetivos e enriquecimento por referências consagradas. Adicionada lógica matemática no loop de arquivos para dividir proporcionalmente a meta de 55 flashcards totais da tutoria entre os PDFs de objetivos da pasta.
