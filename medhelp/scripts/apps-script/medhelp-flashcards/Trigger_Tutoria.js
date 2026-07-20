@@ -87,11 +87,13 @@ function processarFlashcardsDeTutoria() {
 
     const flashcards = GeminiAPI.gerarComPDF(pdfBase64, nomeOriginal, limiteLocal, apiKey);
     if (flashcards) {
-      blocosConsolidados.push(`## 📖 ${nomeOriginal.replace(/\.pdf$/i, '')}\n\n${flashcards.trim()}`);
+      blocosConsolidados.push(`## 📎 ${nomeOriginal.replace(/\.pdf$/i, '')}\n\n${flashcards.trim()}`);
       metaNomes.push(`> - ${nomeOriginal}`);
       console.log(`[SUCESSO] Conteúdo gerado para ${nomeOriginal}.`);
+      SheetsLogger.registrar({ script: 'Tutoria', arquivo: nomeOriginal, disciplina: 'Tutoria', status: 'SUCESSO', duracao: Math.round((Date.now() - tempoInicio) / 1000) });
     } else {
       console.error(`[ERRO] Gemini não retornou dados para o PDF.`);
+      SheetsLogger.registrar({ script: 'Tutoria', arquivo: nomeOriginal, disciplina: 'Tutoria', status: 'ERRO_API', duracao: 0 });
     }
 
     Utilities.sleep(CONFIG.DELAY_ENTRE_ARQUIVOS_MS); // Throttling Preditivo
@@ -112,4 +114,18 @@ function processarFlashcardsDeTutoria() {
   const duracao = Math.round((Date.now() - tempoInicio) / 1000);
   console.log(`[FIM] Concluído em ${duracao}s.`);
   console.log(`============================================================\n`);
+
+  // Notificação por e-mail — enviada apenas se houve consolidação gerada
+  if (blocosConsolidados.length > 0) {
+    try {
+      MailApp.sendEmail({
+        to: Session.getEffectiveUser().getEmail(),
+        subject: `[Medhelp ✅] Flashcards de Tutoria gerados (${blocosConsolidados.length} PDF(s))`,
+        body: `Relatório do ciclo de Flashcards (Tutoria) — ${new Date().toLocaleString('pt-BR')}\n\n✅ PDFs processados: ${blocosConsolidados.length}\nTempo de execução: ${duracao}s\n\nArquivos prontos em: Drive → Flashcards_Prontos/Tutoria/`
+      });
+      console.log('[EMAIL] Notificação enviada.');
+    } catch (e) {
+      console.warn(`[EMAIL] Falha ao enviar notificação: ${e.message}`);
+    }
+  }
 }

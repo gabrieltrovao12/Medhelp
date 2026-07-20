@@ -15,7 +15,7 @@ const CONFIG = {
   MAX_RETRIES: 4,                   // Tentativas em caso de erro 429/500
   
   // Modelo Gemini
-  GEMINI_MODEL: 'gemini-3.5-flash',
+  GEMINI_MODEL: 'gemini-2.5-flash',
   
   // Mapeamento de Disciplinas (usado principalmente pelos Resumos)
   DISCIPLINAS: {

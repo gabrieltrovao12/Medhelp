@@ -63,8 +63,9 @@ function processarNovasTranscricoes() {
         const tituloLimpo = nomeLimpo.replace(/\s*\(Resumo\)\s*/gi, '').trim();
         const resumoFinal = `# ${tituloLimpo}\n\n${resumoGerado}`;
 
-        // Cria o resumo em Markdown na pasta destino
-        pastaResumos.createFile(nomeLimpo + '.md', resumoFinal, MimeType.PLAIN_TEXT);
+        // Salva o resumo como "TEMA.md" — sem "(Resumo)" no nome do arquivo
+        // O script de flashcards localiza o arquivo pelo mesmo padrão de nome limpo
+        pastaResumos.createFile(tituloLimpo + '.md', resumoFinal, MimeType.PLAIN_TEXT);
 
         arquivo.moveTo(pastaArquivados);
         
@@ -73,16 +74,19 @@ function processarNovasTranscricoes() {
 
         console.log(`[SUCESSO] "${nomeLimpo}.md" gerado e salvo. Original arquivado com sucesso.`);
         processados++;
+        SheetsLogger.registrar({ script: 'ResumosTranscricao', arquivo: nomeOriginal, disciplina: 'Resumo', status: 'SUCESSO', duracao: Math.round((Date.now() - tempoInicio) / 1000) });
 
       } catch (e) {
         console.error(`[ERRO] Falha de I/O ao salvar o arquivo "${nomeLimpo}": ${e.message}. ` +
                       'O arquivo .txt permanece na pasta de entrada para tentativa futura.');
         falhas++;
+        SheetsLogger.registrar({ script: 'ResumosTranscricao', arquivo: nomeOriginal, disciplina: 'Resumo', status: 'ERRO_IO', duracao: 0 });
       }
     } else {
       console.error(`[FALHA] API não retornou texto válido para "${nomeOriginal}". ` +
                     'O arquivo .txt permanece na pasta de entrada para revisão ou próxima tentativa.');
       falhas++;
+      SheetsLogger.registrar({ script: 'ResumosTranscricao', arquivo: nomeOriginal, disciplina: 'Resumo', status: 'ERRO_API', duracao: 0 });
     }
 
     // Pausa Preditiva (Throttling) entre arquivos para segurança do Rate Limit
@@ -93,6 +97,32 @@ function processarNovasTranscricoes() {
   }
 
   console.log(`\n[FIM] Ciclo concluído. Processados: ${processados} | Falhas: ${falhas}`);
+
+  // Notificação por e-mail — enviada apenas se houve atividade
+  if (processados > 0 || falhas > 0) {
+    try {
+      const assunto = falhas > 0
+        ? `[Medhelp ⚠️] Pipeline: ${processados} OK, ${falhas} FALHA(S)`
+        : `[Medhelp ✅] Pipeline concluído: ${processados} resumo(s) gerado(s)`;
+
+      const corpo = `Relatório do ciclo de Automação de Resumos — ${new Date().toLocaleString('pt-BR')}
+
+✅ Processados com sucesso: ${processados}
+❌ Falhas:                  ${falhas}
+
+${falhas > 0 ? '⚠️ Arquivos com falha permanecem na pasta de entrada para próxima tentativa.\nVerifique o Log do Apps Script para detalhes.\n' : ''}
+Resumos prontos em: Drive → Resumos_Prontos/`;
+
+      MailApp.sendEmail({
+        to: Session.getEffectiveUser().getEmail(),
+        subject: assunto,
+        body: corpo
+      });
+      console.log('[EMAIL] Notificação de relatório enviada.');
+    } catch (e) {
+      console.warn(`[EMAIL] Falha ao enviar notificação: ${e.message}`);
+    }
+  }
 }
 
 /**
