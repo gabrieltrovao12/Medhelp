@@ -1,5 +1,22 @@
 # Log de Sistema - Medhelp
 
+## 2026-07-20 — Melhorias de Alta Prioridade: Email, Sheets, Nomenclatura e Portabilidade
+- **Arquivos:** `automacao-transcricoes/Config.js`, `automacao-transcricoes/Main.js`, `medhelp-flashcards/Trigger_Resumos.js`, `medhelp-flashcards/Trigger_Tutoria.js`, `medhelp-flashcards/SheetsLogger.js` [NEW], `scripts/orquestrador_academico.py`
+- **Correções Aplicadas:**
+  1. **Bug extra:** `automacao-transcricoes/Config.js` também usava `gemini-3.5-flash` inexistente. Corrigido para `gemini-2.5-flash`.
+  2. **Unificação de nomenclatura:** `Main.js` passou a salvar o resumo como `tituloLimpo.md` (sem `(Resumo)` no nome do arquivo). O `NamingUtils` já esperava esse padrão. Agora o pipeline ponta-a-ponta é coerente.
+  3. **Email de notificação:** `MailApp.sendEmail` adicionado ao final de `processarNovasTranscricoes()`, `processarFlashcardsDeResumos()` e `processarFlashcardsDeTutoria()`. Disparado apenas quando há atividade real. Assunto diferenciado por ✅ (sucesso) ou ⚠️ (falha).
+  4. **Painel Google Sheets:** Criado `SheetsLogger.js` com `SheetsLogger.registrar()`. Ativado via Script Property `SHEETS_LOG_ID`. Auto-gera cabeçalho. Fail-safe (nunca bloqueia o pipeline). Integrado em `Trigger_Resumos.js` e `Trigger_Tutoria.js`.
+  5. **Portabilidade:** `orquestrador_academico.py` agora lê `OBSIDIAN_BASE` via `os.environ.get()`, mantendo o caminho Linux como fallback.
+
+
+- **Arquivos:** `medhelp-flashcards/Config.js`, `medhelp-flashcards/Setup.js`, e `scripts/colab/Transcribe.ipynb`
+- **Descrição:** Resolução dos 3 bugs mais críticos identificados no pipeline.
+- **Correções Aplicadas:** 
+  1. Correção da variável `GEMINI_MODEL` de `gemini-3.5-flash` (inexistente) para `gemini-2.5-flash` em `Config.js`.
+  2. Implementação e configuração dos triggers temporais automatizados com a nova função `setupFlashcardsTriggers()` dentro do script `Setup.js`.
+  3. Integração total do webhook no final do processamento do Whisper no Google Colab, garantindo o envio imediato da requisição POST na Célula 4 para inicializar a geração do pipeline OCANES no Apps Script sem atrasos.
+
 ## 2026-07-20 — Correção Arquitetural Crítica no Transcribe.ipynb (Fim do pré-transcrição)
 - **Arquivos:** `scripts/colab/Transcribe.ipynb` e exclusão de `scripts/apps-script/pre-transcricao/`
 - **Descrição:** Abandono oficial do script de pré-transcrição no Google Apps Script após deliberação conjunta. O usuário optou por montar a Célula 3 manualmente para ter mais controle.

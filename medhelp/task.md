@@ -1,6 +1,12 @@
 # Tarefas do Projeto - Medhelp
 
-## FASE ATUAL: Refatoração Profissional - Automação de Transcrições (VLAEG)
+## FASE ATUAL: Resolução de Bugs Críticos de Automação
+
+- [x] Corrigir modelo Gemini inexistente (`gemini-3.5-flash` para `gemini-2.5-flash`) em `medhelp-flashcards/Config.js`.
+- [x] Integrar acionamento de Webhook no Colab (`Transcribe.ipynb`) ao final da Célula 4.
+- [x] Criar rotina de inicialização de Triggers (`Setup.js`) para automatizar os Flashcards.
+
+## FASE ANTERIOR: Refatoração Profissional - Automação de Transcrições (VLAEG)
 
 - [x] Dividir `Code.js` em múltiplos módulos funcionais (`Config.js`, `Prompt.js`, `GeminiClient.js`, `DriveManager.js`, `Main.js`).
 - [x] Aplicar padrões de JSDoc, Logging Avançado e tratamento de bordas (Exponential Backoff e Pausa Preditiva).

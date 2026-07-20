@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "scientific-slides": {
+      "source": "smithery.ai",
+      "sourceType": "well-known",
+      "computedHash": "1d5776e2706957f5b65b7466b541ed59ce686b09e800606afbf55ced85a0db63"
+    }
+  }
+}

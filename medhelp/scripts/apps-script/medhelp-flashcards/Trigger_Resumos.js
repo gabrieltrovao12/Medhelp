@@ -69,11 +69,14 @@ function processarFlashcardsDeResumos() {
         DriveUtils.saveMarkdown(nomeDestino, flashcards, disciplina, metaData);
         console.log(`[SUCESSO] Salvo o arquivo "${nomeDestino}".`);
         sucesso++;
+        SheetsLogger.registrar({ script: 'Resumos', arquivo: nomeDestino, disciplina, status: 'SUCESSO', duracao: Math.round((Date.now() - tempoInicio) / 1000) });
       } catch (e) {
         console.error(`[ERRO] Falha ao salvar no Drive: ${e.message}`);
+        SheetsLogger.registrar({ script: 'Resumos', arquivo: nomeDestino, disciplina, status: 'ERRO', duracao: 0 });
       }
     } else {
       console.error(`[ERRO] Gemini não retornou dados.`);
+      SheetsLogger.registrar({ script: 'Resumos', arquivo: nomeOriginal, disciplina, status: 'ERRO_API', duracao: 0 });
     }
 
     Utilities.sleep(CONFIG.DELAY_ENTRE_ARQUIVOS_MS); // Throttling Preditivo
@@ -82,4 +85,18 @@ function processarFlashcardsDeResumos() {
   const duracao = Math.round((Date.now() - tempoInicio) / 1000);
   console.log(`[FIM] Concluído em ${duracao}s. Sucessos: ${sucesso}`);
   console.log(`============================================================\n`);
+
+  // Notificação por e-mail — enviada apenas se houve atividade
+  if (sucesso > 0) {
+    try {
+      MailApp.sendEmail({
+        to: Session.getEffectiveUser().getEmail(),
+        subject: `[Medhelp ✅] ${sucesso} flashcard(s) gerado(s) a partir de Resumos`,
+        body: `Relatório do ciclo de Flashcards (Resumos) — ${new Date().toLocaleString('pt-BR')}\n\n✅ Flashcards gerados: ${sucesso}\nTempo de execução: ${duracao}s\n\nArquivos prontos em: Drive → Flashcards_Prontos/`
+      });
+      console.log('[EMAIL] Notificação enviada.');
+    } catch (e) {
+      console.warn(`[EMAIL] Falha ao enviar notificação: ${e.message}`);
+    }
+  }
 }

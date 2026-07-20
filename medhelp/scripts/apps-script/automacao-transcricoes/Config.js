@@ -17,7 +17,7 @@ const CONFIG = {
   ID_PASTA_AUDIOS:      '1rXV-eovjzQvAQxVNWQtROIh7L_1oNAEC',
 
   // Modelo do LLM
-  MODELO_GEMINI:        'gemini-3.5-flash',
+  MODELO_GEMINI:        'gemini-2.5-flash',
 
   // Trava de segurança: GAS mata scripts após 6 min. Usamos 4.5 min.
   TEMPO_LIMITE_MS:      4.5 * 60 * 1000,
