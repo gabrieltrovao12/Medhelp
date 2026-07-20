@@ -7,6 +7,8 @@
 - [x] Configurar `.clasp.json` (mantido o existente do usuário).
 - [x] Excluir o antigo monolito `Code.js`.
 - [x] O usuário fará o push final e revisão via `clasp push`.
+- [x] **[NOVO]** Abandono e deleção oficial da pasta `pre-transcricao/`. O setup "Célula 3" agora será feito manualmente pelo usuário no Colab.
+- [x] **[NOVO]** Remoção completa da integração do Gemini (Priming Automático) do `Transcribe.ipynb` para otimização e limpeza, já que o usuário utilizará o "James" externamente. Ordem de execução original do motor (Transcrição -> Extração OCR) restaurada.
 
 ## FASE ATUAL: Integração do Vigia Local (Antigravity SDK) - [CANCELADA]
 
