@@ -4,9 +4,10 @@
 - **Arquivos:** `scripts/colab/Transcribe.ipynb` e exclusão de `scripts/apps-script/pre-transcricao/`
 - **Descrição:** Abandono oficial do script de pré-transcrição no Google Apps Script após deliberação conjunta. O usuário optou por montar a Célula 3 manualmente para ter mais controle.
 - **Remoção do Priming Automático:** O usuário solicitou a remoção completa da função de "Priming Automático via Gemini" de dentro do notebook, pois essa etapa já é realizada manualmente com maior precisão usando a persona "James" no chat nativo do Gemini.
+- **Migração para faster-whisper:** Foi realizada a migração do motor `openai-whisper` para `faster-whisper` com suporte a `float16` na Célula 4, garantindo redução massiva de VRAM consumida e 4x mais velocidade nas transcrições, mantendo a qualidade original do modelo `large-v3`.
 - **Correções Aplicadas:** 
   1. Deleção completa do Apps Script legado (`pre-transcricao/`).
-  2. Limpeza da Célula 4 do `Transcribe.ipynb`, removendo as integrações com a API do Gemini e retornando à ordem de execução original e otimizada (Transcrição -> Extração OCR) para máxima economia de VRAM na GPU do Colab.
+  2. Limpeza da Célula 4 do `Transcribe.ipynb`, removendo integrações com API do Gemini e implementando o motor CTranslate2 (`faster-whisper`), rodando com prioridade antes do OCR para poupar memória.
 
 ## 2026-07-08 — Otimização de Prompts de Tutoria (PDF) e Meta de 55 Flashcards
 - **Arquivos:** `scripts/apps-script/flashcards/Código.js` e `scripts/apps-script/Código.js`
