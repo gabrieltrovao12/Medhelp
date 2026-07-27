@@ -5,6 +5,11 @@
       "source": "smithery.ai",
       "sourceType": "well-known",
       "computedHash": "1d5776e2706957f5b65b7466b541ed59ce686b09e800606afbf55ced85a0db63"
+    },
+    "skill-creator": {
+      "source": "smithery.ai",
+      "sourceType": "well-known",
+      "computedHash": "5ea13a6d9f0d4bb694405d79acd00cadec0d21bb138c4dd10fcf3c500cb835c2"
     }
   }
 }
