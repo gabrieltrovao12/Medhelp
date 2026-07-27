@@ -1,0 +1,17 @@
+{
+  "skill_name": "Publicar Flashcards no NotebookLM",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Pegue todos os flashcards de farmacologia novos e publique no NotebookLM pro pessoal.",
+      "expected_output": "Agent should locate files, check for existing Notebook, use notebook_add_drive, and return the Anti-Hallucination prompt.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Tenta subir os flashcards de patologia no NotebookLM. O MCP tá dando erro gRPC na IDE.",
+      "expected_output": "Agent should acknowledge the gRPC error and propose running the fallback Node.js wrapper via JSON-RPC 2.0 to force the upload.",
+      "files": []
+    }
+  ]
+}

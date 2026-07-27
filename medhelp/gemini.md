@@ -1,4 +1,13 @@
-# Configurações Ativas e Regras de Negócio - Medhelp
+# Constituição e Regras de Negócio (Medhelp)
+
+Este documento é a **Constituição** do ecossistema Medhelp. Ele contém os princípios inegociáveis de governança, padrões de qualidade, experiência do usuário (UX) e as regras rígidas de negócio. O agente deve referenciar e seguir estes preceitos antes de qualquer implementação.
+
+## Princípios Constitucionais
+1. **Verdade Terrestre Inflexível**: A IA não deve inventar dados ou condutas médicas. Qualquer lacuna deve ser preenchida com um retorno de "DADO AUSENTE".
+2. **Defensividade Sistêmica (Self-Healing)**: O código deve ser construído prevendo falhas. É obrigatório o uso de try/catch e estratégias de *Exponential Backoff* para cotas de API.
+3. **Experiência do Usuário (UX)**: A saída final visual (emails, cards, painéis) deve apresentar fluidez de navegação, espaçamentos consistentes e formatação premium.
+
+---
 
 ## Fábrica de Flashcards por Subagentes
 

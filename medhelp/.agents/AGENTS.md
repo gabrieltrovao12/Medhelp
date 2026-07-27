@@ -17,12 +17,12 @@ Ao criar, depurar ou evoluir qualquer prompt para as integrações com LLMs (com
 ## 2. Lógica e Ciclo de Desenvolvimento (Protocolo V.L.A.E.G. & Protocolo Zero)
 Para evitar desorganização informacional nos diretórios e perda de coesão do código, adote os protocolos de desenvolvimento abaixo:
 
-### A. Protocolo Zero (Alocação Prévia de Memória)
-**Antes de escrever qualquer código lógico ou operacional**, o agente deve criar ou atualizar os 4 arquivos de fundação e obter o alinhamento com o usuário:
-1.  **[task.md](file:///home/vvgfilhos/medhelp/task.md)**: Lista de tarefas a fazer, em andamento e concluídas, registrando a fase atual do projeto.
-2.  **[research.md](file:///home/vvgfilhos/medhelp/research.md)**: Compilação de achados técnicos, documentação de APIs utilizadas, limites de cotas e regras de comunicação.
-3.  **[system_log.md](file:///home/vvgfilhos/medhelp/system_log.md)**: Log de erros sistêmicos observados nos testes locais e os respectivos planos de reparo.
-4.  **[gemini.md](file:///home/vvgfilhos/medhelp/gemini.md)**: O esquema de dados estruturado, mapeamento de variáveis, regras de negócio inflexíveis e a arquitetura geral do ecossistema.
+### A. Protocolo Zero (Alocação Prévia e Spec-Driven Development)
+**Antes de escrever qualquer código lógico ou operacional**, o agente deve atuar guiado por especificação (Spec-Driven), criando ou atualizando os arquivos de fundação e obtendo alinhamento com o usuário:
+1.  **Especificação e Planejamento (`research.md`)**: Focar primeiramente no *o que* e *por que* estamos construindo. Em seguida, definir a stack e a arquitetura explicitamente (*Plan*). Todo esse fluxo de especificação técnica deve ser documentado e alinhado aqui.
+2.  **Tarefas e Execução (`task.md`)**: Apenas após a especificação aprovada, quebrar o plano em uma lista de tarefas acionáveis e rastrear a conclusão (fase de *Tasks* e *Implement*).
+3.  **Registro de Erros (`system_log.md`)**: Log de erros sistêmicos observados nos testes locais e os respectivos planos de reparo.
+4.  **A Constituição do Projeto (`gemini.md`)**: O documento absoluto de regras do projeto, contendo a constituição de padrões de qualidade, esquemas de dados e regras inflexíveis. O agente **sempre** deve respeitar sua Constituição antes de agir.
 
 ### B. Ciclo Sequencial V.L.A.E.G.
 Toda funcionalidade nova deve ser implementada respeitando a progressão das seguintes etapas:

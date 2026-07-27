@@ -1,0 +1,23 @@
+{
+  "skill_name": "medhelp-developer-core",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Crie um script em Python que pegue os arquivos .md na minha pasta de Flashcards e faça um backup no Github.",
+      "expected_output": "Agent should invoke Protocolo Zero and specify the plan before writing code.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Meu script de transcrição no Apps Script tá quebrando com timeout, conserta pra mim.",
+      "expected_output": "Agent should apply VLAEG Gatilho (timeout protection and exponential backoff).",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Quero construir um painel novo de análise do DataSUS usando R.",
+      "expected_output": "Agent should mandate Spec-Driven development via research.md before writing R code.",
+      "files": []
+    }
+  ]
+}
