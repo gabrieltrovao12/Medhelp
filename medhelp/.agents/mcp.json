@@ -1,0 +1,52 @@
+{
+  "mcpServers": {
+    "github-mcp-server": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "GITHUB_PERSONAL_ACCESS_TOKEN",
+        "ghcr.io/github/github-mcp-server"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "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"
+      }
+    },
+    "pubmed": {
+      "command": "npx.cmd",
+      "args": [
+        "-y",
+        "@smithery/cli",
+        "run",
+        "@jackkuo666/pubmed-mcp-server"
+      ]
+    },
+    "consensus": {
+      "command": "npx.cmd",
+      "args": [
+        "-y",
+        "@smithery/cli",
+        "run",
+        "consensus"
+      ]
+    },
+
+    "google-drive": {
+      "command": "node",
+      "args": [
+        "./scripts/mcp_servers/google-drive-mcp/dist/index.js"
+      ]
+    },
+    "brave-search": {
+      "command": "node",
+      "args": [
+        "./scripts/mcp_servers/brave-search-mcp-server/dist/index.js"
+      ],
+      "env": {
+        "BRAVE_API_KEY": "COLE_SUA_CHAVE_AQUI_DEPOIS"
+      }
+    }
+  }
+}

@@ -1,78 +1,126 @@
 ---
 name: "medhelp-prompt-engineering"
-description: "Manual definitivo de engenharia de prompts OCANES no Medhelp. Usar para criar, refatorar, depurar ou otimizar system instructions (prompts) para LLMs (Gemini, etc). Aborda o framework OCANES, extração de dados estruturados (JSON/Markdown), redução de tokens e mitigação de alucinações."
+description: "Manual definitivo de engenharia de prompts OCANES no Medhelp. Make sure to use this skill WHENEVER the user asks you to write, review, debug, or optimize a prompt or 'system instructions' for any LLM (Gemini, etc). Use whenever you see the word 'OCANES'. This skill forces structured extraction, token reduction, and hallucination mitigation through a strict methodology."
 ---
 
 # Skill: medhelp-prompt-engineering (Engenharia de Prompts Medhelp)
 
 ## 1. Visão Geral
-Esta skill consolida as melhores práticas de Engenharia de Prompts adaptadas para as restrições e padrões do projeto Medhelp. Deve ser acionada sempre que for necessário criar ou alterar um prompt (como em `automacao-transcricoes/Code.js`, `flashcards/Código.js` ou `pre-transcricao/Código.js`).
+Esta skill consolida as melhores práticas de Engenharia de Prompts adaptadas para as restrições e padrões do projeto Medhelp. Você deve assumir o papel de **Engenheiro de Prompts Sênior**. O seu objetivo não é apenas escrever o texto, mas garantir que o modelo alvo (que lerá o prompt) não tenha margem para alucinações e opere como um compilador semântico previsível.
 
-## 2. O Framework OCANES (Obrigatório)
-Qualquer prompt no Medhelp deve seguir estritamente o framework OCANES para controle de entropia. Evite personas ("Aja como um médico"), trate o LLM como um compilador semântico.
+## 2. A Entrevista OCANES (Obrigatório Antes de Codificar)
+Nunca gere um prompt de imediato se o usuário der apenas uma ideia vaga. 
+Utilize a ferramenta `ask_question` ou faça perguntas iterativas (uma por vez) para preencher as lacunas do framework OCANES.
 
-*   **[O] - Objetivo**: Definição unívoca e matemática do vetor direcional. O que deve ser alcançado.
-*   **[C] - Contexto**: Metadados, premissas do domínio e limites (ground truth). Ex: Forneça slides/transcrições.
-*   **[A] - Ações**: Etapas sequenciais (Chain of Thought). Mapeamento granular das tarefas.
-*   **[N] - Normas (Guardrails)**: Proibições, regras de formato, limites de segurança. Exija fallback para dúvidas (ex: `DADO_AUSENTE`).
-*   **[E] - Exemplos**: Few-shot prompting. Amostras pareadas de entrada e saída.
-*   **[S] - Saída**: Formato final (Markdown, JSON, XML). Sem saudações ou explicações.
+Você deve ter clareza absoluta sobre:
+- **[O] Objetivo**: O que o prompt deve fazer? (Defina de forma matemática e unívoca).
+- **[C] Contexto**: Quais são os dados de entrada (ground truth)?
+- **[A] Ações**: Quais os passos lógicos (Chain of Thought) que o modelo deve seguir?
+- **[N] Normas**: Quais as restrições de segurança? (O que ele NUNCA deve fazer).
+- **[E] Exemplos**: Quais os pares de input/output esperados?
+- **[S] Saída**: Qual o formato exato? (Markdown, JSON).
 
-### 2.1. Otimização e Compressão (Técnicas Adicionais)
-- **Chain of Thought (CoT)**: Em tarefas lógicas, inclua na Ação instruções como "Pense passo a passo".
-- **Redução de Hallucination**: Em Normas, adicione: "Responda baseando-se APENAS no contexto fornecido. Se a resposta não estiver no contexto, retorne 'INFORMAÇÃO_INEXISTENTE'".
-- **Compressão**: Remova verborragia ("Por favor, você poderia analisar...") e use linguagem imperativa ("Analise:").
+## 3. Teste de Laboratório (Simulação Obrigatória)
+Após redigir a primeira versão do prompt e **antes de entregá-lo como finalizado**, você deve oferecer e realizar um "Teste de Laboratório".
+- Peça ao usuário um pedaço de dado real (ou crie um dado sintético verossímil).
+- Execute o prompt contra esse dado dentro do chat (você mesmo simula como o LLM se comportaria lendo aquele prompt).
+- Avalie se o formato de saída quebrou ou se houve alucinação. 
+- Refine o prompt com base na simulação antes de passar o código final ao usuário.
 
-## 3. Saídas Estruturadas (Structured Output)
-Quando o pipeline (ex: Apps Script) exigir que o LLM retorne dados estruturados em vez de texto livre, siga as seguintes regras de extração:
+## 4. O Framework OCANES na Prática
+Todo prompt gerado deve ser formatado visualmente no padrão OCANES:
 
-1. **Definição de Schema**: Especifique todas as chaves desejadas na seção `[S] - Saída` ou `[N] - Normas`. No Gemini, utilize `generationConfig.responseSchema` se aplicável via API.
-2. **Descrições de Campos**: Nunca use chaves genéricas como `status`. Use algo como `status (string): Indica o estado, deve ser 'ativo' ou 'inativo'`. As descrições funcionam como parte do prompt.
-3. **Markdown Limpo**: Se pedir tabelas ou blocos YAML/JSON, defina nas Normas que o modelo NUNCA deve incluir blocos Markdown englobantes (ex: ````json`) caso o código consumidor não faça o parse.
-4. **Validação**: Ensine o código consumidor a lidar com falhas de schema ou ausência de campos (usando try/catch no `JSON.parse` ou tratamento de strings).
+### 4.1. Otimização e Compressão
+- **Por que é importante:** LLMs perdem o foco (attention collapse) com instruções longas e educadas.
+- **Como fazer:** Remova verborragia ("Por favor, você poderia analisar..."). Use linguagem imperativa e militar ("Analise:", "Extraia:").
+- **Chain of Thought (CoT):** Em [A] Ações, force o raciocínio em etapas numéricas para tarefas complexas.
 
-## 4. Protocolo de Refatoração (Alteração de Prompts Existentes)
+## 5. Saídas Estruturadas (Structured Output)
+Quando o pipeline (ex: Apps Script) exigir JSON, siga as seguintes regras rígidas para evitar quebra de código no lado do cliente:
 
-### FASE 1 — Diagnóstico e Classificação
-1. Identifique o prompt-alvo. Leia o código atual. Conte as Ações (`[A]`) e Normas (`[N]`).
-2. Classifique a mudança: ADIÇÃO, MODIFICAÇÃO, REMOÇÃO, CORREÇÃO.
-3. Avalie o impacto cruzado: A nova ação entra em conflito com alguma norma?
+1. **Definição de Schema**: Especifique todas as chaves desejadas. As descrições das chaves são o seu prompt real. Ex: em vez de `status`, use `status (string): Indica o estado, apenas 'ativo' ou 'inativo'`.
+2. **Zero Markdown**: Defina explicitamente nas [N] Normas: "O retorno deve ser um JSON bruto. NUNCA utilize blocos delimitadores markdown (ex: ````json`)". (Isso é vital porque o `JSON.parse()` do Apps Script falha com crases).
+3. **Tratamento de Falhas (Ground Truth)**: Se a informação não existir no contexto, force o modelo a retornar um padrão (ex: `DADO_AUSENTE`). Nunca deixe o modelo deduzir dados vitais médicos.
 
-### FASE 2 — Planejamento
-1. Apresente ao usuário (via Diff ou markdown) como ficará o prompt modificado, com justificativa.
-2. Verifique:
-   - A nova Ação está na ordem correta?
-   - Os escapes de template string (ex: `\\n`, `\\` no GAS) estão corretos?
-   - O limite de tokens aumentou muito?
+## 6. Protocolo de Refatoração (Alteração de Prompts Existentes)
 
-### FASE 3 — Execução e Validação
-1. Modifique o código. NÃO substitua o prompt inteiro se a alteração for cirúrgica.
-2. Não delete comentários existentes a não ser que os altere.
-3. Após editar, revise logicamente: O prompt continua fluindo da Ação 1 para a última sem contradições? O bloco de Saída contém chaves referenciadas nas Ações novas?
-4. Registre a mudança em `system_log.md`.
+Se o usuário pedir para consertar um prompt que já existe:
+1. **Diagnóstico**: Leia o código atual. O que está falhando? É alucinação (falta de Norma)? É quebra de JSON (falta de restrição de Saída)?
+2. **Planejamento**: Apresente a mudança proposta via diff ou explicação sucinta.
+3. **Execução**: Modifique de forma cirúrgica. NÃO substitua o prompt inteiro se a alteração for pequena, para preservar o histórico de ajustes anteriores.
 
-## 5. Exemplo Rápido de Prompt OCANES Otimizado
+## 7. Exemplos de Prompts OCANES
 
-```
+### 7.1. Exemplo Rápido (Extração Simples)
+```text
 [O]
 Extrair dados vitais do texto do paciente.
 
 [C]
-Texto bruto transcrito de atendimento emergencial.
+Texto bruto transcrito de atendimento emergencial fornecido em <contexto>.
 
 [A]
 1. Identifique a Pressão Arterial (PA).
 2. Identifique a Frequência Cardíaca (FC).
 
 [N]
+- Responda baseando-se APENAS no contexto fornecido.
 - Não invente dados.
 - Se não houver o dado no texto, retorne 'DADO_AUSENTE'.
-- Retorne apenas em formato JSON.
+- Retorne um objeto JSON bruto, SEM blocos de código markdown.
 
 [E]
 Input: "Paciente chegou com PA 12 por 8 e FC 90"
 Output: {"PA": "120/80", "FC": "90"}
 
 [S]
-Retornar um objeto JSON com as chaves "PA" e "FC".
+Retornar objeto JSON com chaves "PA" e "FC".
+```
+
+### 7.2. Exemplo Complexo de Produção (Pipeline de Transcrições Medhelp)
+Este é um exemplo real, longo e consolidado utilizado no ecossistema Medhelp para converter transcrições em resumos. Note como ele adapta o OCANES usando formatação visual rica (`**OBJETIVO**`, `**CONTEXTO**`, etc.) e detalha regras de formatação severas.
+
+```text
+**OBJETIVO:**
+Realizar a análise cruzada entre a transcrição de uma aula e o material visual de apoio (slides) para sintetizar um relatório de estudo tático, estruturado e otimizado para avaliações acadêmicas na área médica.
+
+**CONTEXTO:**
+A análise deve se basear exclusivamente no cruzamento dos dois documentos fornecidos abaixo. O primeiro é a transcrição literal da fala do docente e o segundo é o conteúdo textual extraído dos slides de referência.
+
+**TRANSCRIÇÃO_DA_AULA_EM_TEXTO_BRUTO:**
+[COLE AQUI A TRANSCRIÇÃO COMPLETA DA AULA]
+
+**CONTEÚDO_DOS_SLIDES_EM_TEXTO:**
+[COLE AQUI O CONTEÚDO DOS SLIDES OU UMA DESCRIÇÃO DETALHADA]
+
+**PROTOCOLO DE RENDERIZAÇÃO E ESTILO DE SAÍDA**
+1. **Transparência e Atribuição Docente:** É mandatório que toda informação técnica seja explicitamente atribuída à fala do docente por meio de paráfrase ("O professor enfatizou que...").
+2. **Otimização Visual:** Substitua descrições textuais de processos por uma notação de seta lógica (`->`). Ex: "hipertensão portal -> aumento da pressão hidrostática -> ascite."
+3. **Estética:** Utilize Callouts do Obsidian (`> [!tipo]`). Proibido gerar parágrafos com mais de 3 linhas contínuas.
+
+**AÇÕES:**
+1. **Sincronização de Entidades:** O CONTEÚDO DOS SLIDES é a fonte de verdade absoluta para a nomenclatura técnica. Mapeie a transcrição para ele.
+2. **Índice de Prioridade:** Classifique cada tópico em ALTA, MÉDIA ou BAIXA prioridade com base nos avisos diretos de cobrança na prova.
+3. **Síntese Teórica:** Processe a transcrição para gerar o resumo.
+4. **Descompilação de Correlações Clínicas:** Rastreie a transcrição para identificar pontes entre ciência básica e aplicação prática.
+5. **Compilação Final:** Compile todos os artefatos na estrutura de saída.
+
+**NORMAS:**
+1. **Contenção Teórica:** É terminantemente proibido autocompletar ou inferir informações que não foram explicitamente declaradas pelo docente.
+2. **Tratamento de Dados Ausentes:** Se informações logísticas ou correlações não forem mencionadas, registre "Nenhuma diretriz identificada" em vez de omitir a seção.
+3. **Formatação Estrita:** É proibido o uso de emojis lúdicos, saudações, prólogos ou epílogos.
+
+**SAÍDA:**
+Apresentar a saída exclusivamente no formato Markdown abaixo.
+
+## 1. Foco Principal da Aula
+| Prioridade | Conceito | Evidência |
+| :---: | :--- | :--- |
+| ALTA | [Conceito] | [Paráfrase da evidência] |
+
+## 2. Resumo Teórico
+### [Subtópico A]
+* **Conceito-chave:** [Explicação]
+* **Mecanismo:** 
+  1. Passo 1
 ```

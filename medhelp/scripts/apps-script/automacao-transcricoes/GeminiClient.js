@@ -102,6 +102,79 @@ function chamarGeminiAPI(texto, nomeArquivo, apiKey, systemInstruction) {
 }
 
 /**
+ * Envia o texto para o Gemini e retorna um objeto JSON parseado.
+ * Implementa as mesmas regras de Exponential Backoff.
+ *
+ * @param {string} promptUsuario - Prompt a ser avaliado
+ * @param {string} apiKey - Chave da API Gemini
+ * @param {string} systemInstruction - O prompt de sistema rigoroso
+ * @returns {Object|null} - Objeto JSON, ou null em caso de falha
+ */
+function chamarGeminiJSON(promptUsuario, apiKey, systemInstruction) {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${CONFIG.MODELO_GEMINI}:generateContent?key=${apiKey}`;
+
+  const payload = {
+    system_instruction: {
+      parts: [{ text: systemInstruction }]
+    },
+    contents: [{
+      parts: [{ text: promptUsuario }]
+    }],
+    generationConfig: {
+      temperature: 0.0, // Curadoria determinística
+      response_mime_type: "application/json"
+    }
+  };
+
+  const options = {
+    method: 'post',
+    contentType: 'application/json',
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  };
+
+  for (let tentativa = 1; tentativa <= CONFIG.MAX_RETRIES; tentativa++) {
+    console.log(`[API JSON] Tentativa ${tentativa}/${CONFIG.MAX_RETRIES}...`);
+
+    const response = UrlFetchApp.fetch(url, options);
+    const code     = response.getResponseCode();
+
+    if (code === 200) {
+      try {
+        const json = JSON.parse(response.getContentText());
+        const candidate = json.candidates && json.candidates[0];
+        
+        if (!candidate || !candidate.content || !candidate.content.parts || candidate.content.parts.length === 0) {
+          console.error(`[ERRO JSON] Candidato inválido. Resposta: ${response.getContentText().substring(0, 300)}`);
+          return null;
+        }
+
+        const textoRetorno = candidate.content.parts[0].text;
+        return JSON.parse(textoRetorno);
+
+      } catch (e) {
+        console.error(`[ERRO JSON] Falha ao parsear JSON final: ${e.message}`);
+        return null;
+      }
+    } else if (code === 429) {
+      const espera = 62000;
+      console.warn(`[429 JSON] Cota excedida. Hibernando ${espera / 1000}s...`);
+      if (tentativa < CONFIG.MAX_RETRIES) Utilities.sleep(espera);
+    } else if (code >= 500) {
+      const espera = Math.pow(2, tentativa) * 1000 + Math.floor(Math.random() * 500);
+      console.warn(`[${code} JSON] Erro servidor. Aguardando ${Math.round(espera / 1000)}s...`);
+      if (tentativa < CONFIG.MAX_RETRIES) Utilities.sleep(espera);
+    } else {
+      console.error(`[FATAL HTTP ${code} JSON] Erro não recuperável: ${response.getContentText().substring(0, 500)}`);
+      return null;
+    }
+  }
+
+  console.error(`[ESGOTADO JSON] ${CONFIG.MAX_RETRIES} tentativas falharam.`);
+  return null;
+}
+
+/**
  * Utilitário de diagnóstico manual para validar conexão com a API e o Prompt.
  */
 function testarConexaoAPI() {

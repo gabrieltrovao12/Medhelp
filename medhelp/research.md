@@ -35,3 +35,8 @@
    - Curadoria baseada no PDF 1 (Conceitos de vacinação, vacinas atenuadas vs inativadas, PNI vs SBP/SBIm, calendário de prematuros e a termo, contraindicações, precauções, ESAVI - vigilância e notificação).
 5. **Subagente P5 (Adolescência e Puberdade, Tanner, HEADSS, Saúde do Adolescente)**
    - Curadoria baseada no PDF 5 (Adolescência vs Puberdade, sigilo médico/ética/lei, anamnese e HEADSS, estadiamento de Tanner, desenvolvimento psicossocial e neurodesenvolvimento, medidas de promoção de saúde - vacinas, exercícios, sono, alimentação).
+
+## 4. Subagente Curador do YouTube (Resumos)
+- **Objetivo**: Buscar e curar automaticamente o melhor vídeo didático sobre o tema e anexar no final dos resumos.
+- **Arquitetura**: Busca na YouTube Data API v3 (Top 5) -> Avaliação via Gemini (Prompt OCANES) -> Injeção de Markdown (`🎥 **Aula Sugerida:** [Título](URL)`).
+- **Filtros (LLM)**: Priorizar canais médicos consagrados (Sanar, Jaleko, etc). Rejeitar vídeos para pacientes ou nível ensino médio.

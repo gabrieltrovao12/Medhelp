@@ -13,6 +13,7 @@ function processarNovasTranscricoes() {
 
   const scriptProperties = PropertiesService.getScriptProperties();
   const apiKey = scriptProperties.getProperty('GEMINI_API_KEY');
+  const apiKeyYoutube = scriptProperties.getProperty('YOUTUBE_API_KEY');
   
   if (!apiKey) {
     console.error('[FATAL] GEMINI_API_KEY não encontrada nas Propriedades do Script. Abortando fluxo.');
@@ -61,7 +62,19 @@ function processarNovasTranscricoes() {
       try {
         // Limpa a string "(Resumo)" ou variações do nome do arquivo para usar como título H1
         const tituloLimpo = nomeLimpo.replace(/\s*\(Resumo\)\s*/gi, '').trim();
-        const resumoFinal = `# ${tituloLimpo}\n\n${resumoGerado}`;
+        let resumoFinal = `# ${tituloLimpo}\n\n${resumoGerado}`;
+
+        // Curadoria do YouTube (agora posicionada no topo)
+        const videoMd = YouTubeCurator.obterRecomendacaoDeVideo(tituloLimpo, apiKey, apiKeyYoutube);
+        if (videoMd) {
+          // Tenta injetar logo abaixo do Foco Principal da Aula
+          if (/##\s*1\.\s*Foco Principal/i.test(resumoFinal)) {
+            resumoFinal = resumoFinal.replace(/(##\s*1\.\s*Foco Principal.*?\n)/i, '$1' + videoMd + '\n\n');
+          } else {
+            // Fallback se não encontrar o header
+            resumoFinal = resumoFinal.replace(/(# .*?\n\n)/, '$1' + videoMd + '\n\n');
+          }
+        }
 
         // Salva o resumo como "TEMA.md" — sem "(Resumo)" no nome do arquivo
         // O script de flashcards localiza o arquivo pelo mesmo padrão de nome limpo
