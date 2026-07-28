@@ -1,6 +1,16 @@
 # Tarefas do Projeto - Medhelp
 
-## FASE ATUAL: Resolução de Bugs Críticos de Automação
+## FASE ATUAL: Subagente Curador do YouTube (POC Local)
+
+- [x] Documentar o escopo do Curador no `research.md`.
+- [x] Atualizar `teste_youtube_curator.py` para usar requests e a API Real do YouTube.
+- [x] Testar a execução do script laboratorial localmente.
+- [x] Mapear integração final para o orquestrador (Apps Script - automacao-transcricoes).
+- [x] Módulo GeminiClient: Adicionar suporte a JSON Estruturado.
+- [x] Módulo YouTubeCurator: Implementar buscas na API e curadoria com OCANES.
+- [x] Módulo Main: Orquestrar a injeção do rodapé no Resumo gerado.
+
+## FASE ANTERIOR: Resolução de Bugs Críticos de Automação
 
 - [x] Corrigir modelo Gemini inexistente (`gemini-3.5-flash` para `gemini-2.5-flash`) em `medhelp-flashcards/Config.js`.
 - [x] Integrar acionamento de Webhook no Colab (`Transcribe.ipynb`) ao final da Célula 4.

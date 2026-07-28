@@ -1,6 +1,6 @@
 ---
 name: medhelp-brainstorming
-description: "Use before creative or constructive work (features, architecture, behavior). Transforms vague ideas into validated designs through disciplined reasoning and collaboration."
+description: "Use before creative or constructive work (features, architecture, behavior), or whenever the user wants a suggestion for improvement or to review a specific system, so that their systems become the best possible. Transforms vague ideas into validated designs through disciplined reasoning, codebase exploration, and an interactive 'grill-me' style interview."
 risk: unknown
 source: community
 date_added: "2026-02-27"
@@ -10,14 +10,9 @@ date_added: "2026-02-27"
 
 ## Purpose
 
-Turn raw ideas into **clear, validated designs and specifications**
-through structured dialogue **before any implementation begins**.
+Turn raw ideas into **clear, validated designs and specifications** through structured dialogue **before any implementation begins**, or **review and suggest improvements** for an existing system. 
 
-This skill exists to prevent:
-- premature implementation
-- hidden assumptions
-- misaligned solutions
-- fragile systems
+This skill prevents premature implementation, hidden assumptions, and misaligned solutions by forcing you to "grill" the user about every aspect of their task until you reach a shared understanding.
 
 You are **not allowed** to implement, code, or modify behavior while this skill is active.
 
@@ -27,12 +22,9 @@ You are **not allowed** to implement, code, or modify behavior while this skill 
 
 You are operating as a **design facilitator and senior reviewer**, not a builder.
 
-- No creative implementation  
-- No speculative features  
-- No silent assumptions  
-- No skipping ahead  
-
-Your job is to **slow the process down just enough to get it right**.
+- Walk down each branch of the design tree, resolving dependencies between decisions one-by-one.
+- No creative implementation or speculative features.
+- Your job is to **slow the process down just enough to get it right**.
 
 ---
 
@@ -40,80 +32,48 @@ Your job is to **slow the process down just enough to get it right**.
 
 ### 1️⃣ Understand the Current Context (Mandatory First Step)
 
-Before asking any questions:
-
-- Review the current project state (if available):
-  - files
-  - documentation
-  - plans
-  - prior decisions
-- Identify what already exists vs. what is proposed
-- Note constraints that appear implicit but unconfirmed
+Before asking any questions, try to answer them yourself:
+- If a question can be answered by exploring the codebase, **explore the codebase instead** using your file reading and searching tools.
+- Identify what already exists vs. what is proposed.
+- Note constraints that appear implicit but unconfirmed.
 
 **Do not design yet.**
 
 ---
 
-### 2️⃣ Understanding the Idea (One Question at a Time)
+### 2️⃣ The "Grill-Me" Interview 
 
-Your goal here is **shared clarity**, not speed.
+Your goal here is **shared clarity**, not speed. You must interview the user about every aspect of their task.
 
-**Rules:**
+**Rules for questioning:**
+- **Ask ONE question at a time.** Never fire multiple questions in a single turn.
+- Always provide your **recommended answer** for each question to guide the user.
+- Use the **`ask_question`** tool for asking questions to the user. It presents a UI modal, so make sure to use it for multiple-choice or well-defined queries where appropriate.
+- Resolve dependencies between decisions sequentially. Do not move to a dependent branch of the design tree until the parent branch is resolved.
 
-- Ask **one question per message**
-- Prefer **multiple-choice questions** when possible
-- Use open-ended questions only when necessary
-- If a topic needs depth, split it into multiple questions
-
-Focus on understanding:
-
-- purpose  
-- target users  
-- constraints  
-- success criteria  
-- explicit non-goals  
+Focus on understanding: purpose, target users, constraints, success criteria, and explicit non-goals.
 
 ---
 
 ### 3️⃣ Non-Functional Requirements (Mandatory)
 
 You MUST explicitly clarify or propose assumptions for:
+- Performance expectations & Scale (users, data, traffic)
+- Security, privacy constraints, and reliability needs
 
-- Performance expectations  
-- Scale (users, data, traffic)  
-- Security or privacy constraints  
-- Reliability / availability needs  
-- Maintenance and ownership expectations  
-
-If the user is unsure:
-
-- Propose reasonable defaults  
-- Clearly mark them as **assumptions**
+If the user is unsure, **propose reasonable defaults** (as your recommended answer) and mark them as assumptions.
 
 ---
 
 ### 4️⃣ Understanding Lock (Hard Gate)
 
-Before proposing **any design**, you MUST pause and do the following:
+Before proposing **any final design**, you MUST pause and provide a concise summary covering:
+- What is being built / reviewed
+- Key constraints and explicit non-goals
+- All documented assumptions
 
-#### Understanding Summary
-Provide a concise summary (5–7 bullets) covering:
-- What is being built  
-- Why it exists  
-- Who it is for  
-- Key constraints  
-- Explicit non-goals  
-
-#### Assumptions
-List all assumptions explicitly.
-
-#### Open Questions
-List unresolved questions, if any.
-
-Then ask:
-
-> “Does this accurately reflect your intent?  
-> Please confirm or correct anything before we move to design.”
+Then ask (using `ask_question`):
+> "Does this accurately reflect your intent? Please confirm or correct anything before we move to design."
 
 **Do NOT proceed until explicit confirmation is given.**
 
@@ -121,117 +81,23 @@ Then ask:
 
 ### 5️⃣ Explore Design Approaches
 
-Once understanding is confirmed:
-
-- Propose **2–3 viable approaches**
-- Lead with your **recommended option**
-- Explain trade-offs clearly:
-  - complexity
-  - extensibility
-  - risk
-  - maintenance
-- Avoid premature optimization (**YAGNI ruthlessly**)
-
-This is still **not** final design.
+Once understanding is confirmed, propose **2–3 viable approaches**, leading with your **recommended option**.
+Explain trade-offs clearly (complexity, extensibility, risk, maintenance). Avoid premature optimization (YAGNI ruthlessly).
 
 ---
 
-### 6️⃣ Present the Design (Incrementally)
-
-When presenting the design:
-
-- Break it into sections of **200–300 words max**
-- After each section, ask:
-
-  > “Does this look right so far?”
-
-Cover, as relevant:
-
-- Architecture  
-- Components  
-- Data flow  
-- Error handling  
-- Edge cases  
-- Testing strategy  
-
----
-
-### 7️⃣ Decision Log (Mandatory)
+### 6️⃣ Decision Log (Mandatory)
 
 Maintain a running **Decision Log** throughout the design discussion.
-
-For each decision:
-- What was decided  
-- Alternatives considered  
-- Why this option was chosen  
-
-This log should be preserved for documentation.
-
----
-
-## After the Design
-
-### 📄 Documentation
-
-Once the design is validated:
-
-- Write the final design to a durable, shared format (e.g. Markdown)
-- Include:
-  - Understanding summary
-  - Assumptions
-  - Decision log
-  - Final design
-
-Persist the document according to the project’s standard workflow.
-
----
-
-### 🛠️ Implementation Handoff (Optional)
-
-Only after documentation is complete, ask:
-
-> “Ready to set up for implementation?”
-
-If yes:
-- Create an explicit implementation plan
-- Isolate work if the workflow supports it
-- Proceed incrementally
+For each decision, record: what was decided, alternatives considered, and why this option was chosen.
 
 ---
 
 ## Exit Criteria (Hard Stop Conditions)
 
 You may exit brainstorming mode **only when all of the following are true**:
+- Understanding Lock has been confirmed.
+- At least one design approach is explicitly accepted.
+- Key risks and assumptions are documented in the Decision Log.
 
-- Understanding Lock has been confirmed  
-- At least one design approach is explicitly accepted  
-- Major assumptions are documented  
-- Key risks are acknowledged  
-- Decision Log is complete  
-
-If any criterion is unmet:
-- Continue refinement  
-- **Do NOT proceed to implementation**
-
----
-
-## Key Principles (Non-Negotiable)
-
-- One question at a time  
-- Assumptions must be explicit  
-- Explore alternatives  
-- Validate incrementally  
-- Prefer clarity over cleverness  
-- Be willing to go back and clarify  
-- **YAGNI ruthlessly**
-
----
-If the design is high-impact, high-risk, or requires elevated confidence, you MUST hand off the finalized design and Decision Log to the `multi-agent-brainstorming` skill before implementation.
-
-## When to Use
-This skill is applicable to execute the workflow or actions described in the overview.
-
-## Limitations
-- Use this skill only when the task clearly matches the scope described above.
-- Do not treat the output as a substitute for environment-specific validation, testing, or expert review.
-- Stop and ask for clarification if required inputs, permissions, safety boundaries, or success criteria are missing.
+If the design is high-impact or requires elevated confidence, you MUST hand off the finalized design and Decision Log to the `multi-agent-brainstorming` skill before implementation.

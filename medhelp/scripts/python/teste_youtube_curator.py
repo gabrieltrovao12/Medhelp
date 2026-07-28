@@ -5,8 +5,13 @@ import pydantic
 import sys
 import os
 import requests
+import re
 from google import genai
 from google.genai import types
+
+# Corrige erro de exibição de emojis no console do Windows (UnicodeEncodeError)
+if sys.stdout.encoding.lower() != 'utf-8':
+    sys.stdout.reconfigure(encoding='utf-8')
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
@@ -16,17 +21,19 @@ logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 class VideoCurado(pydantic.BaseModel):
     video_escolhido_id: str = pydantic.Field(description="Apenas a ID do vídeo escolhido (ex: dQw4w9WgXcQ)")
     titulo_formatado: str = pydantic.Field(description="O título formatado de forma limpa para exibição.")
-    justificativa: str = pydantic.Field(description="Por que este vídeo foi escolhido em detrimento dos outros.")
 
 # ==============================================================================
 # BUSCA REAL (YouTube Data API v3)
 # ==============================================================================
 def obter_youtube_real(tema: str, api_key: str) -> list:
-    print(f"\n[🔍 YouTube API] Buscando top 5 vídeos para '{tema}'...")
+    # Limpa prefixos comuns (ex: "LHM - Síndromes Tóxicas" -> "Síndromes Tóxicas")
+    tema_limpo = re.sub(r'^.*?-\s*', '', tema).strip() or tema
+    
+    print(f"\n[🔍 YouTube API] Buscando top 5 vídeos para '{tema_limpo}'...")
     url = "https://www.googleapis.com/youtube/v3/search"
     params = {
         "part": "snippet",
-        "q": f"{tema} medicina aula",
+        "q": f"{tema_limpo} medicina aula",
         "type": "video",
         "maxResults": 5,
         "key": api_key,
@@ -57,16 +64,31 @@ def curar_melhor_video(tema: str, resultados: list, api_key: str) -> VideoCurado
     for i, vid in enumerate(resultados):
         resultados_txt += f"\nOpção {i+1}:\n- ID: {vid['id']}\n- Título: {vid['title']}\n- Canal: {vid['channel']}\n- Descrição: {vid['description']}\n"
     
-    system_prompt = """Você é um curador acadêmico médico altamente rigoroso do ecossistema Medhelp.
-Sua missão é receber uma lista de vídeos retornados pela API do YouTube e escolher O MELHOR vídeo para estudantes de medicina e residentes.
+    system_prompt = """**OBJETIVO:**
+Atuar como Curador Acadêmico Médico rigoroso. Sua missão é analisar uma lista de vídeos e selecionar O MELHOR material para estudantes de medicina e residentes.
 
-REGRAS OCANES DE SELEÇÃO:
-1. PRIORIZE canais de educação médica consagrados (ex: SanarFlix, Jaleko, Estratégia MED, Medway, Sanches).
-2. REJEITE sumariamente vídeos voltados para pacientes leigos ("dicas de saúde", "o que é a doença").
-3. REJEITE aulas de biologia do ensino médio.
-4. O vídeo escolhido deve abordar preferencialmente o tema com profundidade científica (fisiopatologia, diagnóstico, clínica).
-5. Se não houver NENHUM vídeo adequado na lista, retorne a string 'NENHUM' na ID.
-6. Retorne estritamente o Schema JSON solicitado."""
+**CONTEXTO:**
+Você receberá o TEMA DA AULA e as 5 principais opções retornadas pelo YouTube.
+
+**AÇÕES:**
+1. Leia o TEMA DA AULA para entender o foco clínico ou teórico.
+2. Analise os metadados (Título, Canal, Descrição) de cada vídeo.
+3. Filtre pela autoridade médica do canal (priorize cursinhos como SanarFlix, Estratégia MED, Medway, ou ligas acadêmicas).
+4. Selecione o vídeo de maior profundidade científica.
+5. Se não houver candidato aceitável, defina o ID como 'NENHUM'.
+
+**NORMAS:**
+1. REJEITE sumariamente vídeos direcionados a pacientes leigos (ex: "sintomas", "como curar", "o que é").
+2. Se o vídeo escolhido não for de um canal consagrado, tenha um bom critério médico na seleção.
+3. NUNCA invente um ID de vídeo que não esteja na lista.
+4. Retorne APENAS o objeto JSON bruto. NUNCA utilize blocos delimitadores markdown (ex: ```json).
+
+**SAÍDA:**
+Retorne estritamente neste formato JSON:
+{
+  "video_escolhido_id": "ID do vídeo",
+  "titulo_formatado": "Título profissional"
+}"""
 
     user_prompt = f"Tema da Aula/Objetivo: {tema}\n\nAvalie e escolha a melhor opção entre os vídeos abaixo:\n{resultados_txt}"
 
@@ -134,8 +156,7 @@ def main():
         if resultado and resultado.video_escolhido_id != "NENHUM":
             print("✅ VEREDITO DO SUBAGENTE CURADOR:")
             print(f"   > Vídeo Escolhido : {resultado.titulo_formatado}")
-            print(f"   > Justificativa   : {resultado.justificativa}")
-            print(f"   > ID do YouTube   : {resultado.video_escolhido_id}")
+            print(f"   > Link            : https://www.youtube.com/watch?v={resultado.video_escolhido_id}")
             
             # Simulação do rodapé Markdown
             url = f"https://www.youtube.com/watch?v={resultado.video_escolhido_id}"

@@ -13,7 +13,7 @@ if (typeof global.DOMMatrix === 'undefined') {
 }
 
 // Inicia o servidor MCP original do NotebookLM usando import() dinâmico para ES Modules
-import('../node_modules/notebooklm-mcp-server/dist/index.js')
+import('../../node_modules/notebooklm-mcp-server/dist/index.js')
   .catch(err => {
     console.error("❌ Falha ao iniciar o notebooklm-mcp-server:", err);
     process.exit(1);
