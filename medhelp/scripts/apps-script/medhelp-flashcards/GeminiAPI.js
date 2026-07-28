@@ -18,7 +18,7 @@ const GeminiAPI = {
   },
 
   /**
-   * Chamada genérica com Exponential Backoff
+   * Chamada com Exponential Backoff with Full Jitter e Graceful Exit.
    */
   fetchWithRetry: function(payload, apiKey) {
     const url = this._buildUrl(apiKey);
@@ -29,44 +29,76 @@ const GeminiAPI = {
       muteHttpExceptions: true
     };
 
-    const ESPERAS_MS = [60000, 90000, 120000];
+    const startTime = Date.now();
+    const MAX_EXECUTION_TIME_MS = 300000; // Limite de 5 min (GAS mata em 6 min)
+    const BASE_DELAY_MS = 1000;
+    const CAP_DELAY_MS = 60000;
+    
+    let attempt = 1;
 
-    for (let tentativa = 1; tentativa <= CONFIG.MAX_RETRIES; tentativa++) {
+    while (true) {
+      const response = UrlFetchApp.fetch(url, options);
+      const statusCode = response.getResponseCode();
+      const responseText = response.getContentText();
+
+      let jsonResponse;
       try {
-        const response = UrlFetchApp.fetch(url, options);
-        const statusCode = response.getResponseCode();
+        jsonResponse = JSON.parse(responseText);
+      } catch (e) {
+        jsonResponse = { error: { code: statusCode, message: responseText } };
+      }
 
-        if (statusCode === 200) {
-          const json = JSON.parse(response.getContentText());
-          if (!json.candidates || json.candidates.length === 0 || !json.candidates[0].content || !json.candidates[0].content.parts || json.candidates[0].content.parts.length === 0) {
-            throw new Error(`Resposta vazia ou bloqueada. Detalhes: ${json.promptFeedback?.blockReason || 'desconhecido'}`);
-          }
-          return json.candidates[0].content.parts[0].text;
+      const errorCode = (jsonResponse.error && jsonResponse.error.code) ? jsonResponse.error.code : statusCode;
+
+      if (statusCode === 200) {
+        if (!jsonResponse.candidates || jsonResponse.candidates.length === 0 || !jsonResponse.candidates[0].content || !jsonResponse.candidates[0].content.parts || jsonResponse.candidates[0].content.parts.length === 0) {
+          throw new Error(`Resposta vazia ou bloqueada. Detalhes: ${jsonResponse.promptFeedback?.blockReason || 'desconhecido'}`);
+        }
+        return jsonResponse.candidates[0].content.parts[0].text;
+      }
+
+      if (errorCode === 400 || errorCode === 401) {
+        throw new Error(`Erro Crítico [HTTP ${errorCode}]: Cancelamento Imediato. Propagação: ${responseText}`);
+      }
+
+      if (errorCode === 503 || errorCode === 429) {
+        const elapsedMs = Date.now() - startTime;
+        
+        if (elapsedMs >= MAX_EXECUTION_TIME_MS) {
+          throw new Error(`Runtime Safety Timeout: O orçamento cronometrado (${elapsedMs}ms) estoirou o teto de 300 segundos. Saída limpa forçada executada.`);
         }
 
-        if ((statusCode === 429 || statusCode === 503) && tentativa < CONFIG.MAX_RETRIES) {
-          let esperaMs = ESPERAS_MS[tentativa - 1] || 120000;
-          console.warn(`[AVISO HTTP ${statusCode}] Cota ou sobrecarga. Aguardando ${Math.round(esperaMs/1000)}s (Tentativa ${tentativa}/${CONFIG.MAX_RETRIES})...`);
-          Utilities.sleep(esperaMs);
-          continue;
+        const tempCap = Math.min(CAP_DELAY_MS, BASE_DELAY_MS * Math.pow(2, attempt));
+        const sleepMs = Math.random() * tempCap; // Full Jitter
+
+        if (elapsedMs + sleepMs >= MAX_EXECUTION_TIME_MS) {
+          throw new Error(`Runtime Safety Timeout Intercetado: Adicionar sono de ${Math.round(sleepMs)}ms provocaria colapso do sistema (teto 300s). Saída forçada processada.`);
         }
 
-        // Se erro 500 normal
-        if (statusCode >= 500 && tentativa < CONFIG.MAX_RETRIES) {
-          const espera = Math.pow(2, tentativa) * 1000 + Math.floor(Math.random() * 500); // Jitter
-          console.warn(`[AVISO HTTP ${statusCode}] Erro interno. Aguardando ${Math.round(espera/1000)}s...`);
-          Utilities.sleep(espera);
-          continue;
+        console.warn(`[HTTP ${errorCode}] Falha de rede. Tentativa nº ${attempt}: Suspensão mitigadora "Full Jitter" durante ${Math.round(sleepMs)}ms.`);
+        
+        Utilities.sleep(sleepMs);
+        attempt++;
+      } else {
+        // Fallback genérico para outros erros 5xx (mesma lógica do Jitter)
+        if (errorCode >= 500) {
+           const elapsedMs = Date.now() - startTime;
+           if (elapsedMs >= MAX_EXECUTION_TIME_MS) {
+             throw new Error(`Runtime Safety Timeout: Erro Interno ${errorCode}.`);
+           }
+           const tempCap = Math.min(CAP_DELAY_MS, BASE_DELAY_MS * Math.pow(2, attempt));
+           const sleepMs = Math.random() * tempCap;
+           if (elapsedMs + sleepMs >= MAX_EXECUTION_TIME_MS) {
+             throw new Error(`Runtime Safety Timeout Intercetado.`);
+           }
+           console.warn(`[HTTP ${errorCode}] Erro genérico no servidor. Tentativa ${attempt}. Aguardando ${Math.round(sleepMs)}ms.`);
+           Utilities.sleep(sleepMs);
+           attempt++;
+        } else {
+           throw new Error(`Erro não-transiente [HTTP ${errorCode}]: ${responseText}`);
         }
-
-        throw new Error(`Servidor HTTP ${statusCode}: ${response.getContentText()}`);
-      } catch (err) {
-        console.error(`[ERRO DE REDE] Tentativa ${tentativa}: ${err.message}`);
-        if (tentativa === CONFIG.MAX_RETRIES) throw err;
-        Utilities.sleep(15000 * tentativa);
       }
     }
-    return null;
   },
 
   gerarApenasTexto: function(textoBruto, disciplina, apiKey) {
