@@ -104,3 +104,14 @@
   1. **Unificação Interna**: Ajustada a função `get_pdfs_tocs`. Caso o sumário seja gerado via IA (`extract_toc_with_gemini`), as páginas extraídas (impressas) são imediatamente convertidas para físicas somando o offset (`pagina_física = pagina_impressa + offset`).
   2. **Coerência**: Agora, todos os sumários internos mantêm o padrão de páginas físicas, e as conversões bidirecionais ocorrem de forma transparente.
   3. **Regeneração & Git**: Compilação de notebook executada e enviada ao GitHub.
+
+## 2026-07-29 — Correção de Fatiamento Duplicado (Fallback) e Offset no Leitor do Validador
+- **Arquivos alterados:** `scripts/python/generate_notebook.py`, `scripts/python/orquestrador_tutoria.py`, `scripts/colab/Orquestrador_Automatico.ipynb`
+- **Descrição:** Resolvido o bug onde as páginas de capítulos subsequentes eram duplicadas no PDF final, e os limites gerados pelo Validador de Leitura (Agente 2) ficavam defasados.
+- **Causa Raiz:** 
+  1. O fallback na ausência de TOC forçava arbitrariamente um mínimo de `15` páginas de corte, mesmo se um intervalo menor (ex: 5 páginas) fosse definido, invadindo os capítulos seguintes.
+  2. O extrator de texto do Validador (`extrair_texto_paginas`) lia as páginas físicas sem somar o offset do livro, fazendo com que o Agente 2 calibrasse os limites de leitura sobre o texto errado.
+- **Correções Aplicadas:**
+  1. **Ajuste de Fallback**: O fallback de `+15` páginas agora só se aplica se `pag_fim_gemini <= pag_ini_gemini`. Caso contrário, respeita rigorosamente o limite do JSON.
+  2. **Offset no Validador**: Ajustada a função `extrair_texto_paginas` para aplicar o offset do PDF, garantindo que o Agente 2 analise o texto correto.
+  3. **Parâmetro de Reconciliação**: O fatiador final (`exportar_pdfs_finais`) agora passa `reconciliar=False` para garantir que as alterações manuais feitas pelo usuário no JSON de revisão sejam respeitadas 100% sem intervenção do TOC.

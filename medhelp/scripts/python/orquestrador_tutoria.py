@@ -294,16 +294,22 @@ def obter_offset_pdf(source_pdf: str, manual_offsets: dict = None) -> int:
         logging.warning(f"Erro ao autodetectar offset de {filename}: {e}")
     return 0
 
-def reconciliar_e_calcular_limites_corte(source_pdf, capitulo_nome, pag_ini_gemini, pag_fim_gemini):
+def reconciliar_e_calcular_limites_corte(source_pdf, capitulo_nome, pag_ini_gemini, pag_fim_gemini, toc_lista=None, reconciliar=True):
     offset = obter_offset_pdf(source_pdf, OFFSETS_MANUAIS)
-    try:
-        doc = fitz.open(source_pdf)
-        toc = doc.get_toc()
-        total_pages = len(doc)
-        doc.close()
+    p_ini_fisica_gemini = pag_ini_gemini + offset
+    p_fim_fisica_gemini = pag_fim_gemini + offset
+    
+    if not reconciliar:
+        p_fim_val = p_fim_fisica_gemini if pag_fim_gemini > pag_ini_gemini else p_ini_fisica_gemini + 15
+        return p_ini_fisica_gemini, p_fim_val
         
-        p_ini_fisica_gemini = pag_ini_gemini + offset
-        p_fim_fisica_gemini = pag_fim_gemini + offset
+    try:
+        toc = toc_lista
+        if not toc:
+            doc = fitz.open(source_pdf)
+            toc = doc.get_toc()
+            doc.close()
+        total_pages = len(fitz.open(source_pdf))
         
         if toc:
             toc_match_page = None
@@ -332,9 +338,10 @@ def reconciliar_e_calcular_limites_corte(source_pdf, capitulo_nome, pag_ini_gemi
             return p_ini_real, max(p_fim_fisica_gemini, p_fim_real)
     except Exception as e:
         logging.warning(f"Falha na reconciliação de TOC para {source_pdf}: {e}")
-    return pag_ini_gemini + offset, max(pag_fim_gemini + offset, pag_ini_gemini + offset + 15)
+    p_fim_fallback = p_fim_fisica_gemini if pag_fim_gemini > pag_ini_gemini else p_ini_fisica_gemini + 15
+    return p_ini_fisica_gemini, p_fim_fallback
 
-def gerar_pdfs(roteiro: RoteiroTutoria, pdfs_dir: str, output_dir: str):
+def gerar_pdfs(roteiro: RoteiroTutoria, pdfs_dir: str, output_dir: str, tocs: dict = None, reconciliar: bool = True):
     os.makedirs(output_dir, exist_ok=True)
     
     for obj in roteiro.objetivos:
@@ -360,7 +367,8 @@ def gerar_pdfs(roteiro: RoteiroTutoria, pdfs_dir: str, output_dir: str):
                 continue
 
             # Reconciliação Defensiva e Aplicação de Offset (Página Impressa -> Página Física)
-            p_ini_fisica, p_fim_fisica = reconciliar_e_calcular_limites_corte(source_pdf, corte.capitulo, corte.pagina_inicial, corte.pagina_final)
+            corte_toc = tocs.get(corte.arquivo) if tocs else None
+            p_ini_fisica, p_fim_fisica = reconciliar_e_calcular_limites_corte(source_pdf, corte.capitulo, corte.pagina_inicial, corte.pagina_final, corte_toc, reconciliar)
             logging.info(f"ℹ️ Fatiando '{corte.capitulo}' em '{corte.arquivo}': Impresso {corte.pagina_inicial}–{corte.pagina_final} -> Físico {p_ini_fisica}–{p_fim_fisica}.")
                 
             current_book_chapter = f"{corte.arquivo}_{corte.capitulo}"
@@ -495,7 +503,7 @@ async def main():
     
     if data:
         logging.info("Mapeamento recebido com sucesso. Construindo PDFs (Capas e Cortes)...")
-        gerar_pdfs(data, args.refs, args.saida)
+        gerar_pdfs(data, args.refs, args.saida, tocs)
         
         json_path = os.path.join(args.saida, "roteiro_gerado_auditoria.json")
         with open(json_path, "w", encoding="utf-8") as f:
