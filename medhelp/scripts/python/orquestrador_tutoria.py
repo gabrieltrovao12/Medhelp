@@ -255,8 +255,6 @@ def merge_and_sort_cortes(cortes: list[Corte]) -> list[Corte]:
     return merged
 
 def calcular_pagina_final_inteligente(source_pdf, pag_ini, corte_pag_final):
-    if corte_pag_final > pag_ini:
-        return corte_pag_final
     try:
         doc = fitz.open(source_pdf)
         toc = doc.get_toc()
@@ -264,10 +262,11 @@ def calcular_pagina_final_inteligente(source_pdf, pag_ini, corte_pag_final):
         if toc:
             next_pages = sorted([item[2] for item in toc if isinstance(item[2], int) and item[2] > pag_ini])
             if next_pages:
-                return max(pag_ini + 3, next_pages[0] - 1)
+                toc_calculated_end = next_pages[0] - 1
+                return max(corte_pag_final, toc_calculated_end)
     except Exception:
         pass
-    return pag_ini + 15
+    return max(corte_pag_final, pag_ini + 15)
 
 def gerar_pdfs(roteiro: RoteiroTutoria, pdfs_dir: str, output_dir: str):
     os.makedirs(output_dir, exist_ok=True)
@@ -294,10 +293,11 @@ def gerar_pdfs(roteiro: RoteiroTutoria, pdfs_dir: str, output_dir: str):
                 logging.error(f"Arquivo não encontrado: {source_pdf}")
                 continue
 
-            # Ajuste Inteligente da Página Final baseado na estrutura do Sumário real do Livro
-            if corte.pagina_final <= corte.pagina_inicial:
-                corte.pagina_final = calcular_pagina_final_inteligente(source_pdf, corte.pagina_inicial, corte.pagina_final)
-                logging.info(f"ℹ️ Ajuste inteligente de capítulo em '{corte.arquivo}': {corte.pagina_inicial} -> {corte.pagina_final} (Calculado via limites do sumário).")
+            # Garantia Inteligente de Cobertura de Capítulo via Sumário (TOC) do Livro
+            nova_pag_final = calcular_pagina_final_inteligente(source_pdf, corte.pagina_inicial, corte.pagina_final)
+            if nova_pag_final > corte.pagina_final:
+                logging.info(f"ℹ️ Expandindo corte de '{corte.capitulo}' em '{corte.arquivo}': {corte.pagina_inicial} -> {corte.pagina_final} ajustado para {nova_pag_final} (Fim real do capítulo no sumário).")
+                corte.pagina_final = nova_pag_final
                 
             current_book_chapter = f"{corte.arquivo}_{corte.capitulo}"
             
