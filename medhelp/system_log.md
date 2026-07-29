@@ -86,11 +86,12 @@
   2. Modificado o polling do `sync_overgrive.sh` de 60s para 300s (5 minutos) para garantir a finalização estável de uploads em lote.
   3. Criado arquivo `/home/vvgfilhos/medhelp/99-overgrive-inotify.conf` com aumento dos limites do inotify (`max_user_watches` para 524288) para permitir monitoramento em tempo real confiável pelo kernel.
 
-## 2026-07-29 — Reconciliação Defensiva de Offset de Páginas no PDF de Tutoria (PBL)
+## 2026-07-29 — Sistema de Offset de Páginas (Páginas Impressas vs Digitais) no Orquestrador PBL
 - **Arquivos alterados:** `scripts/python/generate_notebook.py`, `scripts/python/orquestrador_tutoria.py`, `scripts/colab/Orquestrador_Automatico.ipynb`
-- **Descrição:** Solução definitiva para a anomalia de fatiamento no `SAito.pdf` onde o Capítulo 13 ("Invasão Tumoral e Metástase") continha 15 páginas impressas do Capítulo 12.
-- **Causa Raiz:** O Gemini gerava a `pagina_inicial: 245` para o Cap 13 confundindo a numeração impressa no rodapé do livro (`245`) com o índice de página física no PDF leitor (`260`). O `PyPDF` fatiava pela página física 245 (que correspondia à pág. impressa 230 do Cap 12).
+- **Descrição:** Implementação do sistema de conversão de offset para os PDFs de tutoria (como `SAito.pdf`, offset = 15 páginas).
+- **Causa Raiz:** Os sumários dos livros impressos utilizam a numeração impressa no rodapé (ex: Cap 12 = 225, Cap 13 = 245). O leitor de PDF exige o índice físico do arquivo (`página_física = página_impressa + 15`).
 - **Correções Aplicadas:**
-  1. **Prompt OCANES**: Atualizado o `system_prompt` para deixar explícito que os números dos sumários são **PÁGINAS FÍSICAS DO PDF** e proibir o uso de páginas impressas.
-  2. **Backend Self-Healing (`reconciliar_e_calcular_limites_corte`)**: Implementada a reconciliação automática contra o `fitz.get_toc()`. Se a página inicial enviada pelo Gemini diferir da página física do capítulo no sumário do PDF, o Python autocorrige para a página física real do sumário antes do fatiamento `PyPDF`.
-  3. **Regeneração**: Notebook `Orquestrador_Automatico.ipynb` compilado e validado com testes sintéticos.
+  1. **Autodetecção & Dicionário `OFFSETS_MANUAIS`**: Adicionada a função `obter_offset_pdf` para autodetectar ou carregar offsets conhecidos por PDF.
+  2. **Prompt OCANES**: O sumário enviado ao Gemini exibe as **Páginas Impressas no Livro** (`página_física - offset`). A IA raciocina com os números impressos reais.
+  3. **Fatiamento PyPDF**: O backend adiciona o `offset` às páginas retornadas pela IA antes do fatiamento (`página_física = página_impressa + offset`).
+  4. **Validação**: Testado e aprovado com 100% de precisão sintética para `SAito.pdf` (Cap 12: 240–259, Cap 13: 260–275).

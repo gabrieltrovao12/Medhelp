@@ -255,12 +255,47 @@ def merge_and_sort_cortes(cortes: list[Corte]) -> list[Corte]:
     merged.sort(key=lambda x: (x.pagina_inicial, ordem.get(x.nivel, 99)))
     return merged
 
+OFFSETS_MANUAIS = {
+    "SAito.pdf": 15
+}
+
+def obter_offset_pdf(source_pdf: str, manual_offsets: dict = None) -> int:
+    if manual_offsets is None:
+        manual_offsets = OFFSETS_MANUAIS
+    filename = os.path.basename(source_pdf)
+    if filename in manual_offsets:
+        return manual_offsets[filename]
+    try:
+        doc = fitz.open(source_pdf)
+        toc = doc.get_toc()
+        if toc:
+            for item in toc:
+                phys_page = item[2]
+                if isinstance(phys_page, int) and 1 <= phys_page <= len(doc):
+                    text = doc[phys_page - 1].get_text("text")
+                    lines = [line.strip() for line in text.split('\n') if line.strip().isdigit()]
+                    for num_str in lines:
+                        printed_num = int(num_str)
+                        diff = phys_page - printed_num
+                        if 0 <= diff < 100:
+                            doc.close()
+                            return diff
+        doc.close()
+    except Exception as e:
+        logging.warning(f"Erro ao autodetectar offset de {filename}: {e}")
+    return 0
+
 def reconciliar_e_calcular_limites_corte(source_pdf, capitulo_nome, pag_ini_gemini, pag_fim_gemini):
+    offset = obter_offset_pdf(source_pdf, OFFSETS_MANUAIS)
     try:
         doc = fitz.open(source_pdf)
         toc = doc.get_toc()
         total_pages = len(doc)
         doc.close()
+        
+        p_ini_fisica_gemini = pag_ini_gemini + offset
+        p_fim_fisica_gemini = pag_fim_gemini + offset
+        
         if toc:
             toc_match_page = None
             cap_num_match = re.search(r'^\s*(\d+)', capitulo_nome)
@@ -276,19 +311,19 @@ def reconciliar_e_calcular_limites_corte(source_pdf, capitulo_nome, pag_ini_gemi
                         if item_num_match and item_num_match.group(1) == cap_num_match.group(1):
                             toc_match_page = page_num
                             break
-            p_ini_real = pag_ini_gemini
-            if toc_match_page is not None and abs(toc_match_page - pag_ini_gemini) > 3:
-                logging.info(f"ℹ️ Self-Healing TOC: Reconciliando início de '{capitulo_nome}' de {pag_ini_gemini} para {toc_match_page} (Página Física do PDF).")
+            p_ini_real = p_ini_fisica_gemini
+            if toc_match_page is not None and abs(toc_match_page - p_ini_fisica_gemini) > 3:
+                logging.info(f"ℹ️ Self-Healing TOC: Reconciliando início de '{capitulo_nome}' de física {p_ini_fisica_gemini} para {toc_match_page} (Página Física do TOC).")
                 p_ini_real = toc_match_page
             next_pages = sorted([item[2] for item in toc if isinstance(item[2], int) and item[2] > p_ini_real])
             if next_pages:
                 p_fim_real = next_pages[0] - 1
             else:
-                p_fim_real = max(pag_fim_gemini, total_pages)
-            return p_ini_real, max(pag_fim_gemini, p_fim_real)
+                p_fim_real = max(p_fim_fisica_gemini, total_pages)
+            return p_ini_real, max(p_fim_fisica_gemini, p_fim_real)
     except Exception as e:
         logging.warning(f"Falha na reconciliação de TOC para {source_pdf}: {e}")
-    return pag_ini_gemini, max(pag_fim_gemini, pag_ini_gemini + 15)
+    return pag_ini_gemini + offset, max(pag_fim_gemini + offset, pag_ini_gemini + offset + 15)
 
 def gerar_pdfs(roteiro: RoteiroTutoria, pdfs_dir: str, output_dir: str):
     os.makedirs(output_dir, exist_ok=True)
@@ -315,12 +350,9 @@ def gerar_pdfs(roteiro: RoteiroTutoria, pdfs_dir: str, output_dir: str):
                 logging.error(f"Arquivo não encontrado: {source_pdf}")
                 continue
 
-            # Reconciliação Defensiva e Ajuste Inteligente via Sumário (TOC)
-            nova_ini, nova_fim = reconciliar_e_calcular_limites_corte(source_pdf, corte.capitulo, corte.pagina_inicial, corte.pagina_final)
-            if nova_ini != corte.pagina_inicial or nova_fim != corte.pagina_final:
-                logging.info(f"ℹ️ Ajustando limites do corte '{corte.capitulo}' em '{corte.arquivo}': {corte.pagina_inicial}–{corte.pagina_final} -> {nova_ini}–{nova_fim}.")
-                corte.pagina_inicial = nova_ini
-                corte.pagina_final = nova_fim
+            # Reconciliação Defensiva e Aplicação de Offset (Página Impressa -> Página Física)
+            p_ini_fisica, p_fim_fisica = reconciliar_e_calcular_limites_corte(source_pdf, corte.capitulo, corte.pagina_inicial, corte.pagina_final)
+            logging.info(f"ℹ️ Fatiando '{corte.capitulo}' em '{corte.arquivo}': Impresso {corte.pagina_inicial}–{corte.pagina_final} -> Físico {p_ini_fisica}–{p_fim_fisica}.")
                 
             current_book_chapter = f"{corte.arquivo}_{corte.capitulo}"
             
@@ -334,8 +366,8 @@ def gerar_pdfs(roteiro: RoteiroTutoria, pdfs_dir: str, output_dir: str):
             reader = PdfReader(source_pdf)
             total_pages = len(reader.pages)
             
-            p_ini = max(0, corte.pagina_inicial - 1)
-            p_fim = min(total_pages, corte.pagina_final)
+            p_ini = max(0, p_ini_fisica - 1)
+            p_fim = min(total_pages, p_fim_fisica)
             
             for p_num in range(p_ini, p_fim):
                 writer.add_page(reader.pages[p_num])
@@ -378,18 +410,21 @@ async def call_agent_with_fallback(system_prompt, prompt, response_schema, max_r
             
     return None
 
-async def process_roteiro(objetivos_text: str, tocs: dict):
+async def process_roteiro(objetivos_text: str, tocs: dict, refs_dir: str = None):
     contexto_tocs = "SUMÁRIOS DISPONÍVEIS NAS REFERÊNCIAS:\n\n"
     has_valid_toc = False
     
     for arquivo, toc in tocs.items():
         if toc:
             has_valid_toc = True
-            contexto_tocs += f"Livro: {arquivo}\n"
+            source_pdf = os.path.join(refs_dir, arquivo) if refs_dir else arquivo
+            offset = obter_offset_pdf(source_pdf, OFFSETS_MANUAIS)
+            contexto_tocs += f"Livro: {arquivo} (Offset de pré-texto: {offset} páginas)\n"
             for item in toc:
-                nivel, titulo, pagina = item
+                nivel, titulo, phys_page = item
                 indent = "  " * (nivel - 1)
-                contexto_tocs += f"{indent}- {titulo} (Página FÍSICA do PDF: {pagina})\n"
+                printed_page = max(1, phys_page - offset) if isinstance(phys_page, int) else phys_page
+                contexto_tocs += f"{indent}- {titulo} (Página Impressa no Livro: {printed_page})\n"
             contexto_tocs += "\n"
 
     if not has_valid_toc:
@@ -401,26 +436,25 @@ Atuar como Orquestrador de Tutoria Médica (PBL), mapeando Objetivos de Aprendiz
 
 [C]
 Você receberá os SUMÁRIOS DISPONÍVEIS e os OBJETIVOS DE APRENDIZAGEM A MAPEAR.
-O sumário contém o título do capítulo e a PÁGINA INICIAL FÍSICA no leitor de PDF.
-ATENÇÃO CRÍTICA: Os números de página indicados no sumário são PÁGINAS FÍSICAS DO PDF, E NÃO as páginas impressas no rodapé do livro.
+O sumário contém o título do capítulo e a PÁGINA IMPRESSA NO LIVRO (número no rodapé).
 
 [A]
 1. Analise o objetivo de aprendizagem.
 2. Identifique na literatura qual(is) capítulo(s) o abordam perfeitamente.
-3. Defina a `pagina_inicial` como a página FÍSICA exata em que o capítulo inicia (fornecida no sumário).
-4. Calcule rigorosamente a `pagina_final`: localize o capítulo IMEDIATAMENTE subsequente no sumário do mesmo nível e subtraia 1 da página física dele. 
+3. Defina a `pagina_inicial` como a página IMPRESSA exata em que o capítulo inicia (fornecida no sumário).
+4. Calcule rigorosamente a `pagina_final`: localize o capítulo IMEDIATAMENTE subsequente no sumário do mesmo nível e subtraia 1 da página impressa dele. 
 5. Se for o último capítulo do livro, calcule `pagina_final` como pagina_inicial + 15.
 6. Classifique o nível didático em 'conceito', 'mecanismo' ou 'clinica'.
 
 [N]
-- REGRA DE OURO: Use EXCLUSIVAMENTE os números de páginas físicas presentes no sumário para pagina_inicial e pagina_final. NUNCA use a numeração impressa do rodapé.
+- REGRA DE OURO: Use EXCLUSIVAMENTE os números de páginas impressas presentes no sumário para pagina_inicial e pagina_final. NUNCA aplique offsets por conta própria.
 - NUNCA iguale a pagina_final com a pagina_inicial. Um capítulo sempre tem extensão de múltiplas páginas.
 - NÃO invente capítulos, use APENAS os do sumário.
 - Retorne EXATAMENTE os dados no schema JSON, sem blocos markdown ao redor.
 
 [E]
-Se o sumário tem: "- Metástase (Página FÍSICA do PDF: 260)" e logo depois "- Biomarcadores (Página FÍSICA do PDF: 276)"
-Seu corte deve ser pagina_inicial: 260 e pagina_final: 275."""
+Se o sumário tem: "- Metástase (Página Impressa no Livro: 245)" e logo depois "- Biomarcadores (Página Impressa no Livro: 261)"
+Seu corte deve ser pagina_inicial: 245 e pagina_final: 260."""
 
     logging.info("Solicitando mapeamento estruturado via Fallback/Backoff...")
     prompt = f"{contexto_tocs}\n\nOBJETIVOS DE APRENDIZAGEM A MAPEAR:\n{objetivos_text}"
