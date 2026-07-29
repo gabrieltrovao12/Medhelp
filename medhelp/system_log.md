@@ -115,3 +115,12 @@
   1. **Ajuste de Fallback**: O fallback de `+15` páginas agora só se aplica se `pag_fim_gemini <= pag_ini_gemini`. Caso contrário, respeita rigorosamente o limite do JSON.
   2. **Offset no Validador**: Ajustada a função `extrair_texto_paginas` para aplicar o offset do PDF, garantindo que o Agente 2 analise o texto correto.
   3. **Parâmetro de Reconciliação**: O fatiador final (`exportar_pdfs_finais`) agora passa `reconciliar=False` para garantir que as alterações manuais feitas pelo usuário no JSON de revisão sejam respeitadas 100% sem intervenção do TOC.
+
+## 2026-07-29 — Transição para Mapeamento de Offsets Interativo e Persistente (`offsets.json`)
+- **Arquivos alterados:** `scripts/python/generate_notebook.py`, `scripts/python/orquestrador_tutoria.py`, `scripts/colab/Orquestrador_Automatico.ipynb`
+- **Descrição:** Substituição do modelo hardcoded/autodetectado de offsets por um modelo interativo e manual direto no Google Colab, garantindo 100% de precisão e empoderando o usuário.
+- **Motivação:** A autodetecção via OCR falhava em PDFs complexos e dicionarizar `OFFSETS_MANUAIS` no código era engessado e impedia o mapeamento de novos livros pelo usuário final no Colab.
+- **Implementação:**
+  1. **Célula Interativa (Notebook)**: Adicionada a "CÉLULA 5 — MAPEAR OFFSETS DOS LIVROS (INTERATIVO)" no notebook. O script itera os PDFs da pasta `PASTA_LIVROS` e pede, via `input()`, a página impressa e a página física do leitor, calculando a matemática do offset.
+  2. **Persistência (`offsets.json`)**: O resultado é salvo em um arquivo JSON na própria pasta de tutoria no Google Drive, sendo recarregado a cada execução (evitando que o usuário precise remapear livros conhecidos).
+  3. **Refatoração Global**: As funções `obter_offset_pdf`, `get_pdfs_tocs`, `process_roteiro`, `gerar_pdfs` e `extrair_texto_paginas` foram atualizadas para receber e consultar o dicionário `offsets_dict` carregado de `offsets.json`, em vez de `OFFSETS_MANUAIS`.
