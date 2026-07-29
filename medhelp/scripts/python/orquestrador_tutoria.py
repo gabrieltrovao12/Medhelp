@@ -220,7 +220,16 @@ async def get_pdfs_tocs(folder_path: str):
                 doc.close()
                 if not toc or len(toc) < 15:
                     logging.warning(f"O arquivo {filename} não possui um sumário (TOC) digital válido. Iniciando extração via IA...")
-                    toc = await extract_toc_with_gemini(filepath)
+                    toc_raw = await extract_toc_with_gemini(filepath)
+                    toc = []
+                    if toc_raw:
+                        offset = obter_offset_pdf(filepath, OFFSETS_MANUAIS)
+                        for item in toc_raw:
+                            nivel, titulo, pag_impressa = item
+                            pag_fisica = pag_impressa
+                            if isinstance(pag_impressa, int) and offset > 0:
+                                pag_fisica = pag_impressa + offset
+                            toc.append([nivel, titulo, pag_fisica])
                     if not toc:
                         logging.warning(f"A IA também falhou ao extrair TOC de {filename}.")
                 tocs[filename] = toc
