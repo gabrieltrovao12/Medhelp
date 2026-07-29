@@ -4,6 +4,7 @@ import logging
 import json
 import os
 import io
+import re
 import pydantic
 import fitz
 from dotenv import load_dotenv
@@ -254,19 +255,40 @@ def merge_and_sort_cortes(cortes: list[Corte]) -> list[Corte]:
     merged.sort(key=lambda x: (x.pagina_inicial, ordem.get(x.nivel, 99)))
     return merged
 
-def calcular_pagina_final_inteligente(source_pdf, pag_ini, corte_pag_final):
+def reconciliar_e_calcular_limites_corte(source_pdf, capitulo_nome, pag_ini_gemini, pag_fim_gemini):
     try:
         doc = fitz.open(source_pdf)
         toc = doc.get_toc()
+        total_pages = len(doc)
         doc.close()
         if toc:
-            next_pages = sorted([item[2] for item in toc if isinstance(item[2], int) and item[2] > pag_ini])
+            toc_match_page = None
+            cap_num_match = re.search(r'^\s*(\d+)', capitulo_nome)
+            for item in toc:
+                title = str(item[1])
+                page_num = item[2]
+                if isinstance(page_num, int):
+                    if capitulo_nome.lower().strip() in title.lower().strip() or title.lower().strip() in capitulo_nome.lower().strip():
+                        toc_match_page = page_num
+                        break
+                    elif cap_num_match:
+                        item_num_match = re.search(r'^\s*(\d+)', title)
+                        if item_num_match and item_num_match.group(1) == cap_num_match.group(1):
+                            toc_match_page = page_num
+                            break
+            p_ini_real = pag_ini_gemini
+            if toc_match_page is not None and abs(toc_match_page - pag_ini_gemini) > 3:
+                logging.info(f"ℹ️ Self-Healing TOC: Reconciliando início de '{capitulo_nome}' de {pag_ini_gemini} para {toc_match_page} (Página Física do PDF).")
+                p_ini_real = toc_match_page
+            next_pages = sorted([item[2] for item in toc if isinstance(item[2], int) and item[2] > p_ini_real])
             if next_pages:
-                toc_calculated_end = next_pages[0] - 1
-                return max(corte_pag_final, toc_calculated_end)
-    except Exception:
-        pass
-    return max(corte_pag_final, pag_ini + 15)
+                p_fim_real = next_pages[0] - 1
+            else:
+                p_fim_real = max(pag_fim_gemini, total_pages)
+            return p_ini_real, max(pag_fim_gemini, p_fim_real)
+    except Exception as e:
+        logging.warning(f"Falha na reconciliação de TOC para {source_pdf}: {e}")
+    return pag_ini_gemini, max(pag_fim_gemini, pag_ini_gemini + 15)
 
 def gerar_pdfs(roteiro: RoteiroTutoria, pdfs_dir: str, output_dir: str):
     os.makedirs(output_dir, exist_ok=True)
@@ -293,11 +315,12 @@ def gerar_pdfs(roteiro: RoteiroTutoria, pdfs_dir: str, output_dir: str):
                 logging.error(f"Arquivo não encontrado: {source_pdf}")
                 continue
 
-            # Garantia Inteligente de Cobertura de Capítulo via Sumário (TOC) do Livro
-            nova_pag_final = calcular_pagina_final_inteligente(source_pdf, corte.pagina_inicial, corte.pagina_final)
-            if nova_pag_final > corte.pagina_final:
-                logging.info(f"ℹ️ Expandindo corte de '{corte.capitulo}' em '{corte.arquivo}': {corte.pagina_inicial} -> {corte.pagina_final} ajustado para {nova_pag_final} (Fim real do capítulo no sumário).")
-                corte.pagina_final = nova_pag_final
+            # Reconciliação Defensiva e Ajuste Inteligente via Sumário (TOC)
+            nova_ini, nova_fim = reconciliar_e_calcular_limites_corte(source_pdf, corte.capitulo, corte.pagina_inicial, corte.pagina_final)
+            if nova_ini != corte.pagina_inicial or nova_fim != corte.pagina_final:
+                logging.info(f"ℹ️ Ajustando limites do corte '{corte.capitulo}' em '{corte.arquivo}': {corte.pagina_inicial}–{corte.pagina_final} -> {nova_ini}–{nova_fim}.")
+                corte.pagina_inicial = nova_ini
+                corte.pagina_final = nova_fim
                 
             current_book_chapter = f"{corte.arquivo}_{corte.capitulo}"
             
@@ -366,7 +389,7 @@ async def process_roteiro(objetivos_text: str, tocs: dict):
             for item in toc:
                 nivel, titulo, pagina = item
                 indent = "  " * (nivel - 1)
-                contexto_tocs += f"{indent}- {titulo} (Página real: {pagina})\n"
+                contexto_tocs += f"{indent}- {titulo} (Página FÍSICA do PDF: {pagina})\n"
             contexto_tocs += "\n"
 
     if not has_valid_toc:
@@ -378,24 +401,26 @@ Atuar como Orquestrador de Tutoria Médica (PBL), mapeando Objetivos de Aprendiz
 
 [C]
 Você receberá os SUMÁRIOS DISPONÍVEIS e os OBJETIVOS DE APRENDIZAGEM A MAPEAR.
-O sumário contém o título do capítulo e a página inicial real do PDF.
+O sumário contém o título do capítulo e a PÁGINA INICIAL FÍSICA no leitor de PDF.
+ATENÇÃO CRÍTICA: Os números de página indicados no sumário são PÁGINAS FÍSICAS DO PDF, E NÃO as páginas impressas no rodapé do livro.
 
 [A]
 1. Analise o objetivo de aprendizagem.
 2. Identifique na literatura qual(is) capítulo(s) o abordam perfeitamente.
-3. Defina a `pagina_inicial` como a página exata em que o capítulo inicia (fornecida no sumário).
-4. Calcule rigorosamente a `pagina_final`: localize o capítulo IMEDIATAMENTE subsequente no sumário do mesmo nível e subtraia 1 da página dele. 
+3. Defina a `pagina_inicial` como a página FÍSICA exata em que o capítulo inicia (fornecida no sumário).
+4. Calcule rigorosamente a `pagina_final`: localize o capítulo IMEDIATAMENTE subsequente no sumário do mesmo nível e subtraia 1 da página física dele. 
 5. Se for o último capítulo do livro, calcule `pagina_final` como pagina_inicial + 15.
 6. Classifique o nível didático em 'conceito', 'mecanismo' ou 'clinica'.
 
 [N]
+- REGRA DE OURO: Use EXCLUSIVAMENTE os números de páginas físicas presentes no sumário para pagina_inicial e pagina_final. NUNCA use a numeração impressa do rodapé.
 - NUNCA iguale a pagina_final com a pagina_inicial. Um capítulo sempre tem extensão de múltiplas páginas.
 - NÃO invente capítulos, use APENAS os do sumário.
 - Retorne EXATAMENTE os dados no schema JSON, sem blocos markdown ao redor.
 
 [E]
-Se o sumário tem: "- Metástase (Página real: 252)" e logo depois "- Biomarcadores (Página real: 270)"
-Seu corte deve ser pagina_inicial: 252 e pagina_final: 269."""
+Se o sumário tem: "- Metástase (Página FÍSICA do PDF: 260)" e logo depois "- Biomarcadores (Página FÍSICA do PDF: 276)"
+Seu corte deve ser pagina_inicial: 260 e pagina_final: 275."""
 
     logging.info("Solicitando mapeamento estruturado via Fallback/Backoff...")
     prompt = f"{contexto_tocs}\n\nOBJETIVOS DE APRENDIZAGEM A MAPEAR:\n{objetivos_text}"

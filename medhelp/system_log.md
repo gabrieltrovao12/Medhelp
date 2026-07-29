@@ -85,3 +85,12 @@
   1. Parado o daemon e removidos os caches corrompidos `.overgrive.cache` e `.overgrive.lastsync` para recriação limpa do mapeamento JSON.
   2. Modificado o polling do `sync_overgrive.sh` de 60s para 300s (5 minutos) para garantir a finalização estável de uploads em lote.
   3. Criado arquivo `/home/vvgfilhos/medhelp/99-overgrive-inotify.conf` com aumento dos limites do inotify (`max_user_watches` para 524288) para permitir monitoramento em tempo real confiável pelo kernel.
+
+## 2026-07-29 — Reconciliação Defensiva de Offset de Páginas no PDF de Tutoria (PBL)
+- **Arquivos alterados:** `scripts/python/generate_notebook.py`, `scripts/python/orquestrador_tutoria.py`, `scripts/colab/Orquestrador_Automatico.ipynb`
+- **Descrição:** Solução definitiva para a anomalia de fatiamento no `SAito.pdf` onde o Capítulo 13 ("Invasão Tumoral e Metástase") continha 15 páginas impressas do Capítulo 12.
+- **Causa Raiz:** O Gemini gerava a `pagina_inicial: 245` para o Cap 13 confundindo a numeração impressa no rodapé do livro (`245`) com o índice de página física no PDF leitor (`260`). O `PyPDF` fatiava pela página física 245 (que correspondia à pág. impressa 230 do Cap 12).
+- **Correções Aplicadas:**
+  1. **Prompt OCANES**: Atualizado o `system_prompt` para deixar explícito que os números dos sumários são **PÁGINAS FÍSICAS DO PDF** e proibir o uso de páginas impressas.
+  2. **Backend Self-Healing (`reconciliar_e_calcular_limites_corte`)**: Implementada a reconciliação automática contra o `fitz.get_toc()`. Se a página inicial enviada pelo Gemini diferir da página física do capítulo no sumário do PDF, o Python autocorrige para a página física real do sumário antes do fatiamento `PyPDF`.
+  3. **Regeneração**: Notebook `Orquestrador_Automatico.ipynb` compilado e validado com testes sintéticos.

@@ -5,6 +5,7 @@
 - [x] Alteração 1: Redesenhar layout da capa em ReportLab (`create_cover_page`) com cálculo de Y dinâmico.
 - [x] Alteração 2: Implementar filtro estrito de idioma PT-BR (Prompt + Backend) no Curador de Vídeos.
 - [x] Alteração 3: Adicionar trava defensiva `pagina_final > pagina_inicial` em Python e regra no prompt `process_roteiro`.
+- [x] Alteração 4: Implementar reconciliação defensiva `reconciliar_e_calcular_limites_corte` (Self-Healing) e prompt OCANES para alinhamento estrito de Páginas Físicas do PDF vs Impressas.
 - [x] Regenerar `Orquestrador_Automatico.ipynb` executando `generate_notebook.py` e testar a sintaxe.
 
 ## FASE ANTERIOR: Subagente Curador do YouTube (POC Local)
