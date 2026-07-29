@@ -208,8 +208,10 @@ REGRAS OCANES:
         logging.error(f"Erro na extração de TOC via LLM para {pdf_path}: {e}")
         return []
 
-async def get_pdfs_tocs(folder_path: str):
+async def get_pdfs_tocs(folder_path: str, offsets_dict: dict = None):
     """Lê a pasta de referências e extrai o sumário de todos os PDFs."""
+    if offsets_dict is None:
+        offsets_dict = carregar_offsets(folder_path)
     tocs = {}
     for filename in os.listdir(folder_path):
         if filename.lower().endswith(".pdf"):
@@ -223,7 +225,7 @@ async def get_pdfs_tocs(folder_path: str):
                     toc_raw = await extract_toc_with_gemini(filepath)
                     toc = []
                     if toc_raw:
-                        offset = obter_offset_pdf(filepath, OFFSETS_MANUAIS)
+                        offset = obter_offset_pdf(filepath, offsets_dict)
                         for item in toc_raw:
                             nivel, titulo, pag_impressa = item
                             pag_fisica = pag_impressa
@@ -264,38 +266,28 @@ def merge_and_sort_cortes(cortes: list[Corte]) -> list[Corte]:
     merged.sort(key=lambda x: (x.pagina_inicial, ordem.get(x.nivel, 99)))
     return merged
 
-OFFSETS_MANUAIS = {
-    "SAito.pdf": 15
-}
+def carregar_offsets(refs_dir: str) -> dict:
+    """Carrega offsets.json da pasta de referências."""
+    offsets_path = os.path.join(refs_dir, "offsets.json")
+    if os.path.exists(offsets_path):
+        with open(offsets_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return {}
 
-def obter_offset_pdf(source_pdf: str, manual_offsets: dict = None) -> int:
-    if manual_offsets is None:
-        manual_offsets = OFFSETS_MANUAIS
+def obter_offset_pdf(source_pdf: str, offsets: dict = None) -> int:
+    """Retorna o offset de um PDF a partir do dicionário de offsets carregado."""
+    if offsets is None:
+        offsets = {}
     filename = os.path.basename(source_pdf)
-    if filename in manual_offsets:
-        return manual_offsets[filename]
-    try:
-        doc = fitz.open(source_pdf)
-        toc = doc.get_toc()
-        if toc:
-            for item in toc:
-                phys_page = item[2]
-                if isinstance(phys_page, int) and 1 <= phys_page <= len(doc):
-                    text = doc[phys_page - 1].get_text("text")
-                    lines = [line.strip() for line in text.split('\n') if line.strip().isdigit()]
-                    for num_str in lines:
-                        printed_num = int(num_str)
-                        diff = phys_page - printed_num
-                        if 0 <= diff < 100:
-                            doc.close()
-                            return diff
-        doc.close()
-    except Exception as e:
-        logging.warning(f"Erro ao autodetectar offset de {filename}: {e}")
+    if filename in offsets:
+        entrada = offsets[filename]
+        if isinstance(entrada, dict):
+            return entrada.get("offset", 0)
+        return entrada
     return 0
 
-def reconciliar_e_calcular_limites_corte(source_pdf, capitulo_nome, pag_ini_gemini, pag_fim_gemini, toc_lista=None, reconciliar=True):
-    offset = obter_offset_pdf(source_pdf, OFFSETS_MANUAIS)
+def reconciliar_e_calcular_limites_corte(source_pdf, capitulo_nome, pag_ini_gemini, pag_fim_gemini, toc_lista=None, reconciliar=True, offsets_dict=None):
+    offset = obter_offset_pdf(source_pdf, offsets_dict)
     p_ini_fisica_gemini = pag_ini_gemini + offset
     p_fim_fisica_gemini = pag_fim_gemini + offset
     
@@ -341,8 +333,10 @@ def reconciliar_e_calcular_limites_corte(source_pdf, capitulo_nome, pag_ini_gemi
     p_fim_fallback = p_fim_fisica_gemini if pag_fim_gemini > pag_ini_gemini else p_ini_fisica_gemini + 15
     return p_ini_fisica_gemini, p_fim_fallback
 
-def gerar_pdfs(roteiro: RoteiroTutoria, pdfs_dir: str, output_dir: str, tocs: dict = None, reconciliar: bool = True):
+def gerar_pdfs(roteiro: RoteiroTutoria, pdfs_dir: str, output_dir: str, tocs: dict = None, reconciliar: bool = True, offsets_dict: dict = None):
     os.makedirs(output_dir, exist_ok=True)
+    if offsets_dict is None:
+        offsets_dict = carregar_offsets(pdfs_dir)
     
     for obj in roteiro.objetivos:
         obj_pdf_path = os.path.join(output_dir, f"Objetivo {obj.numero}.pdf")
@@ -368,7 +362,7 @@ def gerar_pdfs(roteiro: RoteiroTutoria, pdfs_dir: str, output_dir: str, tocs: di
 
             # Reconciliação Defensiva e Aplicação de Offset (Página Impressa -> Página Física)
             corte_toc = tocs.get(corte.arquivo) if tocs else None
-            p_ini_fisica, p_fim_fisica = reconciliar_e_calcular_limites_corte(source_pdf, corte.capitulo, corte.pagina_inicial, corte.pagina_final, corte_toc, reconciliar)
+            p_ini_fisica, p_fim_fisica = reconciliar_e_calcular_limites_corte(source_pdf, corte.capitulo, corte.pagina_inicial, corte.pagina_final, corte_toc, reconciliar, offsets_dict)
             logging.info(f"ℹ️ Fatiando '{corte.capitulo}' em '{corte.arquivo}': Impresso {corte.pagina_inicial}–{corte.pagina_final} -> Físico {p_ini_fisica}–{p_fim_fisica}.")
                 
             current_book_chapter = f"{corte.arquivo}_{corte.capitulo}"
@@ -427,15 +421,17 @@ async def call_agent_with_fallback(system_prompt, prompt, response_schema, max_r
             
     return None
 
-async def process_roteiro(objetivos_text: str, tocs: dict, refs_dir: str = None):
+async def process_roteiro(objetivos_text: str, tocs: dict, refs_dir: str = None, offsets_dict: dict = None):
     contexto_tocs = "SUMÁRIOS DISPONÍVEIS NAS REFERÊNCIAS:\n\n"
     has_valid_toc = False
+    if offsets_dict is None and refs_dir:
+        offsets_dict = carregar_offsets(refs_dir)
     
     for arquivo, toc in tocs.items():
         if toc:
             has_valid_toc = True
             source_pdf = os.path.join(refs_dir, arquivo) if refs_dir else arquivo
-            offset = obter_offset_pdf(source_pdf, OFFSETS_MANUAIS)
+            offset = obter_offset_pdf(source_pdf, offsets_dict)
             contexto_tocs += f"Livro: {arquivo} (Offset de pré-texto: {offset} páginas)\n"
             for item in toc:
                 nivel, titulo, phys_page = item
@@ -497,13 +493,14 @@ async def main():
         objetivos_text = f.read()
 
     logging.info(f"Lendo PDFs da pasta: {args.refs}")
-    tocs = await get_pdfs_tocs(args.refs)
+    offsets_dict = carregar_offsets(args.refs)
+    tocs = await get_pdfs_tocs(args.refs, offsets_dict)
     
-    data = await process_roteiro(objetivos_text, tocs)
+    data = await process_roteiro(objetivos_text, tocs, args.refs, offsets_dict)
     
     if data:
         logging.info("Mapeamento recebido com sucesso. Construindo PDFs (Capas e Cortes)...")
-        gerar_pdfs(data, args.refs, args.saida, tocs)
+        gerar_pdfs(data, args.refs, args.saida, tocs, offsets_dict=offsets_dict)
         
         json_path = os.path.join(args.saida, "roteiro_gerado_auditoria.json")
         with open(json_path, "w", encoding="utf-8") as f:
