@@ -138,16 +138,32 @@ def create_separator_page(livro: str, capitulo: str) -> PageObject:
 # ==============================================================================
 
 async def extract_toc_with_gemini(pdf_path: str) -> list:
-    """Extrai o sumário das primeiras 40 páginas do PDF via LLM"""
+    """Extrai o sumário filtrando especificamente as páginas de sumário do PDF via LLM"""
     try:
         doc = fitz.open(pdf_path)
-        text = ""
-        for i in range(min(40, len(doc))):
-            text += f"\n--- PÁGINA {i+1} ---\n"
-            text += doc[i].get_text("text")
+        toc_text = ""
+        toc_pages = []
+        max_scan = min(35, len(doc))
+        for i in range(max_scan):
+            page_text = doc[i].get_text("text")
+            page_lower = page_text.lower()
+            if any(kw in page_lower for kw in ["sumário", "sumario", "índice", "indice", "table of contents", "conteúdo", "conteudo"]):
+                toc_pages.append(i)
+        if toc_pages:
+            selected_indices = set()
+            for p in toc_pages:
+                for offset in range(-1, 5):
+                    idx = p + offset
+                    if 0 <= idx < len(doc):
+                        selected_indices.add(idx)
+            for idx in sorted(selected_indices):
+                toc_text += f"\n--- PÁGINA {idx+1} ---\n" + doc[idx].get_text("text")
+        else:
+            for i in range(min(25, len(doc))):
+                toc_text += f"\n--- PÁGINA {i+1} ---\n" + doc[i].get_text("text")
         doc.close()
         
-        if not text.strip():
+        if not toc_text.strip():
             return []
             
         sys_prompt = """Você é um especialista em estruturação de metadados de PDFs de medicina.
@@ -173,7 +189,7 @@ REGRAS OCANES:
         
         async with Agent(config) as agent:
             logging.info(f"Extraindo TOC de {os.path.basename(pdf_path)} via LLM...")
-            prompt = f"TEXTO DO INÍCIO DO LIVRO:\n{text}"
+            prompt = f"TEXTO DO SUMÁRIO DO LIVRO:\n{toc_text}"
             response = await agent.chat(prompt)
             data = await response.structured_output()
             
