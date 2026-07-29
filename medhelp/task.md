@@ -1,6 +1,13 @@
 # Tarefas do Projeto - Medhelp
 
-## FASE ATUAL: Subagente Curador do YouTube (POC Local)
+## FASE ATUAL: Correções do Orquestrador Automático de Tutoria (PBL)
+
+- [x] Alteração 1: Redesenhar layout da capa em ReportLab (`create_cover_page`) com cálculo de Y dinâmico.
+- [x] Alteração 2: Implementar filtro estrito de idioma PT-BR (Prompt + Backend) no Curador de Vídeos.
+- [x] Alteração 3: Adicionar trava defensiva `pagina_final > pagina_inicial` em Python e regra no prompt `process_roteiro`.
+- [x] Regenerar `Orquestrador_Automatico.ipynb` executando `generate_notebook.py` e testar a sintaxe.
+
+## FASE ANTERIOR: Subagente Curador do YouTube (POC Local)
 
 - [x] Documentar o escopo do Curador no `research.md`.
 - [x] Atualizar `teste_youtube_curator.py` para usar requests e a API Real do YouTube.

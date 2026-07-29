@@ -40,3 +40,9 @@
 - **Objetivo**: Buscar e curar automaticamente o melhor vídeo didático sobre o tema e anexar no final dos resumos.
 - **Arquitetura**: Busca na YouTube Data API v3 (Top 5) -> Avaliação via Gemini (Prompt OCANES) -> Injeção de Markdown (`🎥 **Aula Sugerida:** [Título](URL)`).
 - **Filtros (LLM)**: Priorizar canais médicos consagrados (Sanar, Jaleko, etc). Rejeitar vídeos para pacientes ou nível ensino médio.
+
+## 5. Orquestrador Automático de Tutoria (PBL) - Correções e Defesas Sistêmicas
+- **Recorte de Páginas Defensivo**: Adição de trava em Python (`pagina_final > pagina_inicial`) e regra OCANES para fallback +20 págs.
+- **Curadoria YouTube PT-BR**: Filtro estrito de idioma no prompt OCANES e heurística em Python para eliminação de títulos em inglês.
+- **Layout ReportLab Dinâmico**: Posição relativa `vy = end_y - 40`px para evitar sobreposição de textos na capa.
+

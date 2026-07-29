@@ -257,6 +257,11 @@ def gerar_pdfs(roteiro: RoteiroTutoria, pdfs_dir: str, output_dir: str):
             if not os.path.exists(source_pdf):
                 logging.error(f"Arquivo não encontrado: {source_pdf}")
                 continue
+
+            # Trava Defensiva contra Recortes Inválidos (pagina_final <= pagina_inicial)
+            if corte.pagina_final <= corte.pagina_inicial:
+                logging.warning(f"⚠️ Corte inválido detectado em '{corte.arquivo}' ({corte.pagina_inicial} -> {corte.pagina_final}). Aplicando offset defensivo de +20 páginas.")
+                corte.pagina_final = corte.pagina_inicial + 20
                 
             current_book_chapter = f"{corte.arquivo}_{corte.capitulo}"
             
