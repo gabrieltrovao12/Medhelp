@@ -41,6 +41,11 @@ class Objetivo(pydantic.BaseModel):
 class RoteiroTutoria(pydantic.BaseModel):
     objetivos: list[Objetivo]
 
+class ValidacaoCorte(pydantic.BaseModel):
+    pagina_inicial_ajustada: int = pydantic.Field(description="Página real onde a explicação técnica do objetivo inicia no PDF")
+    pagina_final_ajustada: int = pydantic.Field(description="Página real onde a explicação técnica do objetivo termina no PDF")
+    resumo_cobertura: str = pydantic.Field(description="Síntese curta em 1 frase dos tópicos do objetivo validados no capítulo")
+
 class TocItem(pydantic.BaseModel):
     nivel: int
     titulo: str

@@ -42,7 +42,9 @@
 - **Filtros (LLM)**: Priorizar canais médicos consagrados (Sanar, Jaleko, etc). Rejeitar vídeos para pacientes ou nível ensino médio.
 
 ## 5. Orquestrador Automático de Tutoria (PBL) - Correções e Defesas Sistêmicas
-- **Recorte de Páginas Defensivo**: Adição de trava em Python (`pagina_final > pagina_inicial`) e regra OCANES para fallback +20 págs.
+- **Remodelagem do Agente 2 (Validador de Tópicos)**: Substituição da filtragem de rejeição binária (`relevante: bool`) pelo Schema `ValidacaoCorte`. O Agente 2 agora valida a presença dos conceitos, calibra os limites e gera o resumo de cobertura (`resumo_cobertura`), eliminando avisos de descarte.
+- **Cálculo Inteligente de Limites de Capítulo (`calcular_pagina_final_inteligente`)**: Substituição da adição genérica de `+20` páginas pela consulta ao sumário (TOC) real do livro, definindo a página final como a anterior ao início do próximo capítulo.
+- **Proteção Anti-Alucinação do YouTube**: Validação estrita em Python exigindo que o `video_escolhido_id` pertença rigorosamente aos IDs reais da busca do YouTube API, com filtro de conteúdo inadequado/músicas.
 - **Curadoria YouTube PT-BR**: Filtro estrito de idioma no prompt OCANES e heurística em Python para eliminação de títulos em inglês.
-- **Layout ReportLab Dinâmico**: Posição relativa `vy = end_y - 40`px para evitar sobreposição de textos na capa.
+- **Layout ReportLab Dinâmico**: Posição relativa `vy = min(end_y - 40, height - 300)`px e links interativos azuis sublinhados para prevenção de sobreposição de texto nas capas.
 
