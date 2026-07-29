@@ -228,22 +228,22 @@ async def get_pdfs_tocs(folder_path: str):
     return tocs
 
 def merge_and_sort_cortes(cortes: list[Corte]) -> list[Corte]:
-    """Mescla cortes adjacentes do mesmo arquivo e ordena didaticamente."""
+    """Mescla cortes adjacentes do mesmo capítulo e ordena por página inicial."""
     if not cortes:
         return []
     
     from collections import defaultdict
     grouped = defaultdict(list)
     for c in cortes:
-        grouped[c.arquivo].append(c)
+        grouped[(c.arquivo, c.capitulo)].append(c)
         
     merged = []
-    for arquivo, lista_cortes in grouped.items():
+    for (arquivo, capitulo), lista_cortes in grouped.items():
         lista_cortes.sort(key=lambda x: x.pagina_inicial)
         current_corte = lista_cortes[0]
         
         for next_corte in lista_cortes[1:]:
-            if next_corte.pagina_inicial <= current_corte.pagina_final + 3:
+            if next_corte.pagina_inicial <= current_corte.pagina_final + 1:
                 current_corte.pagina_final = max(current_corte.pagina_final, next_corte.pagina_final)
             else:
                 merged.append(current_corte)
@@ -251,7 +251,7 @@ def merge_and_sort_cortes(cortes: list[Corte]) -> list[Corte]:
         merged.append(current_corte)
         
     ordem = {"conceito": 0, "mecanismo": 1, "clinica": 2}
-    merged.sort(key=lambda x: ordem.get(x.nivel, 99))
+    merged.sort(key=lambda x: (x.pagina_inicial, ordem.get(x.nivel, 99)))
     return merged
 
 def calcular_pagina_final_inteligente(source_pdf, pag_ini, corte_pag_final):
