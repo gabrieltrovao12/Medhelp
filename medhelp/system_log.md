@@ -95,3 +95,12 @@
   2. **Prompt OCANES**: O sumário enviado ao Gemini exibe as **Páginas Impressas no Livro** (`página_física - offset`). A IA raciocina com os números impressos reais.
   3. **Fatiamento PyPDF**: O backend adiciona o `offset` às páginas retornadas pela IA antes do fatiamento (`página_física = página_impressa + offset`).
   4. **Validação**: Testado e aprovado com 100% de precisão sintética para `SAito.pdf` (Cap 12: 240–259, Cap 13: 260–275).
+
+## 2026-07-29 — Unificação de Offset em TOCs Digitais e TOCs Extraídos via IA
+- **Arquivos alterados:** `scripts/python/generate_notebook.py`, `scripts/python/orquestrador_tutoria.py`, `scripts/colab/Orquestrador_Automatico.ipynb`
+- **Descrição:** Correção do comportamento divergente entre sumários digitais nativos (que retornam páginas físicas) e sumários extraídos via IA (que retornam páginas impressas).
+- **Causa Raiz:** O sumário extraído pelo Gemini do texto do livro já continha páginas impressas. Ao aplicar o offset de subtração no `process_roteiro`, a numeração enviada ao monitor era deslocada ao contrário (ex: pág. `225` virava `210`).
+- **Correções Aplicadas:**
+  1. **Unificação Interna**: Ajustada a função `get_pdfs_tocs`. Caso o sumário seja gerado via IA (`extract_toc_with_gemini`), as páginas extraídas (impressas) são imediatamente convertidas para físicas somando o offset (`pagina_física = pagina_impressa + offset`).
+  2. **Coerência**: Agora, todos os sumários internos mantêm o padrão de páginas físicas, e as conversões bidirecionais ocorrem de forma transparente.
+  3. **Regeneração & Git**: Compilação de notebook executada e enviada ao GitHub.
