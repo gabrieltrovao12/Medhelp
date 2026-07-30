@@ -1,6 +1,16 @@
 # Tarefas do Projeto - Medhelp
 
-## FASE ATUAL: Correções do Orquestrador Automático de Tutoria (PBL)
+## FASE ATUAL: Pipeline Ambulatório SOAP (Apps Script + Gemini API)
+
+- [x] Criar projeto `scripts/apps-script/ambulatorio-soap/`
+  - [x] `appsscript.json` — Manifesto do projeto
+  - [x] `Code.js` — Código consolidado completo (Config, Prompt, API Client, Main, Logger)
+- [x] Usuário: Informar ID da pasta do Google Drive para salvar os `.md`
+- [x] Usuário: Configurar `GEMINI_API_KEY` nas Propriedades do Script do formulário
+- [x] Usuário: Vincular trigger `onFormSubmit` no Editor de Script
+- [x] Teste laboratorial com dados sintéticos no celular
+
+## FASE ANTERIOR: Correções do Orquestrador Automático de Tutoria (PBL)
 
 - [x] Alteração 1: Redesenhar layout da capa em ReportLab (`create_cover_page`) com cálculo de Y dinâmico.
 - [x] Alteração 2: Implementar filtro estrito de idioma PT-BR (Prompt + Backend) no Curador de Vídeos.
