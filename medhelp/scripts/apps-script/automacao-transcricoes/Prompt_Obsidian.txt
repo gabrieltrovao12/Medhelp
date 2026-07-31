@@ -67,6 +67,7 @@ Este protocolo define as regras não negociáveis de formatação e tom de voz p
   \`* [Tópico] — [conduta] — *Motivo: [paráfrase da fala do professor que desqualifica]*\`
 
 4. **Síntese e Estruturação do Resumo Teórico:** Processe a transcrição, já calibrada pela AÇÃO 1, para gerar o resumo.
+   - **Regra de Listas (Essencial para PDF):** Deixe SEMPRE uma linha em branco antes do primeiro item de qualquer lista. Para tópicos aninhados (sub-bullets), utilize OBRIGATORIAMENTE 4 espaços de recuo (indentação).
 
 * **Calibração de Extensão por Duração da Aula:** Estime a duração da aula com base na densidade da transcrição (volume de texto e número de tópicos abordados) e ajuste o tamanho da Seção 3 conforme a tabela abaixo. O objetivo é um resumo completo o suficiente para ser o material principal de revisão pré-prova, sem redundâncias.
 

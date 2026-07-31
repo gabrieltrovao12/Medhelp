@@ -23,37 +23,87 @@ class VideoCurado(pydantic.BaseModel):
     titulo_formatado: str = pydantic.Field(description="O título formatado de forma limpa para exibição.")
 
 # ==============================================================================
+# UTILITÁRIO DE DURAÇÃO (ISO 8601 -> Segundos)
+# ==============================================================================
+def parse_iso_duration(duration_str: str) -> int:
+    """Converte formato ISO 8601 (ex: PT14M35S) em segundos totais."""
+    if not duration_str:
+        return 0
+    match = re.match(r'PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?', duration_str, re.IGNORECASE)
+    if not match:
+        return 0
+    hours = int(match.group(1) or 0)
+    minutes = int(match.group(2) or 0)
+    seconds = int(match.group(3) or 0)
+    return hours * 3600 + minutes * 60 + seconds
+
+# ==============================================================================
 # BUSCA REAL (YouTube Data API v3)
 # ==============================================================================
 def obter_youtube_real(tema: str, api_key: str) -> list:
     # Limpa prefixos comuns (ex: "LHM - Síndromes Tóxicas" -> "Síndromes Tóxicas")
     tema_limpo = re.sub(r'^.*?-\s*', '', tema).strip() or tema
     
-    print(f"\n[🔍 YouTube API] Buscando top 5 vídeos para '{tema_limpo}'...")
-    url = "https://www.googleapis.com/youtube/v3/search"
+    print(f"\n[🔍 YouTube API] Buscando vídeos de aula para '{tema_limpo}'...")
+    search_url = "https://www.googleapis.com/youtube/v3/search"
     params = {
         "part": "snippet",
         "q": f"{tema_limpo} medicina aula",
         "type": "video",
-        "maxResults": 5,
+        "maxResults": 10,
         "key": api_key,
         "relevanceLanguage": "pt"
     }
     
-    response = requests.get(url, params=params)
+    response = requests.get(search_url, params=params)
     response.raise_for_status()
     data = response.json()
     
+    items = data.get("items", [])
+    if not items:
+        return []
+    
+    video_ids = [item["id"]["videoId"] for item in items if "id" in item and "videoId" in item["id"]]
+    if not video_ids:
+        return []
+    
+    # Consulta secundária aos detalhes do vídeo para obter duração (contentDetails)
+    details_url = "https://www.googleapis.com/youtube/v3/videos"
+    details_params = {
+        "part": "contentDetails,snippet",
+        "id": ",".join(video_ids),
+        "key": api_key
+    }
+    
+    details_resp = requests.get(details_url, params=details_params)
+    details_resp.raise_for_status()
+    details_data = details_resp.json()
+    
     resultados = []
-    for item in data.get("items", []):
+    for item in details_data.get("items", []):
         snippet = item.get("snippet", {})
+        content_details = item.get("contentDetails", {})
+        duracao_segundos = parse_iso_duration(content_details.get("duration", ""))
+        
+        # Filtro de Duração Mínima: Apenas vídeos com 10 minutos (600s) ou mais
+        if duracao_segundos < 600:
+            logging.info(f"⏩ Descartando vídeo curto ({duracao_segundos // 60} min): '{snippet.get('title')}'")
+            continue
+            
+        mins = duracao_segundos // 60
+        secs = duracao_segundos % 60
+        
         resultados.append({
-            "id": item["id"]["videoId"],
+            "id": item["id"],
             "title": snippet.get("title", ""),
             "channel": snippet.get("channelTitle", ""),
-            "description": snippet.get("description", "")
+            "description": snippet.get("description", ""),
+            "duration": f"{mins} min {secs} s"
         })
         
+        if len(resultados) >= 5:
+            break
+            
     return resultados
 
 # ==============================================================================
@@ -62,24 +112,24 @@ def obter_youtube_real(tema: str, api_key: str) -> list:
 def curar_melhor_video(tema: str, resultados: list, api_key: str) -> VideoCurado:
     resultados_txt = ""
     for i, vid in enumerate(resultados):
-        resultados_txt += f"\nOpção {i+1}:\n- ID: {vid['id']}\n- Título: {vid['title']}\n- Canal: {vid['channel']}\n- Descrição: {vid['description']}\n"
+        resultados_txt += f"\nOpção {i+1}:\n- ID: {vid['id']}\n- Título: {vid['title']}\n- Canal: {vid['channel']}\n- Duração: {vid['duration']}\n- Descrição: {vid['description']}\n"
     
     system_prompt = """**OBJETIVO:**
 Atuar como Curador Acadêmico Médico rigoroso. Sua missão é analisar uma lista de vídeos e selecionar O MELHOR material para estudantes de medicina e residentes.
 
 **CONTEXTO:**
-Você receberá o TEMA DA AULA e as 5 principais opções retornadas pelo YouTube.
+Você receberá o TEMA DA AULA e opções pré-filtradas de vídeos longos (>= 10 minutos) retornadas pelo YouTube.
 
 **AÇÕES:**
 1. Leia o TEMA DA AULA para entender o foco clínico ou teórico.
-2. Analise os metadados (Título, Canal, Descrição) de cada vídeo.
+2. Analise os metadados (Título, Canal, Duração, Descrição) de cada vídeo.
 3. Filtre pela autoridade médica do canal (priorize cursinhos como SanarFlix, Estratégia MED, Medway, ou ligas acadêmicas).
-4. Selecione o vídeo de maior profundidade científica.
+4. Selecione o vídeo de maior profundidade científica e extensão adequada.
 5. Se não houver candidato aceitável, defina o ID como 'NENHUM'.
 
 **NORMAS:**
 1. REJEITE sumariamente vídeos direcionados a pacientes leigos (ex: "sintomas", "como curar", "o que é").
-2. Se o vídeo escolhido não for de um canal consagrado, tenha um bom critério médico na seleção.
+2. REJEITE vídeos com duração inferior a 10 minutos ou cortes/shorts incompletos.
 3. NUNCA invente um ID de vídeo que não esteja na lista.
 4. Retorne APENAS o objeto JSON bruto. NUNCA utilize blocos delimitadores markdown (ex: ```json).
 

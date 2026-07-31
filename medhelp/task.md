@@ -1,5 +1,11 @@
 # Tarefas do Projeto - Medhelp
 
+## FASE ATUAL: Atualização da Inteligência de Arquiteto (Deep Research)
+
+- [x] Refatorar a skill `medhelp-developer-core` para injetar o padrão de Web Coding (Next.js/React).
+- [x] Injetar padrão Daisy-Chain Quota-Buster para o Google Apps Script na skill mestre.
+- [x] Descartar regras de banco relacional e segurança RLS a pedido do usuário.
+
 ## FASE ATUAL: Pipeline Ambulatório SOAP (Apps Script + Gemini API)
 
 - [x] Criar projeto `scripts/apps-script/ambulatorio-soap/`
@@ -16,7 +22,8 @@
 - [x] Alteração 2: Implementar filtro estrito de idioma PT-BR (Prompt + Backend) no Curador de Vídeos.
 - [x] Alteração 3: Adicionar trava defensiva `pagina_final > pagina_inicial` em Python e regra no prompt `process_roteiro`.
 - [x] Alteração 4: Implementar reconciliação defensiva `reconciliar_e_calcular_limites_corte` (Self-Healing) e prompt OCANES para alinhamento estrito de Páginas Físicas do PDF vs Impressas.
-- [x] Regenerar `Orquestrador_Automatico.ipynb` executando `generate_notebook.py` e testar a sintaxe.
+- [x] Alteração 5: Remover subtítulos (`secao`) do Índice da Capa e alinhar números de páginas à direita em tabela elegante ReportLab no `Orquestrador_Hibrido.ipynb`.
+- [x] Regenerar `Orquestrador_Automatico.ipynb` e `Orquestrador_Hibrido.ipynb` testando compilação e execução.
 
 ## FASE ANTERIOR: Subagente Curador do YouTube (POC Local)
 

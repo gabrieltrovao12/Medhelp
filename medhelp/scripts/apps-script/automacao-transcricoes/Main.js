@@ -64,16 +64,10 @@ function processarNovasTranscricoes() {
         const tituloLimpo = nomeLimpo.replace(/\s*\(Resumo\)\s*/gi, '').trim();
         let resumoFinal = `# ${tituloLimpo}\n\n${resumoGerado}`;
 
-        // Curadoria do YouTube (agora posicionada no topo)
+        // Curadoria do YouTube (posicionada no topo do arquivo MD, logo abaixo do H1)
         const videoMd = YouTubeCurator.obterRecomendacaoDeVideo(tituloLimpo, apiKey, apiKeyYoutube);
         if (videoMd) {
-          // Tenta injetar logo abaixo do Foco Principal da Aula
-          if (/##\s*1\.\s*Foco Principal/i.test(resumoFinal)) {
-            resumoFinal = resumoFinal.replace(/(##\s*1\.\s*Foco Principal.*?\n)/i, '$1' + videoMd + '\n\n');
-          } else {
-            // Fallback se não encontrar o header
-            resumoFinal = resumoFinal.replace(/(# .*?\n\n)/, '$1' + videoMd + '\n\n');
-          }
+          resumoFinal = `# ${tituloLimpo}\n\n${videoMd}\n\n${resumoGerado}`;
         }
 
         // Salva o resumo como "TEMA.md" — sem "(Resumo)" no nome do arquivo
