@@ -70,14 +70,17 @@ Apresentar a saída exclusivamente no formato Markdown abaixo, sem qualquer text
 ## 3. Resumo Teórico
 
 ### [Subtópico A]
+
 - **Conceito-chave:** [Explicação concisa]
 
 **Mecanismo de Ação / Fisiologia:**
+
 - [Passo 1 do mecanismo em bullet]
 - [Passo 2 do mecanismo em bullet]
-  - [Desdobramento em sub-bullet]
+    - [Desdobramento em sub-bullet — obrigatoriamente 4 espaços de recuo]
 
 **Atenção / Risco Clínico:** 
+
 - [Se houver contraindicação grave abordada aqui]
 
 ## 4. Correlação Clínica e Conduta

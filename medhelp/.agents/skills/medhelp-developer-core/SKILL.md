@@ -30,10 +30,24 @@ A principal causa de quebra nos sistemas Medhelp é a exaustão de rede ou limit
 
 - **Exponential Backoff:** Toda requisição de rede (APIs externas, Google Drive, Gemini) DEVE estar em um bloco `try/catch` com lógica de repetição exponencial, aguardando caso ocorram erros 429 (Cota Excedida) ou 500.
 - **Pausa Preditiva (Throttling):** Se o script processar lotes em loop, adicione `sleep()` entre as iterações para respeitar o Rate Limit das APIs.
-- **Guarda de Timeout:** Em ambientes limitados (como o Google Apps Script que tem teto de 6 minutos), monitore o tempo decorrido. Se passar de 4.5 minutos, interrompa o script com segurança e deixe o processamento pendente para a próxima execução.
+- **Daisy-Chain Quota-Buster (Google Apps Script):** É ESTRITAMENTE PROIBIDO usar loops cegos (`for`/`while`) sobre matrizes gigantes. Para contornar o teto de 6 minutos, monitore `Date.now()`. Ao atingir 4.5 minutos, salve o estado da progressão (ex: no `PropertiesService`), feche o fluxo e injete programaticamente um trigger (`ScriptApp.newTrigger`) para que o script desperte sozinho dali a 1 minuto e retome o trabalho.
 - **Log de Erros:** Erros sistêmicos contínuos (que o try/catch não conseguiu salvar após os retries) devem ser documentados em `system_log.md` na raiz do Medhelp, com um plano de reparo.
 
-## 4. Política de Acesso (MCP vs Overgrive)
+## 4. Arquiteto de Web Coding (Next.js e React)
+
+Quando atuar na fundação ou criação de plataformas Web do Medhelp, aplique os seguintes dogmas arquiteturais:
+- **Fronteiras de Rede Rígidas (Server Components):** Componentes devem ser assíncronos e carregar dados diretamente do servidor por padrão (RSC). A diretiva `'use client'` só deve ser usada em folhas da árvore de renderização (arquivos que precisem de `useState`, `useEffect` ou eventos de clique).
+- **Mutações Anti-Legado:** É proibido criar rotas de API arcaicas em `/pages/api` para mutações simples. Toda interação com o banco ou API externa a partir de um formulário deve ser encapsulada usando **Server Actions** (`'use server'`).
+- **Estado Global:** Rejeite estados de carregamento globais que bloqueiam a tela toda. Injete árvores pesadas dentro de limites granulares (`<Suspense fallback={<SkeletonUI />}>`).
+
+## 5. Engenharia de Interface Anti-Slop (UI/UX)
+
+Erradique o "design genérico gerado por IA". As interfaces do Medhelp devem transpirar cuidado e senioridade:
+- **Estética e Tipografia Ousadas:** Use tipografias serifadas distintas para títulos e fontes sem-serifa ultralegíveis para o corpo médico. Evite layouts simétricos e chatos. Use variáveis de CSS modernas para garantir a aplicação perfeita de temas claros/escuros (*Dark Mode*).
+- **Motion Inteligente:** Aplique transições suaves de hover (CSS puro) e animações em cascata (staggered) no carregamento, fugindo do congelamento da interface.
+- **Acessibilidade Inegociável:** Sempre estrutura HTML semântico com marcações ARIA. Componentes (como botões e modais) devem ser operáveis via teclado e com contraste de cores verificado (WCAG 2.1 AA).
+
+## 6. Política de Acesso (MCP vs Overgrive)
 
 Se você precisar buscar arquivos ou validar diretórios:
 - **Regra de Ouro:** Dê preferência aos servidores MCP (como Google Drive MCP) para ler/escrever dados na nuvem do usuário.
