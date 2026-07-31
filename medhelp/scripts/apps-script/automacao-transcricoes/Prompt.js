@@ -92,7 +92,7 @@ Apresentar a saída exclusivamente no formato Markdown abaixo, sem qualquer text
 | [Cenário 2] | [Diagnóstico] | [Tratamento específico] |
 
 ## 5. Erros Comuns e Armadilhas
-* **[Conceito A] NÃO É [Conceito B]:** [Fator determinante segundo o docente].\`;
+* **[Conceito A] NÃO É [Conceito B]:** [Fator determinante segundo o docente].`;
 
 const SYSTEM_INSTRUCTION_OSCE = \`**OBJETIVO**
 Sintetize os múltiplos materiais de referência anexados (PDFs, transcrições e imagens) em um roteiro prático, algorítmico e de auto-instrução detalhada sobre o exame clínico abordado. O roteiro deve guiar a execução passo a passo para provas práticas (OSCE) e atendimento real, facilitando a memorização ativa e a visualização mental, e extrair o foco avaliativo.
@@ -103,10 +103,10 @@ Sintetize os múltiplos materiais de referência anexados (PDFs, transcrições 
 O material destina-se a um acadêmico de medicina em fase de estruturação de protocolos clínicos baseados em evidências institucionais. A fonte primária de dados e condutas é estritamente os documentos anexados nesta interação. O racicionio deve ser lógico, sequencial e focado na ação do examinador.
 
 **TRANSCRIÇÃO_DA_AULA_EM_TEXTO_BRUTO:**
-\\\\\\\`[COLE AQUI A TRANSCRIÇÃO COMPLETA DA AULA]\\\\\\\`
+\`[COLE AQUI A TRANSCRIÇÃO COMPLETA DA AULA]\`
 
 **CONTEÚDO_DOS_SLIDES_EM_TEXTO:**
-\\\\\\\`[COLE AQUI O CONTEÚDO DOS SLIDES/ROTEIRO]\\\\\\\`
+\`[COLE AQUI O CONTEÚDO DOS SLIDES/ROTEIRO]\`
 
 **Hierarquia obrigatória de fontes** (em caso de conflito ou divergência entre documentos, siga esta ordem decrescente de autoridade):
 1. Checklist oficial de OSCE
@@ -141,7 +141,7 @@ O material destina-se a um acadêmico de medicina em fase de estruturação de p
 
 10. Ao final de cada bloco magno, inclua um box destacado com o título **"⚠ Pontos Críticos de Banca"**, listando os erros mais cobrados, "erros fatais" que zeram a estação, e os alertas de professores extraídos dos materiais para aquele bloco específico.
 
-11. Se uma etapa presente no checklist de OSCE não estiver detalhada em nenhuma das outras fontes, inclua o passo normalmente na sequência e sinalize com o marcador \\\`[⚠ NÃO DETALHADO NAS FONTES]\\\` logo após a descrição.
+11. Se uma etapa presente no checklist de OSCE não estiver detalhada em nenhuma das outras fontes, inclua o passo normalmente na sequência e sinalize com o marcador \`[⚠ NÃO DETALHADO NAS FONTES]\` logo após a descrição.
 
 ---
 
@@ -193,4 +193,4 @@ Entregue a resposta exclusivamente no formato Markdown abaixo.
   2. [Ação de despedida/lavagem de mãos]
 
 > ⚠ **Pontos Críticos de Banca**
-> - [Alertas sobre ética/finalização]\`;
+> - [Alertas sobre ética/finalização]`;
