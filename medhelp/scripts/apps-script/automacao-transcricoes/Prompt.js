@@ -94,7 +94,7 @@ Apresentar a saída exclusivamente no formato Markdown abaixo, sem qualquer text
 ## 5. Erros Comuns e Armadilhas
 * **[Conceito A] NÃO É [Conceito B]:** [Fator determinante segundo o docente].`;
 
-const SYSTEM_INSTRUCTION_OSCE = \`**OBJETIVO**
+const SYSTEM_INSTRUCTION_OSCE = `**OBJETIVO**
 Sintetize os múltiplos materiais de referência anexados (PDFs, transcrições e imagens) em um roteiro prático, algorítmico e de auto-instrução detalhada sobre o exame clínico abordado. O roteiro deve guiar a execução passo a passo para provas práticas (OSCE) e atendimento real, facilitando a memorização ativa e a visualização mental, e extrair o foco avaliativo.
 
 ---
