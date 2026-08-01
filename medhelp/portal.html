@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal Medhelp - Materiais de Apoio</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde-musgo: #556B2F;
+    --verde-claro: #A3B18A;
+    --texto: #2c3e50;
+    --texto-leve: #6b7c8a;
+    --borda: #e8ebe4;
+    --card-bg: #ffffff;
+  }
+
+  body {
+    margin: 0;
+    padding: 15px 5px; /* Compactado para o Iframe */
+    font-family: 'Inter', sans-serif;
+    background: transparent;
+    color: var(--texto);
+  }
+
+  .portal {
+    max-width: 1050px; /* Evita estiramento excessivo em telas grandes */
+    margin: 0 auto;
+  }
+
+  .portal-titulo {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--verde-musgo);
+    margin: 0 0 12px 0;
+    letter-spacing: -0.5px;
+    border-bottom: 2px solid var(--verde-musgo);
+    padding-bottom: 8px;
+    display: inline-block;
+  }
+
+  .portal-instrucoes {
+    font-size: 0.95rem;
+    color: var(--texto-leve);
+    line-height: 1.6;
+    margin: 0 0 35px 0;
+    max-width: 750px;
+    font-weight: 300;
+  }
+
+  /* Grid das 3 pastas principais */
+  .grid-pastas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px; /* Grid mais compacto e moderno */
+    align-items: stretch; /* Garante que todos os cards tenham a mesma altura */
+  }
+
+  /* Bloco de cada Pasta Principal */
+  .pasta-bloco {
+    background: var(--card-bg);
+    border: 1px solid rgba(85, 107, 47, 0.08); /* Borda oliva suave */
+    border-top: 4px solid var(--verde-musgo); /* Borda temática de destaque no topo */
+    border-radius: 8px; /* Cantos arredondados modernos */
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.02);
+    display: flex;
+    flex-direction: column; /* Comportamento Flexbox */
+    height: 100%;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .pasta-bloco:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 32px rgba(85, 107, 47, 0.06);
+    border-color: rgba(85, 107, 47, 0.2);
+  }
+
+  /* Cabeçalho da Pasta (Link do Drive Principal) */
+  .pasta-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 22px 20px;
+    text-decoration: none;
+    color: var(--texto);
+    background: rgba(232, 235, 228, 0.15);
+    border-bottom: 1px solid rgba(232, 235, 228, 0.6);
+    transition: background 0.3s ease;
+  }
+
+  .pasta-header:hover {
+    background: rgba(163, 177, 138, 0.1);
+  }
+
+  .pasta-icone {
+    font-size: 22px;
+  }
+
+  .pasta-nome {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    flex-grow: 1;
+    line-height: 1.3;
+  }
+
+  .pasta-seta {
+    font-size: 1rem;
+    color: var(--verde-claro);
+    transition: transform 0.3s ease, color 0.3s ease;
+  }
+
+  .pasta-header:hover .pasta-seta {
+    color: var(--verde-musgo);
+    transform: translateX(4px);
+  }
+
+  .pasta-header:hover .pasta-nome {
+    text-decoration: underline;
+  }
+
+  /* Lista de Subpastas Internas */
+  .subpastas-lista {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Faz a lista crescer para ocupar a altura inteira do card */
+  }
+
+  .sub-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 20px; /* Padding vertical equilibrado */
+    text-decoration: none;
+    color: var(--texto-leve);
+    font-size: 0.95rem;
+    border-bottom: 1px solid rgba(232, 235, 228, 0.4);
+    transition: background 0.25s ease, color 0.25s ease;
+  }
+
+  .sub-item:last-child {
+    border-bottom: none;
+  }
+
+  .sub-item:hover {
+    background: rgba(163, 177, 138, 0.08);
+    color: var(--verde-musgo);
+  }
+
+  .sub-item:hover .sub-nome {
+    text-decoration: underline;
+  }
+
+  /* Marcador em CSS Puro para maior requinte */
+  .sub-marcador {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background-color: var(--verde-claro);
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: transform 0.25s ease, background-color 0.25s ease;
+  }
+
+  .sub-item:hover .sub-marcador {
+    transform: scale(1.3);
+    background-color: var(--verde-musgo);
+  }
+
+  .sub-nome {
+    flex-grow: 1;
+    font-weight: 400;
+  }
+
+  .sub-seta {
+    font-size: 0.85rem;
+    color: var(--verde-claro);
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  .sub-item:hover .sub-seta {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .portal-footer {
+    margin-top: 50px;
+    border-top: 1px solid var(--borda);
+    padding-top: 20px;
+    font-size: 0.8rem;
+    color: var(--texto-leve);
+    text-align: center;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+  }
+
+  @media (max-width: 768px) {
+    body {
+      padding: 20px 10px;
+    }
+    .portal-titulo {
+      font-size: 1.6rem;
+      margin-bottom: 15px;
+    }
+    .portal-instrucoes {
+      margin-bottom: 25px;
+      font-size: 0.9rem;
+    }
+    .grid-pastas {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+  }
+</style>
+
+<!-- Google Analytics 4 (GA4) Integration Script -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YOUR_MEASUREMENT_ID"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // CONFIGURAÇÕES DO GOOGLE ANALYTICS (Substitua pelos seus dados quando criar a conta)
+  const GA_MEASUREMENT_ID = 'G-YOUR_MEASUREMENT_ID'; 
+  const PARENT_PORTAL_URL = 'https://sites.google.com/view/medhelp'; 
+
+  // Inicializa o GA4 forçando a localização para a URL do site pai
+  gtag('config', GA_MEASUREMENT_ID, {
+    'page_title': 'Portal Medhelp - Grade de Disciplinas',
+    'page_path': '/portal-grade-disciplinas',
+    'page_location': PARENT_PORTAL_URL
+  });
+
+  // Rastreamento de cliques em eventos
+  document.addEventListener('DOMContentLoaded', function() {
+    
+    // 1. Cliques em Pastas Principais
+    const headers = document.querySelectorAll('.pasta-header');
+    headers.forEach(function(header) {
+      header.addEventListener('click', function() {
+        const pastaNome = header.querySelector('.pasta-nome') ? header.querySelector('.pasta-nome').innerText.trim() : 'Desconhecido';
+        const url = header.getAttribute('href') || '';
+        
+        gtag('event', 'click_pasta_principal', {
+          'tipo_material': pastaNome,
+          'url_destino': url
+        });
+      });
+    });
+
+    // 2. Cliques em Subpastas / Problemas
+    const subItems = document.querySelectorAll('.sub-item');
+    subItems.forEach(function(item) {
+      item.addEventListener('click', function() {
+        const blocoPai = item.closest('.pasta-bloco');
+        const categoriaPai = blocoPai && blocoPai.querySelector('.pasta-nome') 
+          ? blocoPai.querySelector('.pasta-nome').innerText.trim() 
+          : 'Desconhecido';
+        const subNome = item.querySelector('.sub-nome') ? item.querySelector('.sub-nome').innerText.trim() : 'Desconhecido';
+        const url = item.getAttribute('href') || '';
+        
+        gtag('event', 'click_sub_item', {
+          'categoria_pai': categoriaPai,
+          'nome_item': subNome,
+          'url_destino': url
+        });
+      });
+    });
+
+  });
+</script>
+</head>
+<body>
+
+<div class="portal">
+
+  <h1 class="portal-titulo">2026.2 - Material de apoio Medhelp</h1>
+  
+  <p class="portal-instrucoes">
+    Basta clicar na disciplina desejada para acessar a pasta correspondente no Google Drive. Cada módulo contém mapas mentais, resumos de aulas/conferências, roteiro dos objetivos de aprendizagem e sugestões de vídeos complementares no YouTube.
+  </p>
+
+  <div class="grid-pastas">
+
+    <!-- 1. TUTORIA -->
+    <div class="pasta-bloco">
+      <a href="https://drive.google.com/drive/u/1/folders/1Qd-eMzLSvVJ1L9MS8Q1wGmNnUvBmf2WD" target="_blank" class="pasta-header" aria-label="Acessar pasta principal de Tutoria">
+        <span class="pasta-icone">📚</span>
+        <span class="pasta-nome">Manifestações Abdominais - Tutoria</span>
+        <span class="pasta-seta">→</span>
+      </a>
+      <div class="subpastas-lista">
+        <a href="LINK_PROBLEMA_1_AQUI" target="_blank" class="sub-item">
+          <span class="sub-marcador"></span>
+          <span class="sub-nome">Problema 1</span>
+          <span class="sub-seta">→</span>
+        </a>
+        <a href="LINK_PROBLEMA_2_AQUI" target="_blank" class="sub-item">
+          <span class="sub-marcador"></span>
+          <span class="sub-nome">Problema 2</span>
+          <span class="sub-seta">→</span>
+        </a>
+        <a href="LINK_PROBLEMA_3_AQUI" target="_blank" class="sub-item">
+          <span class="sub-marcador"></span>
+          <span class="sub-nome">Problema 3</span>
+          <span class="sub-seta">→</span>
+        </a>
+        <a href="LINK_PROBLEMA_4_AQUI" target="_blank" class="sub-item">
+          <span class="sub-marcador"></span>
+          <span class="sub-nome">Problema 4</span>
+          <span class="sub-seta">→</span>
+        </a>
+        <a href="LINK_PROBLEMA_5_AQUI" target="_blank" class="sub-item">
+          <span class="sub-marcador"></span>
+          <span class="sub-nome">Problema 5</span>
+          <span class="sub-seta">→</span>
+        </a>
+        <a href="LINK_PROBLEMA_6_AQUI" target="_blank" class="sub-item">
+          <span class="sub-marcador"></span>
+          <span class="sub-nome">Problema 6</span>
+          <span class="sub-seta">→</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- 2. HABILIDADES MÉDICAS -->
+    <div class="pasta-bloco">
+      <a href="https://drive.google.com/drive/u/1/folders/1ODVau9hF6KDBduocEMdebzpuFm0Y7ah5" target="_blank" class="pasta-header" aria-label="Acessar pasta principal de Habilidades Médicas">
+        <span class="pasta-icone">🩺</span>
+        <span class="pasta-nome">Habilidades Médicas</span>
+        <span class="pasta-seta">→</span>
+      </a>
+      <div class="subpastas-lista">
+        <a href="LINK_HABILIDADES_CIRURGICAS_AQUI" target="_blank" class="sub-item">
+          <span class="sub-marcador"></span>
+          <span class="sub-nome">Habilidades Cirúrgicas</span>
+          <span class="sub-seta">→</span>
+        </a>
+        <a href="LINK_HABILIDADES_CLINICAS_AQUI" target="_blank" class="sub-item">
+          <span class="sub-marcador"></span>
+          <span class="sub-nome">Habilidades Clínicas</span>
+          <span class="sub-seta">→</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- 3. TFC -->
+    <div class="pasta-bloco">
+      <a href="https://drive.google.com/drive/u/1/folders/13STTVplklklH6uatjbZ1P4QhR4ZUcnC5" target="_blank" class="pasta-header" aria-label="Acessar pasta principal de TFC">
+        <span class="pasta-icone">🔬</span>
+        <span class="pasta-nome">TFC</span>
+        <span class="pasta-seta">→</span>
+      </a>
+      <div class="subpastas-lista">
+        <a href="LINK_FARMACOLOGIA_AQUI" target="_blank" class="sub-item">
+          <span class="sub-marcador"></span>
+          <span class="sub-nome">Farmacologia</span>
+          <span class="sub-seta">→</span>
+        </a>
+        <a href="LINK_ANATOMIA_AQUI" target="_blank" class="sub-item">
+          <span class="sub-marcador"></span>
+          <span class="sub-nome">Anatomia</span>
+          <span class="sub-seta">→</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="portal-footer">
+    Desenvolvido por Gabriel Trovão &copy; 2026
+  </footer>
+
+</div>
+
+</body>
+</html>
