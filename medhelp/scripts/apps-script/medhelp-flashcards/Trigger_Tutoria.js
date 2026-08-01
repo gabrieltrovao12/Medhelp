@@ -7,20 +7,51 @@ function processarFlashcardsDeTutoria() {
   console.log(`\n============================================================`);
   console.log(`[INÍCIO] Fluxo de Tutoria -> Flashcards`);
 
-  const apiKey = PropertiesService.getScriptProperties().getProperty('GEMINI_API_KEY');
+  const apiKey = CONFIG.getApiKey();
   if (!apiKey) {
     console.error('[FATAL] GEMINI_API_KEY não configurada.');
     return;
   }
 
-  // A Tutoria lê PDFs (não restringe pelo limitador de 168h nativo, pois lê a pasta inteira e deduplica)
-  // Mas para manter performance vamos apenas ler a pasta
+  const resultPdfs = _getTutoriaPdfs();
+  if (!resultPdfs || resultPdfs.arquivos.length === 0) {
+    console.log(`[INFO] Nenhum PDF de tutoria encontrado.`);
+    return;
+  }
+
+  const { arquivos, totalObjetivosGeral } = resultPdfs;
+  console.log(`[INFO] Encontrados ${arquivos.length} PDF(s) de Tutoria com ~${totalObjetivosGeral} objetivos. Inspecionando lote...`);
+
+  const nomeDestino = _gerarNomeDestinoTutoria(arquivos);
+  
+  if (!_verificarDeduplicacao(arquivos, nomeDestino)) {
+    return; // Já existe e está atualizado
+  }
+
+  const { blocosConsolidados, metaNomes } = _processarPdfsTutoria(arquivos, totalObjetivosGeral, apiKey, tempoInicio);
+
+  if (blocosConsolidados.length > 0) {
+    _salvarConsolidadoTutoria(nomeDestino, blocosConsolidados, metaNomes);
+  }
+
+  const duracao = Math.round((Date.now() - tempoInicio) / 1000);
+  console.log(`[FIM] Concluído em ${duracao}s.`);
+  console.log(`============================================================\n`);
+
+  NotificationUtils.sendSuccessReport('Tutoria', blocosConsolidados.length, duracao, 'Tutoria');
+}
+
+/**
+ * Lê a pasta de tutoria e retorna os PDFs deduplicados e o total de objetivos.
+ * @returns {{arquivos: GoogleAppsScript.Drive.File[], totalObjetivosGeral: number}|null}
+ */
+function _getTutoriaPdfs() {
   let folder;
   try {
     folder = DriveApp.getFolderById(CONFIG.ID_PASTA_ENTRADA_TUTORIA);
   } catch(e) {
     console.error(`[ERRO] Falha ao acessar pasta Tutoria: ${e.message}`);
-    return;
+    return null;
   }
 
   const iter = folder.getFilesByType('application/pdf');
@@ -31,24 +62,31 @@ function processarFlashcardsDeTutoria() {
     const f = iter.next();
     if (!arquivosUnicosMap.has(f.getName())) {
       arquivosUnicosMap.set(f.getName(), f);
-      // Conta as barras para saber total de objetivos
       totalObjetivosGeral += ((f.getName().match(/\//g) || []).length + 1);
     }
   }
 
-  const arquivos = Array.from(arquivosUnicosMap.values());
-  if (arquivos.length === 0) {
-    console.log(`[INFO] Nenhum PDF de tutoria encontrado.`);
-    return;
-  }
+  return {
+    arquivos: Array.from(arquivosUnicosMap.values()),
+    totalObjetivosGeral
+  };
+}
 
-  console.log(`[INFO] Encontrados ${arquivos.length} PDF(s) de Tutoria com ~${totalObjetivosGeral} objetivos. Inspecionando lote...`);
-
-  // O nome do arquivo consolidado engloba os nomes dos PDFs sem extensão
+/**
+ * @param {GoogleAppsScript.Drive.File[]} arquivos 
+ * @returns {string}
+ */
+function _gerarNomeDestinoTutoria(arquivos) {
   const nomesParaOArquivo = arquivos.map(f => f.getName().replace(/\.pdf$/i, '').replace(/\//g, '-')).join(' + ');
-  const nomeDestino = NamingUtils.gerarNomeFlashcardLimpo(`Tutoria - ${nomesParaOArquivo}`);
+  return NamingUtils.gerarNomeFlashcardLimpo(`Tutoria - ${nomesParaOArquivo}`);
+}
 
-  // Deduplicação baseada em modificação temporal
+/**
+ * @param {GoogleAppsScript.Drive.File[]} arquivos 
+ * @param {string} nomeDestino 
+ * @returns {boolean} true se deve prosseguir, false se deve abortar (pulo)
+ */
+function _verificarDeduplicacao(arquivos, nomeDestino) {
   const arquivoExistente = DriveUtils.checkIfFileExists(nomeDestino, 'Tutoria');
   if (arquivoExistente) {
     const dataCards = arquivoExistente.getDateCreated().getTime();
@@ -56,13 +94,23 @@ function processarFlashcardsDeTutoria() {
     
     if (!pdfAtualizado) {
       console.log(`[PULO] O consolidado "${nomeDestino}" já existe e está atualizado.`);
-      return;
+      return false;
     }
     
     console.log(`[INFO] Mudança detectada nos PDFs. Deletando "${nomeDestino}" antigo para regeneração.`);
     arquivoExistente.setTrashed(true);
   }
+  return true;
+}
 
+/**
+ * @param {GoogleAppsScript.Drive.File[]} arquivos 
+ * @param {number} totalObjetivosGeral 
+ * @param {string} apiKey 
+ * @param {number} tempoInicio 
+ * @returns {{blocosConsolidados: string[], metaNomes: string[]}}
+ */
+function _processarPdfsTutoria(arquivos, totalObjetivosGeral, apiKey, tempoInicio) {
   const blocosConsolidados = [];
   const metaNomes = [];
 
@@ -99,33 +147,22 @@ function processarFlashcardsDeTutoria() {
     Utilities.sleep(CONFIG.DELAY_ENTRE_ARQUIVOS_MS); // Throttling Preditivo
   }
 
-  if (blocosConsolidados.length > 0) {
-    try {
-      const conteudoFinal = blocosConsolidados.join('\n\n---\n\n');
-      const metaDataHeader = `> **Fontes Originais:**\n${metaNomes.join('\n')}`;
-      
-      DriveUtils.saveMarkdown(nomeDestino, conteudoFinal, 'Tutoria', metaDataHeader);
-      console.log(`\n[SUCESSO GLOBAL] Consolidado "${nomeDestino}" salvo.`);
-    } catch (e) {
-      console.error(`[ERRO] Falha ao salvar consolidado no Drive: ${e.message}`);
-    }
-  }
+  return { blocosConsolidados, metaNomes };
+}
 
-  const duracao = Math.round((Date.now() - tempoInicio) / 1000);
-  console.log(`[FIM] Concluído em ${duracao}s.`);
-  console.log(`============================================================\n`);
-
-  // Notificação por e-mail — enviada apenas se houve consolidação gerada
-  if (blocosConsolidados.length > 0) {
-    try {
-      MailApp.sendEmail({
-        to: Session.getEffectiveUser().getEmail(),
-        subject: `[Medhelp ✅] Flashcards de Tutoria gerados (${blocosConsolidados.length} PDF(s))`,
-        body: `Relatório do ciclo de Flashcards (Tutoria) — ${new Date().toLocaleString('pt-BR')}\n\n✅ PDFs processados: ${blocosConsolidados.length}\nTempo de execução: ${duracao}s\n\nArquivos prontos em: Drive → Flashcards_Prontos/Tutoria/`
-      });
-      console.log('[EMAIL] Notificação enviada.');
-    } catch (e) {
-      console.warn(`[EMAIL] Falha ao enviar notificação: ${e.message}`);
-    }
+/**
+ * @param {string} nomeDestino 
+ * @param {string[]} blocosConsolidados 
+ * @param {string[]} metaNomes 
+ */
+function _salvarConsolidadoTutoria(nomeDestino, blocosConsolidados, metaNomes) {
+  try {
+    const conteudoFinal = blocosConsolidados.join('\n\n---\n\n');
+    const metaDataHeader = `> **Fontes Originais:**\n${metaNomes.join('\n')}`;
+    
+    DriveUtils.saveMarkdown(nomeDestino, conteudoFinal, 'Tutoria', metaDataHeader);
+    console.log(`\n[SUCESSO GLOBAL] Consolidado "${nomeDestino}" salvo.`);
+  } catch (e) {
+    console.error(`[ERRO] Falha ao salvar consolidado no Drive: ${e.message}`);
   }
 }
