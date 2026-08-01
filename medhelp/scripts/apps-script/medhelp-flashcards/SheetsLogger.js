@@ -6,19 +6,22 @@
 // Colunas: Data | Hora | Script | Arquivo | Disciplina | Status | Tempo(s) | Modelo
 // ============================================================
 
+/**
+ * @typedef {Object} LogData
+ * @property {string} [script]     - ex: "Resumos", "Tutoria", "AutomacaoTranscricoes"
+ * @property {string} [arquivo]    - nome do arquivo processado
+ * @property {string} [disciplina] - disciplina detectada
+ * @property {string} [status]     - "SUCESSO" | "ERRO" | "ERRO_API"
+ * @property {number} [duracao]    - tempo em segundos
+ */
+
 const SheetsLogger = {
 
   /**
    * Registra uma linha de produção na planilha de controle.
    * Falha silenciosamente — nunca interrompe o pipeline principal.
    *
-   * @param {Object} dados
-   * @param {string} dados.script     - ex: "Resumos", "Tutoria", "AutomacaoTranscricoes"
-   * @param {string} dados.arquivo    - nome do arquivo processado
-   * @param {string} dados.disciplina - disciplina detectada
-   * @param {string} dados.status     - "SUCESSO" | "ERRO" | "PULADO"
-   * @param {number} dados.duracao    - tempo em segundos
-   */
+   * @param {LogData} dados
   registrar: function(dados) {
     const sheetId = PropertiesService.getScriptProperties().getProperty('SHEETS_LOG_ID');
     if (!sheetId) return; // Sem planilha configurada — ignora silenciosamente

@@ -19,6 +19,9 @@ const GeminiAPI = {
 
   /**
    * Chamada com Exponential Backoff with Full Jitter e Graceful Exit.
+   * @param {Object} payload 
+   * @param {string} apiKey 
+   * @returns {string}
    */
   fetchWithRetry: function(payload, apiKey) {
     const url = this._buildUrl(apiKey);
@@ -101,6 +104,13 @@ const GeminiAPI = {
     }
   },
 
+  /**
+   * Gera flashcards a partir de texto markdown de resumos.
+   * @param {string} textoBruto 
+   * @param {string} disciplina 
+   * @param {string} apiKey 
+   * @returns {string}
+   */
   gerarApenasTexto: function(textoBruto, disciplina, apiKey) {
     const payload = {
       contents: [{ parts: [{ text: PROMPTS.buildPromptResumos(textoBruto, disciplina) }] }],
@@ -110,6 +120,14 @@ const GeminiAPI = {
     return this.fetchWithRetry(payload, apiKey);
   },
 
+  /**
+   * Gera flashcards a partir de extração em PDF de tutoria.
+   * @param {string} pdfBase64 
+   * @param {string} nomeArquivo 
+   * @param {number} limiteCards 
+   * @param {string} apiKey 
+   * @returns {string}
+   */
   gerarComPDF: function(pdfBase64, nomeArquivo, limiteCards, apiKey) {
     const payload = {
       contents: [{

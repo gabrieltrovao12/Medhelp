@@ -2,6 +2,9 @@
 // SEÇÃO 1: CONFIGURAÇÕES GLOBAIS
 // ============================================================
 
+/**
+ * Configurações globais do sistema.
+ */
 const CONFIG = {
   // IDs de Pastas
   ID_PASTA_ENTRADA_RESUMOS: '1QnAfngespsRRQfEHouqcXq1x2MTxgPa6', // Resumos prontos (.md)
@@ -14,6 +17,14 @@ const CONFIG = {
   DELAY_ENTRE_ARQUIVOS_MS: 6000,    // Throttling preditivo para 15 RPM (Gemini Flash)
   MAX_RETRIES: 4,                   // Tentativas em caso de erro 429/500
   
+  /** 
+   * Recupera a chave da API do Gemini armazenada no PropertiesService.
+   * @returns {string|null}
+   */
+  getApiKey: function() {
+    return PropertiesService.getScriptProperties().getProperty('GEMINI_API_KEY');
+  },
+
   // Modelo Gemini
   GEMINI_MODEL: 'gemini-2.5-flash',
   

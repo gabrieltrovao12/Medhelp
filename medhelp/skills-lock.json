@@ -1,6 +1,21 @@
 {
   "version": 1,
   "skills": {
+    "applying-brand-guidelines": {
+      "source": "smithery.ai",
+      "sourceType": "well-known",
+      "computedHash": "e74925ac6b9d20e39a685c79847e6043c965f60e6af4dd814153e98155a4c681"
+    },
+    "frontend-design": {
+      "source": "smithery.ai",
+      "sourceType": "well-known",
+      "computedHash": "3e0be122a3db8206b6d0d6b07cca898b5c75fb9b7b2101abe143fb2851734d2e"
+    },
+    "refactor": {
+      "source": "smithery.ai",
+      "sourceType": "well-known",
+      "computedHash": "87789a786b96f99ba0680e89345a975106e10e7db1071c7cdc2e76d507c449d6"
+    },
     "scientific-slides": {
       "source": "smithery.ai",
       "sourceType": "well-known",

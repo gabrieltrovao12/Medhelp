@@ -67,3 +67,32 @@ function listarFilaPendente() {
   if (count === 0) console.log('  [vazia]');
   console.log(`[FILA] Total: ${count} arquivo(s) aguardando processamento.`);
 }
+
+/**
+ * Lê o conteúdo em texto bruto de um arquivo.
+ * @param {GoogleAppsScript.Drive.File} arquivo 
+ * @returns {string}
+ */
+function lerConteudoArquivo(arquivo) {
+  return arquivo.getBlob().getDataAsString('UTF-8');
+}
+
+/**
+ * Salva o conteúdo formatado em um novo arquivo .md na pasta de resumos.
+ * @param {string} titulo 
+ * @param {string} conteudo 
+ * @returns {GoogleAppsScript.Drive.File}
+ */
+function salvarResumo(titulo, conteudo) {
+  const pastaResumos = DriveApp.getFolderById(CONFIG.ID_PASTA_RESUMOS);
+  return pastaResumos.createFile(titulo + '.md', conteudo, MimeType.PLAIN_TEXT);
+}
+
+/**
+ * Move um arquivo processado para a pasta de arquivados.
+ * @param {GoogleAppsScript.Drive.File} arquivo 
+ */
+function arquivarArquivo(arquivo) {
+  const pastaArquivados = DriveApp.getFolderById(CONFIG.ID_PASTA_ARQUIVADOS);
+  arquivo.moveTo(pastaArquivados);
+}
