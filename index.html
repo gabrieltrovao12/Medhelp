@@ -248,15 +248,12 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  // CONFIGURAÇÕES DO GOOGLE ANALYTICS (Substitua pelos seus dados quando criar a conta)
+  // CONFIGURAÇÕES DO GOOGLE ANALYTICS (Substitua G-YOUR_MEASUREMENT_ID pelo seu ID do painel GA4)
   const GA_MEASUREMENT_ID = 'G-YOUR_MEASUREMENT_ID'; 
-  const PARENT_PORTAL_URL = 'https://sites.google.com/view/medhelp'; 
 
-  // Inicializa o GA4 forçando a localização para a URL do site pai
+  // Inicializa o GA4 diretamente no domínio hospedado
   gtag('config', GA_MEASUREMENT_ID, {
-    'page_title': 'Portal Medhelp - Grade de Disciplinas',
-    'page_path': '/portal-grade-disciplinas',
-    'page_location': PARENT_PORTAL_URL
+    'page_title': 'Portal Medhelp - Grade de Disciplinas'
   });
 
   // Rastreamento de cliques em eventos
