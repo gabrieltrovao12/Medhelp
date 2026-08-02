@@ -1,0 +1,947 @@
+
+
+--- CELL 2 ---
+# 1. Dependências
+!pip install pypdf reportlab google-genai httpx pydantic --quiet
+print('✅ Dependências instaladas!')
+
+--- CELL 3 ---
+# 2. Montagem do Google Drive
+from google.colab import drive
+drive.mount('/content/drive')
+print('✅ Drive montado!')
+
+--- CELL 4 ---
+# 3. Configuração das APIs (Secrets)
+import os
+from google.colab import userdata
+os.environ['GEMINI_API_KEY'] = userdata.get('GEMINI_API_KEY')
+os.environ['YOUTUBE_API_KEY'] = userdata.get('YOUTUBE_API_KEY')
+print('✅ Chaves configuradas!')
+
+--- CELL 6 ---
+import os
+import json
+
+# ✏️ EDITE AQUI
+PASTA_BASE = '/content/drive/MyDrive/Logística - Drive/Livros'
+
+PASTA_LIVROS = PASTA_BASE
+PASTA_SAIDA  = os.path.join(PASTA_BASE, 'saida')
+CONFIG_PATH  = os.path.join(PASTA_BASE, 'config.json')
+OFFSETS_PATH = os.path.join(PASTA_BASE, 'offsets.json')
+
+os.makedirs(PASTA_SAIDA, exist_ok=True)
+
+print(f'📂 Livros : {PASTA_LIVROS}')
+print(f'📂 Saída  : {PASTA_SAIDA}')
+print()
+
+livros_disponiveis = sorted([f for f in os.listdir(PASTA_LIVROS) if f.endswith('.pdf')])
+if livros_disponiveis:
+    print(f'📚 {len(livros_disponiveis)} PDF(s) encontrados:')
+    for l in livros_disponiveis:
+        print(f'   • {l}')
+else:
+    print('⚠️  Nenhum PDF encontrado.')
+
+--- CELL 8 ---
+from pypdf import PdfReader
+
+def _carregar_offsets():
+    if os.path.exists(OFFSETS_PATH):
+        with open(OFFSETS_PATH, encoding='utf-8') as f:
+            return json.load(f)
+    return {}
+
+def _salvar_offsets(offsets):
+    with open(OFFSETS_PATH, 'w', encoding='utf-8') as f:
+        json.dump(offsets, f, ensure_ascii=False, indent=2)
+
+def _tentar_outline(caminho):
+    '''Tenta extrair offset a partir dos bookmarks (outline) do PDF.'''
+    try:
+        reader = PdfReader(caminho)
+        if not reader.outline:
+            return None
+        # Pega o primeiro bookmark que tem página associada
+        for item in reader.outline:
+            if isinstance(item, list):
+                continue  # Sub-nível, pular
+            if hasattr(item, 'page'):
+                # item.page é o índice 0-based da página no arquivo
+                # Tentamos ler o título do bookmark para inferir o número impresso
+                titulo = str(getattr(item, 'title', '') or '')
+                import re as _re
+                match = _re.search(r'(\d+)', titulo)
+                if match:
+                    pagina_idx = reader.get_destination_page_number(item)
+                    num_impresso = int(match.group(1))
+                    pg_leitor = pagina_idx + 1  # 1-based
+                    offset = pg_leitor - num_impresso
+                    return offset
+    except Exception:
+        pass
+    return None
+
+def _pedir_offset(arquivo, caminho):
+    reader = PdfReader(caminho)
+    total = len(reader.pages)
+    print(f'\n📖 Mapeando: {arquivo}  ({total} páginas no arquivo)')
+
+    # Fallback 1: Tentar bookmarks do PDF
+    offset_auto = _tentar_outline(caminho)
+    if offset_auto is not None:
+        sinal = f'+{offset_auto}' if offset_auto >= 0 else str(offset_auto)
+        print(f'   🔖 Offset detectado automaticamente via bookmarks: {sinal}')
+        resp = input(f'   → Aceitar offset {sinal}? (S/n): ').strip().lower()
+        if resp in ('', 's', 'sim', 'y', 'yes'):
+            print(f'   ✅ Offset aceito: {sinal}')
+            return offset_auto, total
+        print('   ↳ Offset automático rejeitado. Entrando no modo manual.')
+
+    # Fallback 2: Input manual
+    print('   Para calcular o offset, escolha qualquer página com número impresso visível.')
+    while True:
+        try:
+            pg_impressa = int(input('   → Número impresso na página: ').strip())
+            pg_leitor   = int(input('   → Número que o leitor de PDF mostra (contador): ').strip())
+            break
+        except ValueError:
+            print('   ⚠️  Digite apenas números inteiros.')
+    offset = pg_leitor - pg_impressa
+    sinal  = f'+{offset}' if offset >= 0 else str(offset)
+    print(f'   ✅ Offset calculado: {sinal}  (impresso {pg_impressa} = arquivo {pg_leitor})')
+    return offset, total
+
+def mapear_offsets():
+    offsets = _carregar_offsets()
+    livros  = sorted([f for f in os.listdir(PASTA_LIVROS) if f.endswith('.pdf')])
+    if not livros:
+        print('⚠️  Nenhum PDF encontrado em:', PASTA_LIVROS)
+        return offsets
+
+    print('=' * 65)
+    print('📐 OFFSETS DE PÁGINA')
+    print('=' * 65)
+    algum_novo = False
+    algum_desatualizado = False
+
+    for arquivo in livros:
+        caminho = os.path.join(PASTA_LIVROS, arquivo)
+        total_atual = len(PdfReader(caminho).pages)
+
+        if arquivo in offsets:
+            entrada = offsets[arquivo]
+            if isinstance(entrada, dict):
+                offset_salvo = entrada['offset']
+                total_salvo  = entrada.get('total_paginas')
+            else:
+                offset_salvo = entrada
+                total_salvo  = None
+                offsets[arquivo] = {'offset': offset_salvo, 'total_paginas': total_atual}
+
+            sinal = f'+{offset_salvo}' if offset_salvo >= 0 else str(offset_salvo)
+
+            if total_salvo is not None and total_salvo != total_atual:
+                algum_desatualizado = True
+                print(f'\n⚠️  OFFSET DESATUALIZADO: {arquivo}')
+                print(f'   Salvo com {total_salvo} páginas — arquivo atual tem {total_atual} páginas.')
+                offset_novo, total_novo = _pedir_offset(arquivo, caminho)
+                offsets[arquivo] = {'offset': offset_novo, 'total_paginas': total_novo}
+            else:
+                offsets[arquivo] = {'offset': offset_salvo, 'total_paginas': total_atual}
+                print(f'✅ {arquivo:<40} offset {sinal:>5}  ({total_atual} págs.)')
+        else:
+            algum_novo = True
+            offset, total = _pedir_offset(arquivo, caminho)
+            offsets[arquivo] = {'offset': offset, 'total_paginas': total}
+
+    _salvar_offsets(offsets)
+
+    print()
+    print('=' * 65)
+    print('📋 OFFSETS MAPEADOS (cole no prompt do Gemini/Claude):')
+    for arquivo in livros:
+        entrada = offsets[arquivo]
+        if isinstance(entrada, dict):
+            offset = entrada['offset']
+            total  = entrada['total_paginas']
+        else:
+            offset = entrada
+            total  = '?'
+        sinal = f'+{offset}' if offset >= 0 else str(offset)
+        print(f'  {arquivo:<45} offset {sinal:>5}   ({total} págs.)')
+    print('=' * 65)
+
+    if algum_desatualizado:
+        print('\n⚠️  Um ou mais offsets foram remapeados porque o arquivo mudou.')
+    if not algum_novo and not algum_desatualizado:
+        print('\n✅ Todos os offsets já estavam salvos e atualizados.')
+    print(f'💾 offsets.json salvo!')
+    return offsets
+
+OFFSETS = mapear_offsets()
+
+--- CELL 10 ---
+# ✏️ COLE O TEXTO DO NOTEBOOKLM AQUI
+TEXTO_NOTEBOOK_LM = """
+
+"""
+
+if len(TEXTO_NOTEBOOK_LM.strip()) < 20:
+    print('⚠️  Texto muito curto. Cole o roteiro completo do NotebookLM acima.')
+else:
+    print(f'✅ Texto recebido: {len(TEXTO_NOTEBOOK_LM)} caracteres ({TEXTO_NOTEBOOK_LM.count(chr(10))} linhas)')
+
+--- CELL 12 ---
+# ══════════════════════════════════════════════════════════════
+# MOTOR DO ORQUESTRADOR HÍBRIDO
+# ══════════════════════════════════════════════════════════════
+import asyncio
+import io
+import re
+import random
+import logging
+import urllib.parse
+import httpx
+from google import genai
+from google.genai import types
+from pypdf import PdfReader, PdfWriter
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.units import cm
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, HRFlowable, Table, TableStyle
+from reportlab.lib.styles import ParagraphStyle
+from reportlab.pdfgen import canvas as rl_canvas
+from difflib import get_close_matches
+import html
+import pydantic
+
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+logging.getLogger('pypdf').setLevel(logging.ERROR)
+
+AUTORIA = '© Conteúdo Autoral  •  João Gabriel R. Trovão'
+GEMINI_FALLBACK_MODELS = ['gemini-3.5-flash-lite', 'gemini-3.6-flash', 'gemini-2.5-flash', 'gemini-3.5-flash']
+
+# ── Gemini API com Exponential Backoff ──────────────────────
+async def call_gemini(client, contents, system_instruction, max_retries=4, response_schema=None):
+    for model_to_use in GEMINI_FALLBACK_MODELS:
+        for tentativa in range(max_retries):
+            try:
+                config_args = {
+                    'system_instruction': system_instruction,
+                    'response_mime_type': 'application/json',
+                }
+                if response_schema:
+                    config_args['response_schema'] = response_schema
+                
+                response = await client.aio.models.generate_content(
+                    model=model_to_use,
+                    contents=contents,
+                    config=types.GenerateContentConfig(**config_args)
+                )
+                
+                if response_schema:
+                    if not response.parsed:
+                        raise ValueError('O modelo não retornou JSON válido.')
+                    return response.parsed
+                else:
+                    if not response.text:
+                        raise ValueError('O modelo não retornou texto.')
+                    return response.text
+            except (Exception, asyncio.CancelledError) as e:
+                error_msg = str(e)
+                is_critical = any(t in error_msg for t in ['400', '401', 'InvalidArgument', 'PermissionDenied'])
+                if is_critical:
+                    logging.error(f'Erro fatal: {e}. Abortando.')
+                    raise e
+                if '404' in error_msg or 'not found' in error_msg.lower():
+                    logging.warning(f'Modelo {model_to_use} indisponível. Pulando...')
+                    break
+                sleep_time = random.uniform(0, 2 ** tentativa)
+                logging.error(f'Erro com {model_to_use} (Tentativa {tentativa+1}/{max_retries}): {type(e).__name__} - {e}')
+                logging.info(f'Aguardando {sleep_time:.2f}s...')
+                await asyncio.sleep(sleep_time)
+    return None
+
+class PlanejamentoVideos(pydantic.BaseModel):
+    termos_busca: list[str]
+
+class CuradoriaVideo(pydantic.BaseModel):
+    video_escolhido_id: str
+    titulo_formatado: str
+
+# ── YouTube: Busca e Curadoria ─────────────────────────────
+ENGLISH_TERMS = ['pathology', 'surgery', 'lecture', 'overview', 'treatment of',
+    'management of', 'diagnosis of', 'journal', 'usmle', 'role in',
+    'review of', 'case report', 'clinical trial', 'definition',
+    'understanding', 'mechanism of', 'syndrome']
+
+def eh_titulo_em_ingles(titulo):
+    t_lower = titulo.lower()
+    indicadores_pt = ['aula', 'medicina', 'resumo', 'fisiopatologia',
+        'tratamento', 'diagnostico', 'diagnóstico', 'doença', 'síndrome',
+        'sindrome', 'sanar', 'jaleko', 'estrategia', 'estratégia',
+        'medway', 'afya', 'medcel']
+    if any(pt in t_lower for pt in indicadores_pt):
+        return False
+    return any(eng in t_lower for eng in ENGLISH_TERMS)
+
+def is_valid_youtube_id(vid_id):
+    if not vid_id or vid_id in ['placeholder_id', 'NENHUM']:
+        return False
+    return len(vid_id) == 11
+
+async def buscar_youtube(termo, api_key):
+    query = urllib.parse.quote(f'{termo} medicina aula')
+    url = f'https://www.googleapis.com/youtube/v3/search?part=snippet&q={query}&type=video&maxResults=5&key={api_key}&relevanceLanguage=pt'
+    async with httpx.AsyncClient() as client:
+        try:
+            r = await client.get(url)
+            if r.status_code == 200:
+                data = r.json()
+                resultados = []
+                termo_proibidos = ['música', 'musica', 'clipe', 'official video',
+                    'video oficial', 'karaoke', 'paródia', 'parodia', 'rick astley']
+                for item in data.get('items', []):
+                    snippet = item.get('snippet', {})
+                    title = snippet.get('title', '')
+                    t_lower = title.lower()
+                    if any(p in t_lower for p in termo_proibidos) or eh_titulo_em_ingles(title):
+                        continue
+                    resultados.append({
+                        'id': item['id']['videoId'],
+                        'title': title,
+                        'channel': snippet.get('channelTitle', ''),
+                        'description': snippet.get('description', '')
+                    })
+                return resultados
+        except Exception as e:
+            logging.error(f'Erro no YouTube API: {e}')
+    return []
+
+async def planejar_videos(client, objetivo_titulo):
+    sys_prompt = '''**OBJETIVO:**
+Atuar como um Planejador Pedagógico Clínico. Fragmentar um Objetivo de Aprendizagem em termos de busca (queries) para encontrar videoaulas no YouTube em Português.
+
+**AÇÕES:**
+1. Desconstrua o objetivo para identificar seus eixos principais.
+2. Avalie a necessidade real de suporte visual para cada eixo.
+3. Se o objetivo contiver múltiplos agentes, patologias ou drogas, fragmente a pesquisa gerando um termo separado para cada entidade.
+4. Para cada eixo relevante, gere um termo de busca clínico e direto em Português.
+
+**NORMAS:**
+1. **Contenção Trivial:** PROIBIDO recomendar vídeos para objetivos puramente epidemiológicos.
+2. **Formatação de Query:** NUNCA inclua as palavras "medicina" ou "aula" nos termos (o sistema injeta automaticamente).
+3. **Limite:** Não gere mais do que 4 termos por objetivo.
+
+**SAÍDA:**
+Retorne o JSON conforme o schema PlanejamentoVideos.'''
+    return await call_gemini(client, f'OBJETIVO:\n{objetivo_titulo}', sys_prompt, response_schema=PlanejamentoVideos)
+
+async def avaliar_com_llm(client, termo, resultados):
+    if not resultados: return None
+    resultados_txt = ''
+    for i, vid in enumerate(resultados):
+        resultados_txt += f'\nOpção {i+1}:\n- ID: {vid["id"]}\n- Título: {vid["title"]}\n- Canal: {vid["channel"]}\n- Descrição: {vid["description"]}\n'
+    sys_prompt = '''**OBJETIVO:**
+Atuar como Curador Acadêmico Médico rigoroso. Selecionar O MELHOR material (videoaula) para estudantes de medicina.
+
+**AÇÕES:**
+1. Analise o Tema/Termo para entender o foco clínico.
+2. Classifique a Autoridade do Canal: priorize canais consolidados (SanarFlix, Estratégia MED, Medway, Afya, Medcel).
+3. Eleja a opção de maior profundidade científica.
+4. Se não houver candidato aceitável em português, defina o ID como 'NENHUM'.
+
+**NORMAS:**
+1. **Filtro de Leigos:** REJEITE vídeos para pacientes leigos.
+2. **Filtro de Idioma:** PROIBIDO selecionar vídeos em inglês. Se todas as opções forem estrangeiras, defina `video_escolhido_id` como 'NENHUM'.
+3. **Alucinação Zero:** NUNCA invente um ID que não esteja nas opções.
+
+**SAÍDA:**
+Retorne o JSON conforme o schema CuradoriaVideo.'''
+    prompt = f'Tema/Termo: {termo}\n\nOpções:\n{resultados_txt}'
+    return await call_gemini(client, prompt, sys_prompt, response_schema=CuradoriaVideo)
+
+async def adicionar_videos(config):
+    api_key_yt = os.environ.get('YOUTUBE_API_KEY')
+    api_key_gem = os.environ.get('GEMINI_API_KEY')
+    if not api_key_yt:
+        logging.warning('YOUTUBE_API_KEY não encontrada. Pulando curadoria de vídeos.')
+        return config
+    client = genai.Client(api_key=api_key_gem)
+    print('\n🎥 Iniciando Curadoria de Vídeos do YouTube...')
+    for obj in config:
+        obj.setdefault('videos', [])
+        print(f'  → Objetivo {obj["objetivo"]}: {obj["titulo"][:60]}...')
+        plan = await planejar_videos(client, obj['titulo'])
+        if plan and plan.termos_busca:
+            print(f'    Termos: {plan.termos_busca}')
+            for termo in plan.termos_busca:
+                resultados = await buscar_youtube(termo, api_key_yt)
+                valid_ids = {vid['id']: vid['title'] for vid in resultados}
+                curadoria = await avaliar_com_llm(client, termo, resultados)
+                if curadoria and curadoria.video_escolhido_id in valid_ids and is_valid_youtube_id(curadoria.video_escolhido_id):
+                    final_title = curadoria.titulo_formatado or valid_ids[curadoria.video_escolhido_id]
+                    obj['videos'].append({
+                        'termo_busca': termo,
+                        'video_id': curadoria.video_escolhido_id,
+                        'titulo_formatado': final_title
+                    })
+                    print(f'    ✅ Vídeo: {final_title}')
+                else:
+                    print(f'    ⚠️ Nenhum vídeo bom em PT-BR para "{termo}"')
+    return config
+
+# ── PDF: Funções de Renderização ──────────────────────────
+def nome_legivel(arquivo):
+    nome = os.path.basename(arquivo).replace('.pdf', '')
+    return re.sub(r'[_\\-]+', ' ', nome).title()
+
+def formatar_paginas(paginas):
+    paginas = sorted(set(paginas))
+    grupos, inicio, fim = [], paginas[0], paginas[0]
+    for p in paginas[1:]:
+        if p == fim + 1: fim = p
+        else:
+            grupos.append((inicio, fim)); inicio = fim = p
+    grupos.append((inicio, fim))
+    return ', '.join(str(a) if a == b else f'{a}–{b}' for a, b in grupos)
+
+def _get_reportlab_styles():
+    azul        = colors.HexColor('#556b2f')
+    preto       = colors.HexColor('#2c3e50')
+    cinza       = colors.HexColor('#555555')
+    cinza_claro = colors.HexColor('#999999')
+    
+    return {
+        'azul': azul,
+        'preto': preto,
+        'cinza': cinza,
+        'cinza_claro': cinza_claro,
+        'divisor': colors.HexColor('#e2e8f0'),
+        'label': ParagraphStyle('label', fontName='Helvetica-Bold', fontSize=9, textColor=azul, spaceAfter=4, leading=12),
+        'num': ParagraphStyle('num', fontName='Helvetica-Bold', fontSize=36, textColor=preto, spaceAfter=2, leading=40),
+        'titulo': ParagraphStyle('titulo', fontName='Helvetica-Bold', fontSize=15, textColor=preto, spaceAfter=20, leading=22, wordWrap='LTR'),
+        'secao': ParagraphStyle('secao', fontName='Helvetica-Bold', fontSize=8, textColor=azul, spaceBefore=16, spaceAfter=10, leading=10, letterSpacing=0.5),
+        'pg_right': ParagraphStyle('pg_right', fontName='Helvetica-Bold', fontSize=9.5, textColor=colors.HexColor('#a3b18a'), alignment=2, leading=14),
+        'livro': ParagraphStyle('livro', fontName='Helvetica-Bold', fontSize=10, textColor=preto, spaceAfter=1, leading=14, wordWrap='LTR'),
+        'cap': ParagraphStyle('cap', fontName='Helvetica', fontSize=9.5, textColor=cinza, spaceAfter=1, leading=13, leftIndent=0, wordWrap='LTR'),
+        'sec': ParagraphStyle('sec', fontName='Helvetica', fontSize=9, textColor=cinza_claro, spaceAfter=4, leading=13, leftIndent=8, wordWrap='LTR'),
+        'autoria': ParagraphStyle('autoria', fontName='Helvetica', fontSize=8, textColor=colors.HexColor('#aaaaaa'), alignment=1, leading=12),
+        'fusao_titulo': ParagraphStyle('fusao_titulo', fontName='Helvetica-Bold', fontSize=8, textColor=azul, spaceAfter=4, leading=11, letterSpacing=0.5),
+        'fusao_texto': ParagraphStyle('fusao_texto', fontName='Helvetica', fontSize=9, textColor=preto, spaceAfter=2, leading=13, leftIndent=8, wordWrap='LTR'),
+        'vid_header': ParagraphStyle('vid_header', fontName='Helvetica-Bold', fontSize=9, textColor=azul, spaceBefore=12, spaceAfter=6, leading=12, letterSpacing=0.5),
+        'vid_link': ParagraphStyle('vid_link', fontName='Helvetica', fontSize=10, textColor=colors.HexColor('#556b2f'), spaceAfter=3, leading=14, leftIndent=8, wordWrap='LTR'),
+    }
+
+def _build_cover_header(objetivo, titulo, styles):
+    return [
+        Paragraph('OBJETIVO DE ESTUDO', styles['label']),
+        Paragraph(html.escape(objetivo), styles['num']),
+        Paragraph(html.escape(titulo), styles['titulo']),
+    ]
+
+def _build_fusion_banner(fusao, styles):
+    elems = [HRFlowable(width='100%', thickness=0.5, color=styles['azul'], spaceAfter=8),
+             Paragraph('⚠ ESTE MATERIAL ABRANGE MAIS DE UM OBJETIVO', styles['fusao_titulo'])]
+    linhas = fusao if isinstance(fusao, list) else [fusao]
+    for linha in linhas:
+        elems.append(Paragraph(f'• {html.escape(linha)}', styles['fusao_texto']))
+        elems.append(Spacer(1, 0.15 * cm))
+    elems.append(Spacer(1, 0.2 * cm))
+    elems.append(HRFlowable(width='100%', thickness=0.5, color=styles['azul'], spaceAfter=8))
+    return elems
+
+def _build_videos_section(videos, styles):
+    elems = []
+    valid_vids = [v for v in (videos or []) if is_valid_youtube_id(v.get('video_id', ''))]
+    if valid_vids:
+        elems.append(Paragraph('🎥 VÍDEOS RECOMENDADOS', styles['vid_header']))
+        for vid in valid_vids[:5]:
+            url = f'https://youtube.com/watch?v={vid["video_id"]}'
+            safe_title = html.escape(vid["titulo_formatado"])
+            link_text = f'<a href="{url}" color="#1565c0"><u>▶ {safe_title}</u></a>'
+            elems.append(Paragraph(link_text, styles['vid_link']))
+        elems.append(HRFlowable(width='100%', thickness=0.5, color=styles['divisor'], spaceAfter=4))
+    return elems
+
+def _build_cover_index(cortes, styles):
+    elems = [Paragraph('ÍNDICE', styles['secao'])]
+    pagina_atual = 2  # p.1 = capa
+    for corte in cortes:
+        nome     = nome_legivel(corte['arquivo'])
+        capitulo = corte.get('capitulo', '')
+        n        = len(corte['paginas'])
+        pg_ini   = pagina_atual + 1   # +1 pelo separador
+        pg_fim   = pg_ini + n - 1
+
+        pg_str = f'p. {pg_ini}–{pg_fim}' if pg_ini != pg_fim else f'p. {pg_ini}'
+
+        col_esq = [Paragraph(html.escape(nome), styles['livro'])]
+        if capitulo:
+            col_esq.append(Paragraph(html.escape(capitulo), styles['cap']))
+
+        col_dir = Paragraph(pg_str, styles['pg_right'])
+
+        t_item = Table([[col_esq, col_dir]], colWidths=['80%', '20%'])
+        t_item.setStyle(TableStyle([
+            ('VALIGN', (0,0), (-1,-1), 'TOP'),
+            ('ALIGN', (1,0), (1,0), 'RIGHT'),
+            ('LEFTPADDING', (0,0), (-1,-1), 0),
+            ('RIGHTPADDING', (0,0), (-1,-1), 0),
+            ('BOTTOMPADDING', (0,0), (-1,-1), 6),
+            ('TOPPADDING', (0,0), (-1,-1), 2),
+        ]))
+        elems.append(t_item)
+        pagina_atual += 1 + n
+    return elems
+
+def gerar_capa(objetivo, titulo, cortes, pasta_livros, fusao=None, videos=None):
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(
+        buffer, pagesize=A4,
+        leftMargin=2.5 * cm, rightMargin=2.5 * cm,
+        topMargin=3.5 * cm, bottomMargin=2.5 * cm
+    )
+
+    styles = _get_reportlab_styles()
+    
+    elems = _build_cover_header(objetivo, titulo, styles)
+
+    if fusao:
+        elems.extend(_build_fusion_banner(fusao, styles))
+    else:
+        elems.append(HRFlowable(width='100%', thickness=0.5, color=styles['divisor'], spaceAfter=4))
+
+    elems.extend(_build_videos_section(videos, styles))
+    elems.extend(_build_cover_index(cortes, styles))
+
+    elems.append(Spacer(1, 1 * cm))
+    elems.append(HRFlowable(width='100%', thickness=0.5, color=styles['divisor'], spaceAfter=6))
+    elems.append(Paragraph(AUTORIA, styles['autoria']))
+
+    doc.build(elems)
+    buffer.seek(0)
+    return buffer
+
+def draw_wrapped_text(c, texto, x, y_topo, max_larg, fonte, tamanho, cor, line_height):
+    c.setFont(fonte, tamanho)
+    c.setFillColor(cor)
+    palavras = texto.split()
+    linha_atual = ''
+    linhas_w = []
+    for palavra in palavras:
+        teste = (linha_atual + ' ' + palavra).strip()
+        if c.stringWidth(teste, fonte, tamanho) <= max_larg:
+            linha_atual = teste
+        else:
+            if linha_atual: linhas_w.append(linha_atual)
+            linha_atual = palavra
+    if linha_atual: linhas_w.append(linha_atual)
+    y = y_topo
+    for linha in linhas_w:
+        c.setFont(fonte, tamanho)
+        c.setFillColor(cor)
+        c.drawString(x, y, linha)
+        y -= line_height
+    return y
+
+def gerar_separador(nome_livro, capitulo='', secao='', pagesize=A4):
+    buffer = io.BytesIO()
+    W, H = pagesize
+    c = rl_canvas.Canvas(buffer, pagesize=pagesize)
+
+    azul  = colors.HexColor('#556b2f')
+    preto = colors.HexColor('#2c3e50')
+    cinza = colors.HexColor('#555555')
+
+    c.setFillColor(colors.white)
+    c.rect(0, 0, W, H, fill=1, stroke=0)
+    c.setFillColor(azul)
+    c.rect(2 * cm, 0, 0.35 * cm, H, fill=1, stroke=0)
+
+    x_texto  = 3.2 * cm
+    max_larg = W - x_texto - 1.5 * cm
+    base = H / 2
+    
+    c.setFillColor(azul)
+    c.setFont('Helvetica-Bold', 8)
+    c.drawString(x_texto, base + 2.8 * cm, 'FONTE')
+
+    y_apos = draw_wrapped_text(c, nome_livro, x_texto, base + 1.8 * cm, max_larg, 'Helvetica-Bold', 18, preto, 0.75 * cm)
+    
+    if capitulo:
+        y_apos = draw_wrapped_text(c, capitulo, x_texto, y_apos - 0.4 * cm, max_larg, 'Helvetica-Bold', 11, preto, 0.45 * cm)
+    if secao:
+        draw_wrapped_text(c, f'›  {secao}', x_texto, y_apos - 0.3 * cm, max_larg, 'Helvetica', 10, cinza, 0.4 * cm)
+
+    c.save()
+    return buffer
+
+def _cortes_precisam_separador(corte_anterior, corte_atual):
+    if corte_anterior is None:
+        return True
+    mesmo_arquivo  = corte_anterior['arquivo'] == corte_atual['arquivo']
+    mesmo_capitulo = corte_anterior.get('capitulo', '') == corte_atual.get('capitulo', '')
+    paginas_ant    = sorted(corte_anterior['paginas'])
+    paginas_atu    = sorted(corte_atual['paginas'])
+    contiguas      = paginas_ant and paginas_atu and (paginas_ant[-1] + 1 == paginas_atu[0])
+    return not (mesmo_arquivo and mesmo_capitulo and contiguas)
+
+def _agrupar_cortes_para_capa(cortes):
+    if not cortes: return []
+    grupos = []
+    grupo_atual = {
+        'arquivo':  cortes[0]['arquivo'],
+        'capitulo': cortes[0].get('capitulo', ''),
+        'secao':    cortes[0].get('secao', ''),
+        'paginas':  list(cortes[0]['paginas']),
+    }
+    for corte in cortes[1:]:
+        if not _cortes_precisam_separador(grupo_atual, corte):
+            grupo_atual['paginas'].extend(corte['paginas'])
+            secao_nova = corte.get('secao', '')
+            if secao_nova and secao_nova != grupo_atual['secao']:
+                grupo_atual['secao'] = (
+                    grupo_atual['secao'] + ' / ' + secao_nova
+                    if grupo_atual['secao'] else secao_nova
+                )
+        else:
+            grupos.append(grupo_atual)
+            grupo_atual = {
+                'arquivo':  corte['arquivo'],
+                'capitulo': corte.get('capitulo', ''),
+                'secao':    corte.get('secao', ''),
+                'paginas':  list(corte['paginas']),
+            }
+    grupos.append(grupo_atual)
+    return grupos
+
+def validar_config(config, pasta_livros):
+    erros = []
+    pdfs_disponiveis = [f for f in os.listdir(pasta_livros) if f.lower().endswith('.pdf')]
+    for obj in config:
+        rotulo = f'Objetivo {obj["objetivo"]}'
+        paginas_vistas = {}
+        for i, corte in enumerate(obj['cortes']):
+            arquivo = corte['arquivo']
+            caminho = os.path.join(pasta_livros, arquivo)
+            if not os.path.exists(caminho):
+                sugestao = get_close_matches(arquivo, pdfs_disponiveis, n=1, cutoff=0.6)
+                hint = f'\n           💡 Você quis dizer: "{sugestao[0]}"?' if sugestao else ''
+                erros.append(f'[{rotulo}] Arquivo não encontrado: "{arquivo}"{hint}')
+                continue
+            # Guard: Gemini pode devolver VERIFICAR_OFFSET ao invés de lista
+            if corte.get('paginas') == 'VERIFICAR_OFFSET' or (isinstance(corte.get('paginas'), str)):
+                erros.append(f'[{rotulo}] {arquivo}: ⚠️ OFFSET PRECISA SER VERIFICADO MANUALMENTE (campo paginas = "{corte["paginas"]}")')
+                continue
+            total = len(PdfReader(caminho).pages)
+            if not isinstance(corte['paginas'], list):
+                erros.append(f'[{rotulo}] {arquivo}: campo "paginas" inválido — esperado lista')
+                continue
+            for pg in corte['paginas']:
+                if not isinstance(pg, int):
+                    erros.append(f'[{rotulo}] {arquivo}: página "{pg}" não é um número inteiro')
+                    continue
+                if pg < 1:
+                    erros.append(f'[{rotulo}] {arquivo}: página {pg} inválida (≤ 0). Verifique o offset.')
+                elif pg > total:
+                    erros.append(f'[{rotulo}] {arquivo}: página {pg} inválida (arquivo tem {total} páginas)')
+                chave = (arquivo, pg)
+                if chave in paginas_vistas:
+                    erros.append(f'[{rotulo}] Página {pg} de "{arquivo}" duplicada nos cortes {paginas_vistas[chave]+1} e {i+1}')
+                else:
+                    paginas_vistas[chave] = i
+    return erros
+
+def gerar_pdf_objetivo(obj, pasta_livros, pasta_saida):
+    writer = PdfWriter()
+    fusao  = obj.get('fusao', None)
+    videos = obj.get('videos', [])
+
+    cortes_capa = _agrupar_cortes_para_capa(obj['cortes'])
+    capa = PdfReader(gerar_capa(obj['objetivo'], obj['titulo'], cortes_capa, pasta_livros, fusao=fusao, videos=videos))
+    writer.add_page(capa.pages[0])
+
+    corte_anterior = None
+    for corte in obj['cortes']:
+        nome     = nome_legivel(corte['arquivo'])
+        capitulo = corte.get('capitulo', '')
+        secao    = corte.get('secao', '')
+
+        if _cortes_precisam_separador(corte_anterior, corte):
+            sep = PdfReader(gerar_separador(nome, capitulo, secao))
+            writer.add_page(sep.pages[0])
+
+        caminho = os.path.join(pasta_livros, corte['arquivo'])
+        reader  = PdfReader(caminho)
+        total   = len(reader.pages)
+        for pg in corte['paginas']:
+            idx = pg - 1
+            if 0 <= idx < total:
+                writer.add_page(reader.pages[idx])
+            else:
+                print(f'     ⚠️  Página {pg} ignorada (fora do intervalo)')
+
+        corte_anterior = corte
+
+    nome_arquivo  = f'Objetivo {obj["objetivo"]}.pdf'
+    caminho_saida = os.path.join(pasta_saida, nome_arquivo)
+    with open(caminho_saida, 'wb') as f:
+        writer.write(f)
+
+    n      = sum(len(c['paginas']) for c in obj['cortes'])
+    n_seps = sum(
+        1 for i, c in enumerate(obj['cortes'])
+        if _cortes_precisam_separador(obj['cortes'][i-1] if i > 0 else None, c)
+    )
+    total_pdf = 1 + n_seps + n
+    fusao_aviso = ' [FUSÃO]' if fusao else ''
+    vid_aviso = f' [{len(videos)} vídeo(s)]' if videos else ''
+    print(f'   ✅ {nome_arquivo}  ({total_pdf} páginas, {n_seps} separador(es)){fusao_aviso}{vid_aviso}')
+    return caminho_saida
+
+print('✅ Motor carregado!')
+
+
+--- CELL 14 ---
+# ══════════════════════════════════════════════════════════════
+# AGENTE 1: Converter texto do NotebookLM em JSON estruturado
+# ══════════════════════════════════════════════════════════════
+
+SYSTEM_PROMPT_CONVERSAO = '''Você vai converter um roteiro de leitura acadêmico para JSON pronto para uso no Google Colab.
+ARQUIVOS DISPONÍVEIS NO DRIVE E SEUS OFFSETS:
+{tabela_offsets}
+
+════════════════════════════════════
+REGRA DE FUSÃO DE OBJETIVOS
+════════════════════════════════════
+Antes de gerar o JSON, analise todos os objetivos em conjunto e verifique se há cortes do mesmo capítulo/arquivo distribuídos em objetivos diferentes.
+PASSO 1 — Para cada par de objetivos, verifique:
+Os cortes pertencem ao mesmo capítulo do mesmo arquivo?
+Os temas são complementares (ex: etiologia em um, tratamento em outro)?
+Se sim, marque esses objetivos para fusão.
+PASSO 2 — Ao fundir, agrupe os cortes por CAPÍTULO:
+Identifique todos os capítulos presentes no conjunto fundido
+Para cada capítulo, reúna TODOS os cortes daquele capítulo
+Ordene os cortes dentro de cada capítulo: conceito → mecanismo → clínica
+PASSO 3 — Para ordenar os capítulos entre si, use a sequência didática.
+PASSO 4 — Adicione o campo "fusao" como lista com os títulos completos de cada objetivo fundido.
+PASSO 5 — Se os objetivos forem de capítulos ou arquivos completamente diferentes, mantenha separados.
+
+════════════════════════════════════
+REGRA DE PÁGINAS COMPARTILHADAS
+════════════════════════════════════
+Antes de gerar o JSON, registre internamente todas as páginas já alocadas por arquivo.
+Para cada novo corte, verifique se alguma página já foi alocada em outro objetivo.
+Se houver sobreposição: REMOVA as páginas duplicadas do corte atual.
+NUNCA repita a mesma página do mesmo arquivo em dois objetivos diferentes.
+
+════════════════════════════════════
+LÓGICA DE ORDENAÇÃO DOS CORTES
+════════════════════════════════════
+Conceito base / definição → Mecanismo / fisiopatologia → Aplicação clínica / diagnóstico / tratamento.
+
+════════════════════════════════════
+REGRAS DE CAMPOS
+════════════════════════════════════
+"objetivo" → número com dois dígitos ("01", "02"...)
+"titulo" → texto do objetivo sem o número
+"fusao" → lista de strings, uma por objetivo fundido. Inclua apenas se dois ou mais objetivos foram fundidos
+"ordem_motivo" → inclua apenas se a ordenação não for óbvia
+"arquivo" → use exatamente o nome do arquivo conforme tabela acima
+"capitulo" → copie exatamente como está no roteiro
+"secao" → subtítulo ou seção citada. Se o roteiro citar o capítulo completo, deixe ""
+"nivel" → classifique cada corte como "conceito", "mecanismo" ou "clinica"
+"paginas" → siga exatamente estes passos:
+ PASSO 1 — Identifique o arquivo e localize o offset na tabela acima
+ PASSO 2 — Expanda o intervalo do roteiro para lista completa ANTES de aplicar offset
+ PASSO 3 — Some o offset a CADA número individualmente
+ PASSO 4 — Verifique se todos os resultantes são ≥ 1
+ Se algum for ≤ 0, coloque "VERIFICAR_OFFSET" no campo paginas
+ PASSO 5 — O campo "paginas" recebe APENAS os números já convertidos
+
+════════════════════════════════════
+REGRA PARA PÁGINAS SEM NUMERAÇÃO IMPRESSA
+════════════════════════════════════
+Se o texto de entrada contiver páginas marcadas como 'sem numeração impressa' (ex: 'pág. 45 - sem numeração impressa'),
+trate o número informado como número do leitor de PDF e aplique offset = 0 (use o número como está, sem somar nada).
+Converta esse número diretamente para a lista de "paginas" sem transformação alguma.
+
+Se um objetivo tiver ⚠️ SEM COBERTURA, ignore-o no JSON
+Retorne APENAS o JSON, sem explicações, sem markdown, sem texto antes ou depois
+
+════════════════════════════════════
+ESTRUTURA OBRIGATÓRIA
+════════════════════════════════════
+[
+  {
+    "objetivo": "01",
+    "titulo": "Título unificado se houve fusão, ou título original",
+    "fusao": [
+      "Obj. 01 — Título completo do primeiro objetivo",
+      "Obj. 03 — Título completo do terceiro objetivo"
+    ],
+    "cortes": [
+      {
+        "arquivo": "Parte_1_Saito.pdf",
+        "capitulo": "Cap. 13: Invasão Tumoral e Metástase",
+        "secao": "Processo Metastático",
+        "nivel": "conceito",
+        "paginas": [261, 262, 263]
+      }
+    ]
+  }
+]
+'''
+
+def gerar_tabela_offsets():
+    '''Gera a tabela de offsets formatada para injeção no prompt.'''
+    offsets = _carregar_offsets()
+    linhas = ['📋 OFFSETS MAPEADOS (cole no prompt do Gemini/Claude):']
+    for arquivo, entrada in sorted(offsets.items()):
+        if isinstance(entrada, dict):
+            offset = entrada['offset']
+            total  = entrada.get('total_paginas', '?')
+        else:
+            offset = entrada
+            total  = '?'
+        sinal = f'+{offset}' if offset >= 0 else str(offset)
+        linhas.append(f'  {arquivo:<45} offset {sinal:>5}   ({total} págs.)')
+    return '\n'.join(linhas)
+
+async def converter_notebooklm_para_json(texto_bruto):
+    api_key = os.environ.get('GEMINI_API_KEY')
+    client = genai.Client(api_key=api_key, http_options={'timeout': 300.0})
+
+    tabela_offsets = gerar_tabela_offsets()
+    system_prompt = SYSTEM_PROMPT_CONVERSAO.format(tabela_offsets=tabela_offsets)
+    prompt = f'ROTEIRO PARA CONVERTER:\n\n{texto_bruto}'
+
+    print('🧠 Enviando roteiro para o Gemini...')
+    resposta = await call_gemini(client, prompt, system_prompt)
+
+    if not resposta:
+        print('❌ Falha ao obter resposta do Gemini.')
+        return None
+
+    # Limpeza: remover blocos de código markdown se presentes
+    texto_limpo = resposta.strip()
+    if texto_limpo.startswith('```'):
+        texto_limpo = re.sub(r'^```[a-zA-Z]*\n', '', texto_limpo)
+        texto_limpo = re.sub(r'\n```$', '', texto_limpo)
+
+    try:
+        config = json.loads(texto_limpo)
+        print(f'✅ JSON gerado com {len(config)} objetivo(s)!')
+        return config
+    except json.JSONDecodeError as e:
+        print(f'❌ Erro ao parsear JSON: {e}')
+        print('Resposta bruta salva em /content/resposta_gemini.txt para inspeção.')
+        with open('/content/resposta_gemini.txt', 'w', encoding='utf-8') as f:
+            f.write(resposta)
+        return None
+
+config = await converter_notebooklm_para_json(TEXTO_NOTEBOOK_LM)
+
+if config:
+    with open(CONFIG_PATH, 'w', encoding='utf-8') as f:
+        json.dump(config, f, ensure_ascii=False, indent=2)
+    print(f'💾 config.json salvo em: {CONFIG_PATH}')
+    print()
+    for obj in config:
+        n_pags = sum(len(c['paginas']) for c in obj['cortes'])
+        fusao = ' [FUSÃO]' if obj.get('fusao') else ''
+        print(f'   • Objetivo {obj["objetivo"]}: {n_pags} página(s) de {len(obj["cortes"])} fonte(s){fusao}')
+
+
+--- CELL 16 ---
+with open(CONFIG_PATH, encoding='utf-8') as f:
+    config = json.load(f)
+
+erros = validar_config(config, PASTA_LIVROS)
+if erros:
+    print('❌ Erros encontrados — corrija antes de gerar:\n')
+    for e in erros:
+        print(f'   • {e}')
+else:
+    print('✅ Tudo validado!')
+    print()
+
+    # Preview
+    total_geral = 0
+    print('=' * 65)
+    print('📋 PREVIEW — O QUE SERÁ GERADO')
+    print('=' * 65)
+
+    for obj in config:
+        n_pags    = sum(len(c['paginas']) for c in obj['cortes'])
+        n_seps    = sum(1 for i, c in enumerate(obj['cortes'])
+                        if _cortes_precisam_separador(obj['cortes'][i-1] if i > 0 else None, c))
+        total_pdf = 1 + n_seps + n_pags
+        total_geral += total_pdf
+
+        fusao_aviso = ' [FUSÃO]' if obj.get('fusao') else ''
+        print(f'\n🎯 Objetivo {obj["objetivo"]}  ({total_pdf} págs. no PDF final){fusao_aviso}')
+        titulo_curto = obj['titulo'][:75] + '...' if len(obj['titulo']) > 75 else obj['titulo']
+        print(f'   {titulo_curto}')
+        print()
+
+        pagina_atual = 2
+        for i, corte in enumerate(obj['cortes']):
+            nome     = nome_legivel(corte['arquivo'])
+            capitulo = corte.get('capitulo', '')
+            secao    = corte.get('secao', '')
+            n        = len(corte['paginas'])
+            pags_str = formatar_paginas(corte['paginas'])
+
+            need_sep = _cortes_precisam_separador(obj['cortes'][i-1] if i > 0 else None, corte)
+            if need_sep:
+                pg_ini = pagina_atual + 1
+            else:
+                pg_ini = pagina_atual
+            pg_fim = pg_ini + n - 1
+
+            print(f'   [{i+1}] {nome}')
+            if capitulo: print(f'       {capitulo}')
+            if secao:    print(f'       › {secao}')
+            print(f'       Fonte: págs. {pags_str}  →  PDF final: p. {pg_ini}–{pg_fim}')
+
+            pagina_atual = pg_fim + 1
+
+    print()
+    print('=' * 65)
+    print(f'📦 Total: {total_geral} páginas em {len(config)} PDF(s)')
+    print('=' * 65)
+    print('\n✅ Se estiver correto, rode a Célula 8 (Curadoria de Vídeos) ou vá direto para a Célula 9 (Gerar PDFs).')
+
+--- CELL 18 ---
+with open(CONFIG_PATH, encoding='utf-8') as f:
+    config = json.load(f)
+
+config = await adicionar_videos(config)
+
+# Salva config atualizado com vídeos
+with open(CONFIG_PATH, 'w', encoding='utf-8') as f:
+    json.dump(config, f, ensure_ascii=False, indent=2)
+
+print('\n✅ Curadoria concluída! Rode a Célula 9 para gerar os PDFs.')
+
+--- CELL 20 ---
+with open(CONFIG_PATH, encoding='utf-8') as f:
+    config = json.load(f)
+
+erros = validar_config(config, PASTA_LIVROS)
+if erros:
+    print('❌ Corrija os erros antes de gerar (rode a Célula 7):')
+    for e in erros:
+        print(f'   • {e}')
+else:
+    print(f'🚀 Gerando {len(config)} PDF(s)...\n')
+    for obj in config:
+        fusao_aviso = ' [FUSÃO]' if obj.get('fusao') else ''
+        print(f'📄 Objetivo {obj["objetivo"]}{fusao_aviso} — {obj["titulo"][:60]}...')
+        gerar_pdf_objetivo(obj, PASTA_LIVROS, PASTA_SAIDA)
+    print(f'\n🎉 Concluído! Arquivos em: {PASTA_SAIDA}')
