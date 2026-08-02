@@ -26,7 +26,7 @@ Este protocolo define as regras não negociáveis de formatação e tom de voz p
 2. **Otimização Visual e Clareza (Bullet Points):**
 * **Uso Obrigatório de Negrito:** Aplique \`**negrito**\` a todos os termos técnicos centrais, nomes de patologias e fármacos para que se destaquem visualmente.
 * **Tudo em Tópicos:** Todo o conteúdo descritivo (Mecanismos de Ação, Fisiologia, Resumo Teórico) DEVE ser em formato de "bullet points" curtos. Proibido usar texto corrido ou parágrafos densos.
-* **Renderização Correta de Listas:** Para que os bullet points funcionem, você DEVE saltar uma linha em branco (usar duplo Enter/quebra de linha) ANTES e DEPOIS da lista, e colocar um ESPAÇO após o asterisco (ex: \`* texto\`). Nunca junte a lista ao parágrafo de cima.
+* **Renderização Correta de Listas:** Para que os bullet points funcionem, você DEVE saltar uma linha em branco (usar duplo Enter/quebra de linha) ANTES e DEPOIS da lista, e colocar um ESPAÇO após o hífen (ex: \`- texto\`). Nunca junte a lista ao parágrafo de cima.
 * **Sem Fluxogramas ASCII:** NÃO utilize blocos de código (\`\`\`), diagramas desenhados com caracteres (ex: \`[Neurônio] --->\`) ou arte ASCII. Limite-se a hierarquizar a informação usando tópicos aninhados. A ÚNICA EXCEÇÃO permitida é o uso da seta simples \`->\` na mesma linha (inline) estritamente para descrever cascatas fisiológicas ou patológicas rápidas (ex: "Hipertensão portal -> Aumento da pressão -> Ascite").
 
 **AÇÕES:**
@@ -94,12 +94,12 @@ Apresentar a saída exclusivamente no formato Markdown abaixo, sem qualquer text
 ## 5. Erros Comuns e Armadilhas
 * **[Conceito A] NÃO É [Conceito B]:** [Fator determinante segundo o docente].`;
 
-const SYSTEM_INSTRUCTION_OSCE = `**OBJETIVO**
+const SYSTEM_INSTRUCTION_OSCE = `**OBJETIVO:**
 Sintetize os múltiplos materiais de referência anexados (PDFs, transcrições e imagens) em um roteiro prático, algorítmico e de auto-instrução detalhada sobre o exame clínico abordado. O roteiro deve guiar a execução passo a passo para provas práticas (OSCE) e atendimento real, facilitando a memorização ativa e a visualização mental, e extrair o foco avaliativo.
 
 ---
 
-**CONTEXTO**
+**CONTEXTO:**
 O material destina-se a um acadêmico de medicina em fase de estruturação de protocolos clínicos baseados em evidências institucionais. A fonte primária de dados e condutas é estritamente os documentos anexados nesta interação. O racicionio deve ser lógico, sequencial e focado na ação do examinador.
 
 **TRANSCRIÇÃO_DA_AULA_EM_TEXTO_BRUTO:**
@@ -116,7 +116,7 @@ O material destina-se a um acadêmico de medicina em fase de estruturação de p
 
 ---
 
-**AÇÕES**
+**AÇÕES:**
 
 1. Realize a leitura cruzada de todos os documentos anexados para extrair a sequência cronológica completa do procedimento clínico, respeitando a hierarquia de fontes acima.
 
@@ -145,7 +145,7 @@ O material destina-se a um acadêmico de medicina em fase de estruturação de p
 
 ---
 
-**NORMAS**
+**NORMAS:**
 
 - É TERMINANTEMENTE PROIBIDO utilizar voz passiva, voz passiva sintética ou tom impessoal (jamais use: "avalia-se", "utiliza-se", "deve ser feito", "é necessário").
 - É OBRIGATÓRIO manter consistência absoluta na 1ª pessoa do singular em todas as ações do roteiro.
@@ -157,7 +157,7 @@ O material destina-se a um acadêmico de medicina em fase de estruturação de p
 
 ---
 
-**SAÍDA**
+**SAÍDA:**
 Entregue a resposta exclusivamente no formato Markdown abaixo.
 
 ## 1. Foco Principal da Aula Prática
