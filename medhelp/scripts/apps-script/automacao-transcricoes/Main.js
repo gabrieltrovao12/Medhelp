@@ -54,6 +54,11 @@ function processarNovasTranscricoes() {
   if (processados > 0 || falhas > 0) {
     enviarNotificacaoEmail(processados, falhas);
   }
+
+  // Aciona o gerador de flashcards se tivermos processado novos resumos
+  if (processados > 0) {
+    acionarWebhookFlashcards();
+  }
 }
 
 /**
@@ -178,5 +183,33 @@ function doPost(e) {
       status: "erro",
       mensagem: err.message
     })).setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+/**
+ * Aciona o webhook do projeto Medhelp Flashcards para iniciar
+ * a geração automática dos flashcards a partir dos novos resumos.
+ */
+function acionarWebhookFlashcards() {
+  const url = PropertiesService.getScriptProperties().getProperty('WEBHOOK_FLASHCARDS_URL');
+  
+  if (!url) {
+    console.warn("[AVISO] WEBHOOK_FLASHCARDS_URL não configurada nas Propriedades do Script. Ignorando acionamento do Flashcards.");
+    return;
+  }
+
+  try {
+    console.log(`[WEBHOOK OUT] Acionando pipeline de Flashcards...`);
+    
+    const options = {
+      method: 'post',
+      contentType: 'application/json',
+      muteHttpExceptions: true // Impede que o GAS lance erro e aborte o script caso o webhook retorne 500
+    };
+    
+    const response = UrlFetchApp.fetch(url, options);
+    console.log(`[WEBHOOK OUT] Resposta Flashcards (HTTP ${response.getResponseCode()}): ${response.getContentText()}`);
+  } catch (e) {
+    console.error(`[WEBHOOK OUT ERRO] Falha ao acionar o webhook do Flashcards: ${e.message}`);
   }
 }
