@@ -5,295 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Portal Medhelp - Materiais de Apoio</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;1,500&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --verde-musgo: #556B2F;
-    --verde-claro: #A3B18A;
-    --texto: #2c3e50;
-    --texto-leve: #6b7c8a;
-    --borda: #e8ebe4;
-    --card-bg: #ffffff;
-  }
-
-  body {
-    margin: 0;
-    padding: 15px 5px; /* Compactado para o Iframe */
-    font-family: 'Inter', sans-serif;
-    background: transparent;
-    color: var(--texto);
-  }
-
-  .portal {
-    max-width: 1050px; /* Evita estiramento excessivo em telas grandes */
-    margin: 0 auto;
-  }
-
-  .portal-titulo {
-    font-family: 'Playfair Display', serif;
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--verde-musgo);
-    margin: 0 0 12px 0;
-    letter-spacing: -0.5px;
-    border-bottom: 2px solid var(--verde-musgo);
-    padding-bottom: 8px;
-    display: inline-block;
-  }
-
-  .portal-instrucoes {
-    font-size: 0.95rem;
-    color: var(--texto-leve);
-    line-height: 1.6;
-    margin: 0 0 35px 0;
-    max-width: 750px;
-    font-weight: 300;
-  }
-
-  /* Grid das 3 pastas principais */
-  .grid-pastas {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 24px; /* Grid mais compacto e moderno */
-    align-items: stretch; /* Garante que todos os cards tenham a mesma altura */
-  }
-
-  /* Bloco de cada Pasta Principal */
-  .pasta-bloco {
-    background: var(--card-bg);
-    border: 1px solid rgba(85, 107, 47, 0.08); /* Borda oliva suave */
-    border-top: 4px solid var(--verde-musgo); /* Borda temática de destaque no topo */
-    border-radius: 8px; /* Cantos arredondados modernos */
-    overflow: hidden;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.02);
-    display: flex;
-    flex-direction: column; /* Comportamento Flexbox */
-    height: 100%;
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .pasta-bloco:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 16px 32px rgba(85, 107, 47, 0.06);
-    border-color: rgba(85, 107, 47, 0.2);
-  }
-
-  /* Cabeçalho da Pasta (Link do Drive Principal) */
-  .pasta-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 22px 20px;
-    text-decoration: none;
-    color: var(--texto);
-    background: rgba(232, 235, 228, 0.15);
-    border-bottom: 1px solid rgba(232, 235, 228, 0.6);
-    transition: background 0.3s ease;
-  }
-
-  .pasta-header:hover {
-    background: rgba(163, 177, 138, 0.1);
-  }
-
-  .pasta-icone {
-    font-size: 22px;
-  }
-
-  .pasta-nome {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.2rem;
-    font-weight: 700;
-    flex-grow: 1;
-    line-height: 1.3;
-  }
-
-  .pasta-seta {
-    font-size: 1rem;
-    color: var(--verde-claro);
-    transition: transform 0.3s ease, color 0.3s ease;
-  }
-
-  .pasta-header:hover .pasta-seta {
-    color: var(--verde-musgo);
-    transform: translateX(4px);
-  }
-
-  .pasta-header:hover .pasta-nome {
-    text-decoration: underline;
-  }
-
-  /* Lista de Subpastas Internas */
-  .subpastas-lista {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1; /* Faz a lista crescer para ocupar a altura inteira do card */
-  }
-
-  .sub-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 15px 20px; /* Padding vertical equilibrado */
-    text-decoration: none;
-    color: var(--texto-leve);
-    font-size: 0.95rem;
-    border-bottom: 1px solid rgba(232, 235, 228, 0.4);
-    transition: background 0.25s ease, color 0.25s ease;
-  }
-
-  .sub-item:last-child {
-    border-bottom: none;
-  }
-
-  .sub-item:hover {
-    background: rgba(163, 177, 138, 0.08);
-    color: var(--verde-musgo);
-  }
-
-  .sub-item:hover .sub-nome {
-    text-decoration: underline;
-  }
-
-  /* Marcador em CSS Puro para maior requinte */
-  .sub-marcador {
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    background-color: var(--verde-claro);
-    border-radius: 50%;
-    flex-shrink: 0;
-    transition: transform 0.25s ease, background-color 0.25s ease;
-  }
-
-  .sub-item:hover .sub-marcador {
-    transform: scale(1.3);
-    background-color: var(--verde-musgo);
-  }
-
-  .sub-nome {
-    flex-grow: 1;
-    font-weight: 400;
-  }
-
-  .sub-seta {
-    font-size: 0.85rem;
-    color: var(--verde-claro);
-    opacity: 0;
-    transform: translateX(-4px);
-    transition: opacity 0.25s ease, transform 0.25s ease;
-  }
-
-  .sub-item:hover .sub-seta {
-    opacity: 1;
-    transform: translateX(0);
-  }
-
-  .portal-footer {
-    margin-top: 50px;
-    border-top: 1px solid var(--borda);
-    padding-top: 20px;
-    font-size: 0.8rem;
-    color: var(--texto-leve);
-    text-align: center;
-    font-weight: 300;
-    letter-spacing: 0.5px;
-  }
-
-  html, body {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  @media (max-width: 768px) {
-    body {
-      padding: 10px 5px;
-    }
-    .portal-titulo {
-      font-size: 1.4rem;
-      margin-bottom: 8px;
-    }
-    .portal-instrucoes {
-      margin-bottom: 15px;
-      font-size: 0.85rem;
-      line-height: 1.4;
-    }
-    .grid-pastas {
-      grid-template-columns: 1fr;
-      gap: 12px;
-    }
-    .pasta-header {
-      padding: 14px 16px;
-    }
-    .pasta-nome {
-      font-size: 1.05rem;
-    }
-    .pasta-icone {
-      font-size: 18px;
-    }
-    .sub-item {
-      padding: 10px 16px;
-      font-size: 0.85rem;
-    }
-    .portal-footer {
-      margin-top: 25px;
-      padding-top: 12px;
-    }
-  }
-</style>
+<link rel="stylesheet" href="styles.css">
 
 <!-- Google Analytics 4 (GA4) Integration Script -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZRZ8CP11KF"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  // CONFIGURAÇÕES DO GOOGLE ANALYTICS (Substitua G-ZRZ8CP11KF pelo seu ID do painel GA4)
-  const GA_MEASUREMENT_ID = 'G-ZRZ8CP11KF'; 
-
-  // Inicializa o GA4 diretamente no domínio hospedado
-  gtag('config', GA_MEASUREMENT_ID, {
-    'page_title': 'Portal Medhelp - Grade de Disciplinas'
-  });
-
-  // Rastreamento de cliques em eventos
-  document.addEventListener('DOMContentLoaded', function() {
-    
-    // 1. Cliques em Pastas Principais
-    const headers = document.querySelectorAll('.pasta-header');
-    headers.forEach(function(header) {
-      header.addEventListener('click', function() {
-        const pastaNome = header.querySelector('.pasta-nome') ? header.querySelector('.pasta-nome').innerText.trim() : 'Desconhecido';
-        const url = header.getAttribute('href') || '';
-        
-        gtag('event', 'click_pasta_principal', {
-          'tipo_material': pastaNome,
-          'url_destino': url
-        });
-      });
-    });
-
-    // 2. Cliques em Subpastas / Problemas
-    const subItems = document.querySelectorAll('.sub-item');
-    subItems.forEach(function(item) {
-      item.addEventListener('click', function() {
-        const blocoPai = item.closest('.pasta-bloco');
-        const categoriaPai = blocoPai && blocoPai.querySelector('.pasta-nome') 
-          ? blocoPai.querySelector('.pasta-nome').innerText.trim() 
-          : 'Desconhecido';
-        const subNome = item.querySelector('.sub-nome') ? item.querySelector('.sub-nome').innerText.trim() : 'Desconhecido';
-        const url = item.getAttribute('href') || '';
-        
-        gtag('event', 'click_sub_item', {
-          'categoria_pai': categoriaPai,
-          'nome_item': subNome,
-          'url_destino': url
-        });
-      });
-    });
-
-  });
-</script>
+<script src="analytics.js" defer></script>
 </head>
 <body>
 
@@ -315,34 +31,29 @@
         <span class="pasta-seta">→</span>
       </a>
       <div class="subpastas-lista">
-        <a href="LINK_PROBLEMA_1_AQUI" target="_blank" class="sub-item">
+        <a href="https://drive.google.com/drive/u/1/folders/1I2cdbYPJZooQW3O-1IOCYB5rUymIT6ON" target="_blank" class="sub-item">
           <span class="sub-marcador"></span>
-          <span class="sub-nome">Problema 1</span>
+          <span class="sub-nome">Lacuna Zero</span>
           <span class="sub-seta">→</span>
         </a>
-        <a href="LINK_PROBLEMA_2_AQUI" target="_blank" class="sub-item">
+        <a href="https://drive.google.com/drive/u/1/folders/1Na55xnAmbizZo3M51Dt7qJFsyJVDdNGW" target="_blank" class="sub-item">
           <span class="sub-marcador"></span>
-          <span class="sub-nome">Problema 2</span>
+          <span class="sub-nome">Problema 01</span>
           <span class="sub-seta">→</span>
         </a>
-        <a href="LINK_PROBLEMA_3_AQUI" target="_blank" class="sub-item">
+        <a href="https://drive.google.com/drive/u/1/folders/1kFrVlGF3TP6dlwYs8bpQILHJ6NSw8dUE" target="_blank" class="sub-item">
           <span class="sub-marcador"></span>
-          <span class="sub-nome">Problema 3</span>
+          <span class="sub-nome">Problema 02</span>
           <span class="sub-seta">→</span>
         </a>
-        <a href="LINK_PROBLEMA_4_AQUI" target="_blank" class="sub-item">
+        <a href="https://drive.google.com/drive/u/1/folders/1CLvijVbHfqNqFaWdpiD0vmO7gyjnySzc" target="_blank" class="sub-item">
           <span class="sub-marcador"></span>
-          <span class="sub-nome">Problema 4</span>
+          <span class="sub-nome">Problema 03</span>
           <span class="sub-seta">→</span>
         </a>
-        <a href="LINK_PROBLEMA_5_AQUI" target="_blank" class="sub-item">
+        <a href="https://drive.google.com/drive/u/1/folders/1j-GlcrtwjGjYgaqySQ4RH6L5bUWzBuhc" target="_blank" class="sub-item">
           <span class="sub-marcador"></span>
-          <span class="sub-nome">Problema 5</span>
-          <span class="sub-seta">→</span>
-        </a>
-        <a href="LINK_PROBLEMA_6_AQUI" target="_blank" class="sub-item">
-          <span class="sub-marcador"></span>
-          <span class="sub-nome">Problema 6</span>
+          <span class="sub-nome">Problema 04</span>
           <span class="sub-seta">→</span>
         </a>
       </div>
@@ -356,12 +67,12 @@
         <span class="pasta-seta">→</span>
       </a>
       <div class="subpastas-lista">
-        <a href="LINK_HABILIDADES_CIRURGICAS_AQUI" target="_blank" class="sub-item">
+        <a href="https://drive.google.com/drive/u/1/folders/1C_rivnsGu00GaRl6dC_u3ehKF-oT8lQD" target="_blank" class="sub-item">
           <span class="sub-marcador"></span>
           <span class="sub-nome">Habilidades Cirúrgicas</span>
           <span class="sub-seta">→</span>
         </a>
-        <a href="LINK_HABILIDADES_CLINICAS_AQUI" target="_blank" class="sub-item">
+        <a href="https://drive.google.com/drive/u/1/folders/1dRhQ5Db9x6SSXqRI_ebzk2oVQOaPfXeb" target="_blank" class="sub-item">
           <span class="sub-marcador"></span>
           <span class="sub-nome">Habilidades Clínicas</span>
           <span class="sub-seta">→</span>
