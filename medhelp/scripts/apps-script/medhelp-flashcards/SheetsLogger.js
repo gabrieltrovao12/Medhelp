@@ -22,6 +22,7 @@ const SheetsLogger = {
    * Falha silenciosamente — nunca interrompe o pipeline principal.
    *
    * @param {LogData} dados
+   */
   registrar: function(dados) {
     const sheetId = PropertiesService.getScriptProperties().getProperty('SHEETS_LOG_ID');
     if (!sheetId) return; // Sem planilha configurada — ignora silenciosamente
