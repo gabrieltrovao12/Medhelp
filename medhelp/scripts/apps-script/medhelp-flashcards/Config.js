@@ -9,8 +9,28 @@ const CONFIG = {
   // IDs de Pastas
   ID_PASTA_ENTRADA_RESUMOS: '1QnAfngespsRRQfEHouqcXq1x2MTxgPa6', // Resumos prontos (.md)
   ID_PASTA_ENTRADA_TUTORIA: '1woWImU-UQFDEEFPUBrOu9S1s7LJU16TB', // PDFs de Tutoria
-  ID_PASTA_SAIDA_FLASHCARDS: '1SR34LW4W_hcxm4nXbt1uqyQF8z3O2PfA', // Onde caem no Obsidian
+  ID_PASTA_SAIDA_FLASHCARDS: '1SR34LW4W_hcxm4nXbt1uqyQF8z3O2PfA', // Onde caem no Obsidian (Fallback Geral)
   
+  // Pastas de Saída Específicas por Categoria
+  PASTAS_SAIDA_CATEGORIAS: {
+    'Tutoria': '15sMBhmUoiO8MVHt2Lzo1X3K7SklRC5o8',
+    'TFC': '1MU8tqPAss0E8gAkky15eVQjStQWbhJEa',
+    'LHM': '1xeKf5DCbIWl_OTLggw5PHeeN4XTRU9dZ',
+    'Lacuna': '1Bkz6ElXUXJzyGxo_isC24S3TyEWleLOL'
+  },
+
+  /**
+   * Retorna o ID da pasta do Drive com base na categoria resolvida.
+   * @param {string} categoria
+   * @returns {string} ID da pasta no Google Drive
+   */
+  obterPastaSaidaPorCategoria: function(categoria) {
+    if (categoria && this.PASTAS_SAIDA_CATEGORIAS[categoria]) {
+      return this.PASTAS_SAIDA_CATEGORIAS[categoria];
+    }
+    return this.ID_PASTA_SAIDA_FLASHCARDS;
+  },
+
   // Limites e Tempos (VLAEG)
   TEMPO_LIMITE_MS: 4.5 * 60 * 1000, // Proteção de 4.5 min do Apps Script
   HORAS_RECENTES: 168,              // Janela de 7 dias

@@ -120,12 +120,45 @@ function processarArquivoIndividual(arquivo, apiKey, apiKeyYoutube, tempoInicio)
 }
 
 /**
- * Remove prefixos e formatações indesejadas do nome do arquivo.
+ * Remove prefixos e formatações indesejadas do nome do arquivo, preservando a categoria no início.
  * @param {string} nomeOriginal 
  * @returns {string}
  */
 function limparNomeArquivo(nomeOriginal) {
-  return nomeOriginal.replace(/^\d+\s*-\s*(?:[^-]+-\s*)?/, '').trim();
+  // 1. Detecta a categoria baseando-se no termo contido no nome original
+  const nomeLower = nomeOriginal.toLowerCase();
+  let categoria = '';
+  if (nomeLower.includes('tutoria')) categoria = 'Tutoria';
+  else if (nomeLower.includes('tfc')) categoria = 'TFC';
+  else if (nomeLower.includes('lhm')) categoria = 'LHM';
+  else if (nomeLower.includes('lacuna')) categoria = 'Lacuna';
+
+  // 2. Remove termos de categoria e colchetes para poder limpar o restante
+  let resto = nomeOriginal
+    .replace(/tutoria/ig, '')
+    .replace(/tfc/ig, '')
+    .replace(/lhm/ig, '')
+    .replace(/lacuna(\s*zero)?/ig, '')
+    .replace(/[\[\]]/g, '')
+    .trim();
+
+  resto = resto.replace(/^-\s*/, '').trim();
+
+  // 3. Remove numeração sequencial inicial (ex: "01 - ") e hifens órfãos
+  resto = resto
+    .replace(/^\d+\s*-\s*/, '')
+    .replace(/^-\s*/, '')
+    .replace(/\s*-\s*$/, '')
+    .trim();
+
+  resto = resto.replace(/\s*-\s*-\s*/g, ' - ').trim();
+
+  // 4. Remonta no formato padronizado se houver categoria
+  if (categoria) {
+    resto = resto.replace(/^-\s*/, '');
+    return `${categoria} - ${resto}`;
+  }
+  return resto;
 }
 
 /**

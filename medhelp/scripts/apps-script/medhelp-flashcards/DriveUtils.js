@@ -25,8 +25,15 @@ const DriveUtils = {
     return recentes;
   },
 
-  obterOuCriarSubpasta: function(nomePasta) {
-    const pastaRaiz = DriveApp.getFolderById(CONFIG.ID_PASTA_SAIDA_FLASHCARDS);
+  obterOuCriarSubpasta: function(nomePasta, categoria) {
+    const folderId = CONFIG.obterPastaSaidaPorCategoria(categoria);
+    const pastaRaiz = DriveApp.getFolderById(folderId);
+
+    // Evita criar subpastas redundantes quando a disciplina coincide com a categoria
+    if (nomePasta && categoria && (nomePasta.toLowerCase() === categoria.toLowerCase() || nomePasta.toLowerCase() === 'geral')) {
+      return pastaRaiz;
+    }
+
     const subpastas = pastaRaiz.getFoldersByName(nomePasta);
     if (subpastas.hasNext()) {
       return subpastas.next();
@@ -34,15 +41,15 @@ const DriveUtils = {
     return pastaRaiz.createFolder(nomePasta);
   },
 
-  checkIfFileExists: function(nome, subpastaNome) {
-    const folder = this.obterOuCriarSubpasta(subpastaNome);
+  checkIfFileExists: function(nome, subpastaNome, categoria) {
+    const folder = this.obterOuCriarSubpasta(subpastaNome, categoria);
     const files = folder.getFilesByName(nome);
     if (files.hasNext()) return files.next();
     return null;
   },
 
-  saveMarkdown: function(nomeDestino, content, subpastaNome, metaDataHeader) {
-    const folder = this.obterOuCriarSubpasta(subpastaNome);
+  saveMarkdown: function(nomeDestino, content, subpastaNome, metaDataHeader, categoria) {
+    const folder = this.obterOuCriarSubpasta(subpastaNome, categoria);
     
     const cabecalho = [
       `# ${nomeDestino.replace(/\.md$/i, '')}`,

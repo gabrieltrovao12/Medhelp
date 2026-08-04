@@ -87,7 +87,7 @@ function _gerarNomeDestinoTutoria(arquivos) {
  * @returns {boolean} true se deve prosseguir, false se deve abortar (pulo)
  */
 function _verificarDeduplicacao(arquivos, nomeDestino) {
-  const arquivoExistente = DriveUtils.checkIfFileExists(nomeDestino, 'Tutoria');
+  const arquivoExistente = DriveUtils.checkIfFileExists(nomeDestino, 'Tutoria', 'Tutoria');
   if (arquivoExistente) {
     const dataCards = arquivoExistente.getDateCreated().getTime();
     const pdfAtualizado = arquivos.some(f => f.getLastUpdated().getTime() > dataCards);
@@ -160,7 +160,7 @@ function _salvarConsolidadoTutoria(nomeDestino, blocosConsolidados, metaNomes) {
     const conteudoFinal = blocosConsolidados.join('\n\n---\n\n');
     const metaDataHeader = `> **Fontes Originais:**\n${metaNomes.join('\n')}`;
     
-    DriveUtils.saveMarkdown(nomeDestino, conteudoFinal, 'Tutoria', metaDataHeader);
+    DriveUtils.saveMarkdown(nomeDestino, conteudoFinal, 'Tutoria', metaDataHeader, 'Tutoria');
     console.log(`\n[SUCESSO GLOBAL] Consolidado "${nomeDestino}" salvo.`);
   } catch (e) {
     console.error(`[ERRO] Falha ao salvar consolidado no Drive: ${e.message}`);
