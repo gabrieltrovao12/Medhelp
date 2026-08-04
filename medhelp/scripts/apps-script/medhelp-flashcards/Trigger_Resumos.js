@@ -70,10 +70,11 @@ function _processarResumoUnico(arquivo, apiKey, tempoInicio) {
   const nomeOriginal = arquivo.getName();
   const disciplina = NamingUtils.detectarDisciplina(nomeOriginal);
   const nomeDestino = NamingUtils.gerarNomeFlashcardLimpo(nomeOriginal);
+  const categoria = NamingUtils.detectarCategoria(nomeOriginal);
 
-  console.log(`\n[LENDO] "${nomeOriginal}" -> Destino planejado: "${nomeDestino}"`);
+  console.log(`\n[LENDO] "${nomeOriginal}" -> Destino planejado: "${nomeDestino}" | Categoria: "${categoria}"`);
 
-  const arquivoExistente = DriveUtils.checkIfFileExists(nomeDestino, disciplina);
+  const arquivoExistente = DriveUtils.checkIfFileExists(nomeDestino, disciplina, categoria);
   if (arquivoExistente) {
     console.log(`[PULO] O flashcard já existe ("${nomeDestino}"). Ignorando.`);
     return false;
@@ -94,7 +95,7 @@ function _processarResumoUnico(arquivo, apiKey, tempoInicio) {
   if (flashcards) {
     try {
       const metaData = `> **Fonte Original:** ${nomeOriginal}`;
-      DriveUtils.saveMarkdown(nomeDestino, flashcards, disciplina, metaData);
+      DriveUtils.saveMarkdown(nomeDestino, flashcards, disciplina, metaData, categoria);
       console.log(`[SUCESSO] Salvo o arquivo "${nomeDestino}".`);
       SheetsLogger.registrar({ script: 'Resumos', arquivo: nomeDestino, disciplina, status: 'SUCESSO', duracao: Math.round((Date.now() - tempoInicio) / 1000) });
       geradoComSucesso = true;

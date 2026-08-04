@@ -36,5 +36,18 @@ const NamingUtils = {
     const nObjetivos = barras + 1;
     // Distribui o total proporcional a 55 flashcards no geral
     return Math.max(5, Math.round((nObjetivos / totalObjetivosGeral) * 55));
+  },
+  
+  detectarCategoria: function(nomeArquivo) {
+    const nomeLower = nomeArquivo.toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim();
+
+    if (nomeLower.includes('tutoria')) return 'Tutoria';
+    if (nomeLower.includes('tfc')) return 'TFC';
+    if (nomeLower.includes('lhm')) return 'LHM';
+    if (nomeLower.includes('lacuna')) return 'Lacuna';
+    return 'Geral';
   }
 };

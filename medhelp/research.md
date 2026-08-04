@@ -48,3 +48,21 @@
 - **Curadoria YouTube PT-BR**: Filtro estrito de idioma no prompt OCANES e heurística em Python para eliminação de títulos em inglês.
 - **Layout ReportLab Dinâmico**: Posição relativa `vy = min(end_y - 40, height - 300)`px e links interativos azuis sublinhados para prevenção de sobreposição de texto nas capas.
 
+
+## 6. Roteamento por Categoria e Padrões de Nomenclatura
+- **Pastas do Google Drive por Categoria**:
+  - **Tutoria**: `15sMBhmUoiO8MVHt2Lzo1X3K7SklRC5o8`
+  - **TFC**: `1MU8tqPAss0E8gAkky15eVQjStQWbhJEa`
+  - **LHM**: `1xeKf5DCbIWl_OTLggw5PHeeN4XTRU9dZ`
+  - **Lacuna / Lacuna Zero**: `1Bkz6ElXUXJzyGxo_isC24S3TyEWleLOL`
+  - **Geral (Fallback)**: `1SR34LW4W_hcxm4nXbt1uqyQF8z3O2PfA` (ID antigo)
+- **Lógica de Identificação de Categoria**:
+  - O sistema analisa o nome do arquivo buscando os termos chave `tutoria`, `tfc`, `lhm` ou `lacuna` (como `Lacuna` ou `Lacuna Zero`).
+- **Padrão de Nome de Aula (`limparNomeArquivo` em Transcrições)**:
+  - Formato padronizado: `[Categoria] - [Nome Limpo]`. 
+  - Limpa números de ordem de lote (ex: `01 - `) e tags, mas garante que o prefixo da categoria se mantenha no início do arquivo gerado.
+- **Estrutura de Subpastas por Disciplina**:
+  - As subpastas por disciplina (ex: `Pediatria`, `Histologia`) serão criadas/acessadas *dentro* da pasta de destino da categoria correspondente.
+  - Para evitar subpastas redundantes, se o nome da subpasta (disciplina) for idêntico ao nome da categoria (ex: salvando um arquivo consolidado de `Tutoria` com disciplina `Tutoria`), o arquivo será salvo diretamente na raiz da pasta da categoria.
+
+
