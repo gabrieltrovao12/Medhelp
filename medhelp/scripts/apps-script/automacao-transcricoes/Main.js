@@ -20,12 +20,14 @@ function processarNovasTranscricoes() {
   }
 
   const pastaEntrada = DriveApp.getFolderById(CONFIG.ID_PASTA_ENTRADA);
-  const arquivos = pastaEntrada.getFilesByType(MimeType.PLAIN_TEXT);
+  const listaArquivos = obterArquivosTextoPendentes(pastaEntrada);
 
   let processados = 0;
   let falhas      = 0;
 
-  while (arquivos.hasNext()) {
+  console.log(`[ENTRADA] Total de arquivos .txt detectados na pasta: ${listaArquivos.length}`);
+
+  for (let i = 0; i < listaArquivos.length; i++) {
     // Guarda de Timeout de 4.5 minutos para evitar Crash Limits do GAS (6 minutos)
     if (Date.now() - tempoInicio > CONFIG.TEMPO_LIMITE_MS) {
       console.warn('[AVISO] Tempo limite de 4.5 min atingido. Encerrando o lote de forma segura. ' +
@@ -33,7 +35,7 @@ function processarNovasTranscricoes() {
       break;
     }
 
-    const arquivo = arquivos.next();
+    const arquivo = listaArquivos[i];
     const sucesso = processarArquivoIndividual(arquivo, apiKey, apiKeyYoutube, tempoInicio);
     
     if (sucesso) {
@@ -43,7 +45,7 @@ function processarNovasTranscricoes() {
     }
 
     // Pausa Preditiva (Throttling) entre arquivos para segurança do Rate Limit
-    if (arquivos.hasNext()) {
+    if (i < listaArquivos.length - 1) {
       console.log(`[ESPERA] Aguardando ${CONFIG.INTERVALO_ENTRE_ARQUIVOS_MS / 1000}s para proteção de cota...`);
       Utilities.sleep(CONFIG.INTERVALO_ENTRE_ARQUIVOS_MS);
     }
@@ -199,7 +201,8 @@ Resumos prontos em: Drive → Resumos_Prontos/`;
  * @returns {TextOutput} Resposta em formato JSON
  */
 function doPost(e) {
-  console.log("[WEBHOOK] Acionador recebido. Iniciando pipeline de processamento...");
+  console.log("[WEBHOOK] Acionador recebido. Aguardando 5s para sincronização e indexação do Google Drive...");
+  Utilities.sleep(5000); // Pausa defensiva: evita race condition onde o Colab salva o arquivo no Drive e chama o Webhook no mesmo milissegundo antes da API indexar
   
   try {
     processarNovasTranscricoes();
