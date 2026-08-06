@@ -1,0 +1,4 @@
+exclude:
+  - medhelp
+  - modify_notebook.py
+  - modify_notebook2.py
