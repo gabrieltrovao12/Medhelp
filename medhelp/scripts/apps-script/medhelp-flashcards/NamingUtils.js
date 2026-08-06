@@ -16,10 +16,10 @@ const NamingUtils = {
 
   gerarNomeFlashcardLimpo: function(nomeOriginal) {
     // 1. Remove a extensão atual se houver (.md ou .pdf ou .txt)
-    let nomeLimpo = nomeOriginal.replace(/\.(md|pdf|txt)$/i, '');
+    let nomeLimpo = (nomeOriginal || '').replace(/\.(md|pdf|txt)$/i, '');
     
-    // 2. Remove lixo inicial numérico e hifens (ex: "01 - [LHM] Dinâmica -> Dinâmica")
-    nomeLimpo = nomeLimpo.replace(/^\d+\s*-\s*(?:[^-]+-\s*)?/, '');
+    // 2. Remove apenas a numeração de lote inicial (ex: "01 - TFC - Aula" -> "TFC - Aula")
+    nomeLimpo = nomeLimpo.replace(/^\d+\s*-\s*/, '');
     
     // 3. Remove indicativos legados (ex: "(Resumo)", "[Resumo]")
     nomeLimpo = nomeLimpo.replace(/\(Resumo\)/ig, '');
@@ -39,15 +39,16 @@ const NamingUtils = {
   },
   
   detectarCategoria: function(nomeArquivo) {
-    const nomeLower = nomeArquivo.toLowerCase()
+    const nomeLower = (nomeArquivo || '')
+      .toLowerCase()
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
       .trim();
 
-    if (nomeLower.includes('tutoria')) return 'Tutoria';
     if (nomeLower.includes('tfc')) return 'TFC';
     if (nomeLower.includes('lhm')) return 'LHM';
-    if (nomeLower.includes('lacuna')) return 'Lacuna';
+    if (nomeLower.includes('conferencia') || nomeLower.includes('tutoria')) return 'Conferência';
+    if (nomeLower.includes('lacuna')) return 'Lacuna Zero';
     return 'Geral';
   }
 };

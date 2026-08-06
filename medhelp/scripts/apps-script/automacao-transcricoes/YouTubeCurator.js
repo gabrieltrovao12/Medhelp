@@ -58,8 +58,8 @@ const YouTubeCurator = {
    * Busca os top vídeos na YouTube Data API v3 e filtra apenas vídeos com >= 10 minutos (600s).
    */
   buscarVideosNoYouTube: function(tema, apiKey) {
-    // Limpa prefixos comuns do Medhelp (ex: "LHM - Síndromes Tóxicas" -> "Síndromes Tóxicas")
-    const temaLimpo = String(tema || '').replace(/^.*?-\s*/, '').trim() || tema;
+    // Limpa prefixos de categoria do Medhelp (ex: "TFC - Cardiologia" -> "Cardiologia")
+    const temaLimpo = String(tema || '').replace(/^(TFC|LHM|Conferência|Conferencia|Lacuna Zero|Lacuna|Tutoria)\s*-\s*/i, '').trim() || tema;
     
     console.log(`[YouTubeCurator] Buscando no YouTube API para: ${temaLimpo}`);
     const query = encodeURIComponent(`${temaLimpo} medicina aula`);

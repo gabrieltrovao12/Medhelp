@@ -123,20 +123,26 @@ function processarArquivoIndividual(arquivo, apiKey, apiKeyYoutube, tempoInicio)
 
 /**
  * Remove prefixos e formatações indesejadas do nome do arquivo, preservando a categoria no início.
+ * Filtros suportados: TFC, LHM, Conferência, Lacuna Zero.
  * @param {string} nomeOriginal 
  * @returns {string}
  */
 function limparNomeArquivo(nomeOriginal) {
-  // 1. Detecta a categoria baseando-se no termo contido no nome original
-  const nomeLower = nomeOriginal.toLowerCase();
+  // 1. Detecta a categoria baseando-se no termo contido no nome original (insensível a acentos)
+  const nomeLower = (nomeOriginal || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+
   let categoria = '';
-  if (nomeLower.includes('tutoria')) categoria = 'Tutoria';
-  else if (nomeLower.includes('tfc')) categoria = 'TFC';
+  if (nomeLower.includes('tfc')) categoria = 'TFC';
   else if (nomeLower.includes('lhm')) categoria = 'LHM';
-  else if (nomeLower.includes('lacuna')) categoria = 'Lacuna';
+  else if (nomeLower.includes('conferencia') || nomeLower.includes('tutoria')) categoria = 'Conferência';
+  else if (nomeLower.includes('lacuna')) categoria = 'Lacuna Zero';
 
   // 2. Remove termos de categoria e colchetes para poder limpar o restante
   let resto = nomeOriginal
+    .replace(/conferênci[aa]|conferenci[aa]/ig, '')
     .replace(/tutoria/ig, '')
     .replace(/tfc/ig, '')
     .replace(/lhm/ig, '')

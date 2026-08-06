@@ -13,9 +13,12 @@ const CONFIG = {
   
   // Pastas de Saída Específicas por Categoria
   PASTAS_SAIDA_CATEGORIAS: {
-    'Tutoria': '15sMBhmUoiO8MVHt2Lzo1X3K7SklRC5o8',
     'TFC': '1MU8tqPAss0E8gAkky15eVQjStQWbhJEa',
     'LHM': '1xeKf5DCbIWl_OTLggw5PHeeN4XTRU9dZ',
+    'Conferência': '15sMBhmUoiO8MVHt2Lzo1X3K7SklRC5o8',
+    'Lacuna Zero': '1Bkz6ElXUXJzyGxo_isC24S3TyEWleLOL',
+    // Aliases para compatibilidade legada
+    'Tutoria': '15sMBhmUoiO8MVHt2Lzo1X3K7SklRC5o8',
     'Lacuna': '1Bkz6ElXUXJzyGxo_isC24S3TyEWleLOL'
   },
 
@@ -92,13 +95,13 @@ const CONFIG = {
     'oftalmo':    'Oftalmologia',
     'otorrino':   'Otorrinolaringologia',
 
-    // Especiais (LMF / LHM) herdados do original
-    'radiologia': 'LMF - Radiologia',
-    'rastreio':   'LMF - Radiologia',
-    'torax':      'LMF - Radiologia',
-    'clinica':    'LHM - Clínica',
-    'fetal':      'LHM - Clínica',
-    'obstetri':   'LHM - Clínica'
+    // Mapeamentos específicos por palavras-chave
+    'radiologia': 'Radiologia',
+    'rastreio':   'Radiologia',
+    'torax':      'Radiologia',
+    'clinica':    'Clínica Médica',
+    'fetal':      'Medicina Fetal',
+    'obstetri':   'Ginecologia e Obstetrícia'
   }
 };
 
