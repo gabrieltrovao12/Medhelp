@@ -48,24 +48,47 @@ function excluirAudiosDaAula(textoBruto, nomeArquivo) {
 }
 
 /**
+ * Obtém todos os arquivos .txt da pasta de entrada de forma robusta.
+ * Não depende estritamente de MimeType.PLAIN_TEXT para evitar falhas com arquivos
+ * criados via Colab FUSE / Google Drive Desktop (que usam application/octet-stream ou text/x-plain).
+ * 
+ * @param {GoogleAppsScript.Drive.Folder} pastaEntrada
+ * @returns {Array<GoogleAppsScript.Drive.File>}
+ */
+function obterArquivosTextoPendentes(pastaEntrada) {
+  const iterador = pastaEntrada.getFiles();
+  const pendentes = [];
+  
+  while (iterador.hasNext()) {
+    const f = iterador.next();
+    const nome = f.getName();
+    const mime = f.getMimeType();
+    
+    if (nome.toLowerCase().endsWith('.txt') || mime === MimeType.PLAIN_TEXT || mime.startsWith('text/') || mime === 'application/octet-stream') {
+      if (!f.isTrashed()) {
+        pendentes.push(f);
+      }
+    }
+  }
+  return pendentes;
+}
+
+/**
  * Utilitário: Lista os arquivos pendentes na pasta de entrada.
  * Execute manualmente para checar a fila no Apps Script Editor antes de acionar o pipeline.
  */
 function listarFilaPendente() {
   const pastaEntrada = DriveApp.getFolderById(CONFIG.ID_PASTA_ENTRADA);
-  const arquivos = pastaEntrada.getFilesByType(MimeType.PLAIN_TEXT);
-  let count = 0;
+  const pendentes = obterArquivosTextoPendentes(pastaEntrada);
   
   console.log('[FILA] Arquivos .txt pendentes na pasta de entrada:');
-  while (arquivos.hasNext()) {
-    const f = arquivos.next();
+  pendentes.forEach(f => {
     const tamanhoKB = Math.round(f.getSize() / 1024);
-    console.log(`  - ${f.getName()} (${tamanhoKB} KB) | Modificado: ${f.getLastUpdated()}`);
-    count++;
-  }
+    console.log(`  - ${f.getName()} (${tamanhoKB} KB) | MIME: ${f.getMimeType()} | Modificado: ${f.getLastUpdated()}`);
+  });
   
-  if (count === 0) console.log('  [vazia]');
-  console.log(`[FILA] Total: ${count} arquivo(s) aguardando processamento.`);
+  if (pendentes.length === 0) console.log('  [vazia]');
+  console.log(`[FILA] Total: ${pendentes.length} arquivo(s) aguardando processamento.`);
 }
 
 /**
