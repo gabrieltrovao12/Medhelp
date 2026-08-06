@@ -1,6 +1,15 @@
 # Tarefas do Projeto - Medhelp
 
-## FASE ATUAL: Atualização da Inteligência de Arquiteto (Deep Research)
+## FASE ATUAL: Padronização e Correção dos Filtros por Categoria (TFC, LHM, Conferência, Lacuna Zero)
+
+- [x] Atualizar especificação e roteamento de categorias em `research.md`.
+- [x] Atualizar `limparNomeArquivo` em `automacao-transcricoes/Main.js`.
+- [x] Atualizar regex de busca em `automacao-transcricoes/YouTubeCurator.js`.
+- [x] Corrigir `detectarCategoria` e `gerarNomeFlashcardLimpo` em `medhelp-flashcards/NamingUtils.js`.
+- [x] Ajustar `PASTAS_SAIDA_CATEGORIAS` e `DISCIPLINAS` em `medhelp-flashcards/Config.js`.
+- [x] Executar simulações unitárias dos casos de borda e validar estabilidade dos nomes.
+
+## FASE ANTERIOR: Atualização da Inteligência de Arquiteto (Deep Research)
 
 - [x] Refatorar a skill `medhelp-developer-core` para injetar o padrão de Web Coding (Next.js/React).
 - [x] Injetar padrão Daisy-Chain Quota-Buster para o Google Apps Script na skill mestre.

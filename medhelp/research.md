@@ -50,19 +50,19 @@
 
 
 ## 6. Roteamento por Categoria e Padrões de Nomenclatura
-- **Pastas do Google Drive por Categoria**:
-  - **Tutoria**: `15sMBhmUoiO8MVHt2Lzo1X3K7SklRC5o8`
+- **Filtros Oficiais de Categoria**:
   - **TFC**: `1MU8tqPAss0E8gAkky15eVQjStQWbhJEa`
   - **LHM**: `1xeKf5DCbIWl_OTLggw5PHeeN4XTRU9dZ`
-  - **Lacuna / Lacuna Zero**: `1Bkz6ElXUXJzyGxo_isC24S3TyEWleLOL`
-  - **Geral (Fallback)**: `1SR34LW4W_hcxm4nXbt1uqyQF8z3O2PfA` (ID antigo)
+  - **Conferência** (anteriormente Tutoria): `15sMBhmUoiO8MVHt2Lzo1X3K7SklRC5o8`
+  - **Lacuna Zero** (Lacuna): `1Bkz6ElXUXJzyGxo_isC24S3TyEWleLOL`
+  - **Geral (Fallback)**: `1SR34LW4W_hcxm4nXbt1uqyQF8z3O2PfA` (ID de fallback)
 - **Lógica de Identificação de Categoria**:
-  - O sistema analisa o nome do arquivo buscando os termos chave `tutoria`, `tfc`, `lhm` ou `lacuna` (como `Lacuna` ou `Lacuna Zero`).
+  - O sistema analisa o nome do arquivo buscando os termos chave `tfc`, `lhm`, `conferencia` / `conferência` (ou `tutoria`) e `lacuna` / `lacuna zero`.
 - **Padrão de Nome de Aula (`limparNomeArquivo` em Transcrições)**:
-  - Formato padronizado: `[Categoria] - [Nome Limpo]`. 
-  - Limpa números de ordem de lote (ex: `01 - `) e tags, mas garante que o prefixo da categoria se mantenha no início do arquivo gerado.
+  - Formato padronizado: `[Categoria] - [Nome Limpo]` (ex: `TFC - Cardiologia - Infarto.md`). 
+  - Limpa números de ordem de lote (ex: `01 - `) e colchetes, preservando obrigatoriamente a tag da categoria oficial no início.
 - **Estrutura de Subpastas por Disciplina**:
   - As subpastas por disciplina (ex: `Pediatria`, `Histologia`) serão criadas/acessadas *dentro* da pasta de destino da categoria correspondente.
-  - Para evitar subpastas redundantes, se o nome da subpasta (disciplina) for idêntico ao nome da categoria (ex: salvando um arquivo consolidado de `Tutoria` com disciplina `Tutoria`), o arquivo será salvo diretamente na raiz da pasta da categoria.
+  - Para evitar subpastas redundantes, se o nome da subpasta (disciplina) for idêntico ao nome da categoria, o arquivo será salvo diretamente na raiz da pasta da categoria.
 
 
