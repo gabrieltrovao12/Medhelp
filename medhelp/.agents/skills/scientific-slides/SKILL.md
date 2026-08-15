@@ -1,6 +1,6 @@
 ---
 name: scientific-slides
-description: "Build slide decks and presentations for research talks. Use this for making PowerPoint slides, conference presentations, seminar talks, research presentations, thesis defense slides, or any scientific talk. Provides slide structure, design templates, timing guidance, and visual validation. Works with PowerPoint and LaTeX Beamer."
+description: "Build slide decks and presentations for research talks. Use this for making PowerPoint slides, conference presentations, seminar talks, research presentations, thesis defense slides, or any scientific talk. Provides slide structure, design templates, timing guidance, and visual validation. Works with PowerPoint, LaTeX Beamer, and Gemini Canvas."
 allowed-tools: [Read, Write, Edit, Bash]
 ---
 
@@ -36,7 +36,7 @@ This skill should be used when:
 
 **This skill uses Nano Banana Pro AI to generate stunning presentation slides automatically.**
 
-There are two workflows depending on output format:
+There are three workflows depending on output format:
 
 ### Default Workflow: PDF Slides (Recommended)
 
@@ -522,6 +522,48 @@ Use Nano Banana Pro with `--visual-only` to generate images, then build PPTX wit
 - Complex animations and transitions
 - Interactive elements
 - Company template compatibility
+
+#### Gemini Canvas Workflow (Medhelp Format)
+
+**Best for**: Generating structured markdown content for medical slides directly in Gemini Canvas, organized by **Perguntas Norteadoras** (guiding questions).
+
+**Reference**: See `references/gemini_canvas_medhelp.md` for the complete template structure and slide archetypes (Tipo A–J).
+
+**Macro-Structure (Mandatory)**:
+The entire presentation is organized around guiding questions. Each question generates an independent block of slides:
+```
+CAPA → SUBCAPA (Pergunta 01, texto completo) → Slides de Conteúdo → SUBCAPA (Pergunta 02) → Slides de Conteúdo → ...
+```
+
+**Workflow**:
+1. Receive medical content and guiding questions from the user.
+2. Read the `references/gemini_canvas_medhelp.md` template (archetypes Tipo A–J + structural slides).
+3. Generate the **Capa** slide with the general theme.
+4. **For each guiding question** (in order):
+   a. Generate a **Subcapa** slide with the question number and its **full, uncut text**.
+   b. Decompose the question into implicit sub-topics.
+   c. Select the appropriate **Slide Archetype** (Tipo A–J) for each sub-topic and generate content slides.
+   d. Ensure **exhaustive coverage**: every aspect mentioned in the question must be answered.
+5. Number all slides sequentially (1, 2, 3...).
+6. Output the complete Markdown, preserving the **Arquitetura Visual** and **Hierarquia Tipográfica** exactly. Only adapt the **Conteúdo Textual (Semântico)**.
+
+**Available Slide Archetypes**:
+- **Tipo A**: Epidemiologia e Fatores de Risco
+- **Tipo B**: Fisiopatologia / Mecanismos / Anatomia Funcional
+- **Tipo C**: Clínica e Diagnóstico
+- **Tipo D**: Sinais de Alarme / Red Flags / Achados Específicos
+- **Tipo E**: Tratamento
+- **Tipo F**: Complicações
+- **Tipo G**: Classificações e Tabelas de Risco / Sorologia
+- **Tipo H**: Esquemas Mnemônicos e Acrônimos
+- **Tipo I**: Profilaxia / Prevenção / Vacinação
+- **Tipo J**: Marcadores Laboratoriais / Perfis Sorológicos
+
+**Advantages**:
+- Driven by pedagogical guiding questions
+- Standardized, premium visual structure
+- Exhaustive coverage guaranteed by decomposition
+- Highly structured for medical/educational content
 
 #### LaTeX Beamer
 
@@ -1056,6 +1098,7 @@ Comprehensive guides for specific aspects:
 - **`references/talk_types_guide.md`**: Specific guidance for conferences, seminars, defenses, grants, journal clubs, with examples
 - **`references/beamer_guide.md`**: Complete LaTeX Beamer documentation, themes, customization, advanced features, compilation
 - **`references/visual_review_workflow.md`**: PDF to images conversion, systematic inspection, issue documentation, iterative improvement
+- **`references/gemini_canvas_medhelp.md`**: Strict structural and typographic templates for generating medical slides via Gemini Canvas in the Medhelp ecosystem.
 
 ## Assets
 
