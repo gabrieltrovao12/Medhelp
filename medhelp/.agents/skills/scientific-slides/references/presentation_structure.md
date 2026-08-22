@@ -390,10 +390,10 @@ Help audience track progress through talk:
 - Key results: 2-4 minutes each
 
 **Common Timing Mistakes**:
-- ❌ Spending too long on introduction (>15% of talk)
-- ❌ Rushing through results (should be 40-50%)
-- ❌ Not leaving time for questions
-- ❌ Going over time (extremely unprofessional)
+- [X] Spending too long on introduction (>15% of talk)
+- [X] Rushing through results (should be 40-50%)
+- [X] Not leaving time for questions
+- [X] Going over time (extremely unprofessional)
 
 ### Practice Strategies
 
@@ -471,20 +471,20 @@ For seminars and longer talks:
 ### Body Language and Delivery
 
 **Effective Practices**:
-- ✅ Stand to side of screen, facing audience
-- ✅ Use pointer deliberately for specific elements
-- ✅ Make eye contact with different sections of room
-- ✅ Gesture naturally to emphasize points
-- ✅ Vary voice pitch and pace
-- ✅ Pause after important points
+- [OK] Stand to side of screen, facing audience
+- [OK] Use pointer deliberately for specific elements
+- [OK] Make eye contact with different sections of room
+- [OK] Gesture naturally to emphasize points
+- [OK] Vary voice pitch and pace
+- [OK] Pause after important points
 
 **Avoid**:
-- ❌ Reading slides verbatim
-- ❌ Turning back to audience
-- ❌ Standing in front of projection
-- ❌ Fidgeting with pointer/objects
-- ❌ Pacing repetitively
-- ❌ Monotone delivery
+- [X] Reading slides verbatim
+- [X] Turning back to audience
+- [X] Standing in front of projection
+- [X] Fidgeting with pointer/objects
+- [X] Pacing repetitively
+- [X] Monotone delivery
 
 ## Special Considerations
 

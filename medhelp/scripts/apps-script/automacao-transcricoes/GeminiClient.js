@@ -6,22 +6,37 @@
 
 /**
  * Wrapper de execução estritamente síncrona para Google Apps Script desenhado 
- * para consumo da arquitetura da Gemini API (gemini-3.5-flash).
+ * para consumo da arquitetura da Gemini API.
  * 
  * Implementa a neutralização 'Exponential Backoff with Full Jitter' exclusivamente 
- * para anomalias HTTP 503 (Alta Demanda) e HTTP 429 (Quota de Taxa Excedida). 
- * Possui vigilância nativa e inviolável sobre o ciclo de vida do Wall-Clock, forçando 
+ * para anomalias HTTP 503 (Alta Demanda) e HTTP 429 (Quota de Taxa Excedida).
+ * Respeita CONFIG.MAX_RETRIES por modelo e escala automaticamente pela cadeia
+ * CONFIG.MODELOS_FALLBACK[] quando o modelo ativo esgota as tentativas.
+ * Possui vigilância nativa sobre o ciclo de vida do Wall-Clock, forçando 
  * um Graceful Exit à marca dos 300 segundos para proteger os sistemas de um crash GWS.
  * 
- * @param {string} url Endpoint HTTP REST da API do Gemini.
+ * @param {string} url Endpoint HTTP REST da API do Gemini (com modelo primário).
  * @param {object} payload Configuração nativa JSON do prompt do LLM.
+ * @param {number} [fallbackIndex=-1] Índice atual na cadeia MODELOS_FALLBACK (-1 = primário).
  * @returns {object} Corpo JSON deserializado do payload inferido.
  */
-function fetchGeminiWithResilience(url, payload) {
+function fetchGeminiWithResilience(url, payload, fallbackIndex) {
   const startTime = Date.now();
   const MAX_EXECUTION_TIME_MS = 300000; // Limite de 5 min (GAS mata em 6 min)
   const BASE_DELAY_MS = 1000;
   const CAP_DELAY_MS = 60000;
+  const maxRetries = CONFIG.MAX_RETRIES || 4;
+  const fallbackChain = CONFIG.MODELOS_FALLBACK || [];
+  const currentIndex = (fallbackIndex === undefined || fallbackIndex === null) ? -1 : fallbackIndex;
+
+  // Determina modelo e URL ativa
+  let activeUrl = url;
+  let modeloAtivo = CONFIG.MODELO_GEMINI;
+  if (currentIndex >= 0 && currentIndex < fallbackChain.length) {
+    modeloAtivo = fallbackChain[currentIndex];
+    activeUrl = url.replace(/models\/[^:]+:/, `models/${modeloAtivo}:`);
+    console.log(`[FALLBACK ${currentIndex + 1}/${fallbackChain.length}] Escalando para: ${modeloAtivo}`);
+  }
   
   const options = {
     method: 'post',
@@ -32,8 +47,8 @@ function fetchGeminiWithResilience(url, payload) {
 
   let attempt = 1;
 
-  while (true) {
-    const response = UrlFetchApp.fetch(url, options);
+  while (attempt <= maxRetries) {
+    const response = UrlFetchApp.fetch(activeUrl, options);
     const statusCode = response.getResponseCode();
     const responseText = response.getContentText();
 
@@ -47,28 +62,56 @@ function fetchGeminiWithResilience(url, payload) {
     const errorCode = (jsonResponse.error && jsonResponse.error.code) ? jsonResponse.error.code : statusCode;
 
     if (statusCode >= 200 && statusCode < 300) {
+      if (currentIndex >= 0) {
+        console.log(`[FALLBACK] Sucesso via modelo alternativo: ${modeloAtivo}`);
+      }
       return jsonResponse;
     }
 
     if (errorCode === 400 || errorCode === 401) {
-      throw new Error(`Erro Crítico [HTTP ${errorCode}]: Cancelamento Imediato de Retentativas. Ocorreu falha no esqueleto do pedido. Propagação: ${responseText}`);
+      throw new Error(`Erro Crítico [HTTP ${errorCode}]: Cancelamento Imediato de Retentativas. Propagação: ${responseText}`);
+    }
+
+    if (errorCode === 404) {
+      const nextIndex = currentIndex + 1;
+      if (nextIndex < fallbackChain.length) {
+        console.warn(`[MODELO INDISPONÍVEL] O modelo "${modeloAtivo}" retornou HTTP 404. Escalando imediatamente para próximo fallback (${nextIndex + 1}/${fallbackChain.length}): ${fallbackChain[nextIndex]}`);
+        return fetchGeminiWithResilience(url, payload, nextIndex);
+      }
+      throw new Error(`[ESGOTAMENTO TOTAL] Todos os modelos falharam (primário + ${fallbackChain.length} fallbacks), erro final foi HTTP 404. Última resposta: ${responseText.substring(0, 300)}`);
     }
 
     if (errorCode === 503 || errorCode === 429) {
       const elapsedMs = Date.now() - startTime;
       
       if (elapsedMs >= MAX_EXECUTION_TIME_MS) {
-        throw new Error(`Runtime Safety Timeout: O orçamento cronometrado (${elapsedMs}ms) estoirou o teto de 300 segundos. Saída limpa forçada executada.`);
+        throw new Error(`Runtime Safety Timeout: O orçamento cronometrado (${elapsedMs}ms) estoirou o teto de 300s. Saída limpa forçada.`);
+      }
+
+      // Se esgotou tentativas neste modelo, escalar para o próximo da cadeia
+      if (attempt >= maxRetries) {
+        const nextIndex = currentIndex + 1;
+        if (nextIndex < fallbackChain.length) {
+          console.warn(`[BACKOFF] ${maxRetries} tentativas esgotadas em "${modeloAtivo}". Escalando para próximo fallback (${nextIndex + 1}/${fallbackChain.length}): ${fallbackChain[nextIndex]}`);
+          return fetchGeminiWithResilience(url, payload, nextIndex);
+        }
+        throw new Error(`[ESGOTAMENTO TOTAL] Todos os modelos falharam (primário + ${fallbackChain.length} fallbacks). HTTP ${errorCode}. Última resposta: ${responseText.substring(0, 300)}`);
       }
 
       const tempCap = Math.min(CAP_DELAY_MS, BASE_DELAY_MS * Math.pow(2, attempt));
       const sleepMs = Math.random() * tempCap; // Full Jitter
 
       if (elapsedMs + sleepMs >= MAX_EXECUTION_TIME_MS) {
-        throw new Error(`Runtime Safety Timeout Intercetado: Adicionar sono de ${Math.round(sleepMs)}ms provocaria colapso do sistema (teto 300s). Saída forçada processada.`);
+        // Timeout iminente — pular direto para próximo fallback se disponível
+        const nextIndex = currentIndex + 1;
+        if (nextIndex < fallbackChain.length) {
+          console.warn(`[TIMEOUT IMINENTE] Sleep de ${Math.round(sleepMs)}ms causaria timeout. Escalando imediatamente para: ${fallbackChain[nextIndex]}`);
+          return fetchGeminiWithResilience(url, payload, nextIndex);
+        }
+        throw new Error(`Runtime Safety Timeout: Sleep de ${Math.round(sleepMs)}ms provocaria colapso (teto 300s). Cadeia de fallback esgotada.`);
       }
 
-      console.log(`[HTTP ${errorCode}] Rejeição da Cloud. Tentativa nº ${attempt}: Suspensão mitigadora "Full Jitter" durante ${Math.round(sleepMs)}ms.`);
+      console.log(`[HTTP ${errorCode}] Rejeição em "${modeloAtivo}". Tentativa ${attempt}/${maxRetries}: Full Jitter ${Math.round(sleepMs)}ms.`);
       
       Utilities.sleep(sleepMs);
       attempt++;

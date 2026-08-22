@@ -381,24 +381,24 @@ STYLE:
                 if isinstance(error_msg, dict):
                     error_msg = error_msg.get("message", str(error_msg))
                 self._last_error = f"API Error: {error_msg}"
-                print(f"✗ {self._last_error}")
+                print(f"[FAIL] {self._last_error}")
                 return None
             
             image_data = self._extract_image_from_response(response)
             if image_data:
-                self._log(f"✓ Generated image ({len(image_data)} bytes)")
+                self._log(f"[OK] Generated image ({len(image_data)} bytes)")
             else:
                 self._last_error = "No image data in API response"
-                self._log(f"✗ {self._last_error}")
+                self._log(f"[FAIL] {self._last_error}")
             
             return image_data
         except RuntimeError as e:
             self._last_error = str(e)
-            self._log(f"✗ Generation failed: {self._last_error}")
+            self._log(f"[FAIL] Generation failed: {self._last_error}")
             return None
         except Exception as e:
             self._last_error = f"Unexpected error: {str(e)}"
-            self._log(f"✗ Generation failed: {self._last_error}")
+            self._log(f"[FAIL] Generation failed: {self._last_error}")
             return None
     
     def review_image(self, image_path: str, original_prompt: str, 
@@ -508,7 +508,7 @@ If score < {threshold}, mark as NEEDS_IMPROVEMENT with specific suggestions."""
             elif score < threshold:
                 needs_improvement = True
             
-            self._log(f"✓ Review complete (Score: {score}/10, Threshold: {threshold}/10)")
+            self._log(f"[OK] Review complete (Score: {score}/10, Threshold: {threshold}/10)")
             
             return (content if content else "Image generated successfully", score, needs_improvement)
         except Exception as e:
@@ -601,7 +601,7 @@ Generate a high-quality {'visual/figure' if visual_only else 'presentation slide
             
             if not image_data:
                 error_msg = self._last_error or 'Image generation failed'
-                print(f"✗ Generation failed: {error_msg}")
+                print(f"[FAIL] Generation failed: {error_msg}")
                 results["iterations"].append({
                     "iteration": i,
                     "success": False,
@@ -618,13 +618,13 @@ Generate a high-quality {'visual/figure' if visual_only else 'presentation slide
             
             with open(temp_path, "wb") as f:
                 f.write(image_data)
-            print(f"✓ Generated image (iteration {i})")
+            print(f"[OK] Generated image (iteration {i})")
             
             print(f"Reviewing image with Gemini 3 Pro...")
             critique, score, needs_improvement = self.review_image(
                 str(temp_path), user_prompt, i, visual_only, iterations
             )
-            print(f"✓ Score: {score}/10 (threshold: {self.QUALITY_THRESHOLD}/10)")
+            print(f"[OK] Score: {score}/10 (threshold: {self.QUALITY_THRESHOLD}/10)")
             
             results["iterations"].append({
                 "iteration": i,
@@ -635,7 +635,7 @@ Generate a high-quality {'visual/figure' if visual_only else 'presentation slide
             })
             
             if not needs_improvement:
-                print(f"\n✓ Quality meets threshold ({score} >= {self.QUALITY_THRESHOLD})")
+                print(f"\n[OK] Quality meets threshold ({score} >= {self.QUALITY_THRESHOLD})")
                 final_image_data = image_data
                 results["final_score"] = score
                 results["success"] = True
@@ -643,13 +643,13 @@ Generate a high-quality {'visual/figure' if visual_only else 'presentation slide
                 break
             
             if i == iterations:
-                print(f"\n⚠ Maximum iterations reached")
+                print(f"\n[WARN] Maximum iterations reached")
                 final_image_data = image_data
                 results["final_score"] = score
                 results["success"] = True
                 break
             
-            print(f"\n⚠ Quality below threshold ({score} < {self.QUALITY_THRESHOLD})")
+            print(f"\n[WARN] Quality below threshold ({score} < {self.QUALITY_THRESHOLD})")
             print(f"Improving prompt...")
             current_prompt = self.improve_prompt(user_prompt, critique, i + 1, visual_only)
         
@@ -666,7 +666,7 @@ Generate a high-quality {'visual/figure' if visual_only else 'presentation slide
             with open(output_path, "wb") as f:
                 f.write(final_image_data)
             results["final_image"] = str(output_path)
-            print(f"\n✓ Final image: {output_path}")
+            print(f"\n[OK] Final image: {output_path}")
         
         print(f"\n{'='*60}")
         print(f"Generation Complete!")
@@ -749,13 +749,13 @@ Environment:
         )
         
         if results["success"]:
-            print(f"\n✓ Success! Image saved to: {args.output}")
+            print(f"\n[OK] Success! Image saved to: {args.output}")
             sys.exit(0)
         else:
-            print(f"\n✗ Generation failed. Check review log for details.")
+            print(f"\n[FAIL] Generation failed. Check review log for details.")
             sys.exit(1)
     except Exception as e:
-        print(f"\n✗ Error: {str(e)}")
+        print(f"\n[FAIL] Error: {str(e)}")
         sys.exit(1)
 
 
