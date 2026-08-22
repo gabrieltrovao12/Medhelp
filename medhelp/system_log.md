@@ -1,5 +1,21 @@
 # Log de Sistema - Medhelp
 
+## 2026-08-21 — Erro HTTP 503 (Rejeição da Cloud) na Geração de Resumos
+- **Arquivos:** `automacao-transcricoes/Config.js`, `automacao-transcricoes/GeminiClient.js`
+- **Descrição:** O pipeline de transcrições falhava sistematicamente com `[HTTP 503] Rejeição da Cloud` ao processar resumos, ativando o loop de Exponential Backoff sem sucesso.
+- **Causa Raiz (4 problemas identificados):**
+  1. **Modelo instável (`gemini-flash-latest`)**: O alias `-latest` aponta para o modelo mais recente (`gemini-3.7-flash` em ago/2026), sujeito a picos de demanda e rejeições 503 frequentes. Não é recomendado para produção.
+  2. **`MAX_RETRIES` ignorado**: Declarado em `CONFIG` (valor 3) mas nunca consumido por `fetchGeminiWithResilience`, que operava com `while(true)` — desperdiçando os 5 minutos de runtime do GAS em retries infinitos contra um modelo sobrecarregado.
+  3. **Sem fallback de modelo**: Quando o modelo primário esgotava o tempo, o script simplesmente abortava sem tentar alternativa.
+  4. **Falta de tratamento para modelo indisponível (HTTP 404)**: O modelo `gemini-2.5-flash` estava indisponível para novos usuários, retornando um erro 404 que quebrava o script sem acionar os fallbacks.
+- **Correções Aplicadas:**
+  1. Modelo primário atualizado para `gemini-3.5-flash`.
+  2. Cadeia de fallback reordenada com 3 modelos: `gemini-3.5-flash-lite` → `gemini-3.6-flash` → `gemini-2.5-flash` (`CONFIG.MODELOS_FALLBACK`).
+  3. `fetchGeminiWithResilience` reescrito: `while(true)` → `while(attempt <= maxRetries)`, consumindo `CONFIG.MAX_RETRIES` (agora 4). Ao esgotar tentativas no modelo ativo, escala automaticamente para o próximo da cadeia via `fallbackIndex`.
+  4. Implementado fallback imediato para erro HTTP 404. Se um modelo estiver indisponível, o motor pula diretamente para o próximo sem gastar tempo com tentativas (backoff).
+  5. Proteção de timeout iminente: se o sleep do backoff causaria timeout, pula direto para o próximo modelo da cadeia em vez de abortar.
+
+
 ## 2026-07-20 — Melhorias de Alta Prioridade: Email, Sheets, Nomenclatura e Portabilidade
 - **Arquivos:** `automacao-transcricoes/Config.js`, `automacao-transcricoes/Main.js`, `medhelp-flashcards/Trigger_Resumos.js`, `medhelp-flashcards/Trigger_Tutoria.js`, `medhelp-flashcards/SheetsLogger.js` [NEW], `scripts/orquestrador_academico.py`
 - **Correções Aplicadas:**

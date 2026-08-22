@@ -7,8 +7,8 @@ This guide provides comprehensive instructions for creating professional scienti
 **CRITICAL**: Avoid dry, text-heavy presentations. Scientific slides should be:
 - **Visually engaging**: High-quality images, figures, diagrams on EVERY slide
 - **Research-backed**: Citations from research-lookup for credibility (8-15 papers minimum)
-- **Modern design**: Contemporary color palettes, not default themes
-- **Minimal text**: 3-4 bullets with 4-6 words each, visuals do the talking
+- **Modern design**: White background, clean aesthetics, no default themes
+- **Minimal text**: 3-4 bullets with 6-7 words each, visuals do the talking
 - **Professional polish**: Consistent but varied layouts, generous white space
 
 **Anti-Pattern Warning**: All-bullet-point slides with black text on white background = instant boredom and forgotten science.
@@ -154,10 +154,10 @@ pptx.writeFile({ fileName: "presentation.pptx" });
 - **Size**: For hierarchy
 - **Alignment**: Left for body, center for titles
 
-**The 6×6 Rule**:
-- Maximum 6 bullet points per slide
-- Maximum 6 words per bullet
-- Better: 3-4 bullets with 4-8 words each
+**The Ultra-Concise Rule**:
+- Maximum 4 bullet points per slide
+- Maximum 7 words per bullet
+- Ideal: 3-4 bullets with 6-7 words each
 
 ### 3. Color Schemes
 
@@ -219,15 +219,15 @@ Consider your subject matter and audience:
 ### 5. Animations and Transitions
 
 **When to Use**:
-- ✅ Progressive disclosure of bullet points
-- ✅ Building complex figures incrementally
-- ✅ Emphasizing key findings
-- ✅ Showing process steps
+- [OK] Progressive disclosure of bullet points
+- [OK] Building complex figures incrementally
+- [OK] Emphasizing key findings
+- [OK] Showing process steps
 
 **When to Avoid**:
-- ❌ Decoration or entertainment
-- ❌ Every single slide
-- ❌ Distracting effects (fly in, bounce, spin)
+- [X] Decoration or entertainment
+- [X] Every single slide
+- [X] Distracting effects (fly in, bounce, spin)
 
 **Recommended Animations**:
 - **Appear**: Clean, professional
@@ -251,10 +251,10 @@ Consider your subject matter and audience:
 **CRITICAL**: Select colors that reflect your subject matter, not generic defaults.
 
 **Topic-Based Palette Examples:**
-- **Biotechnology/Life Sciences**: Teal (#0A9396), Coral (#EE6C4D), Cream (#F4F1DE)
-- **Neuroscience/Brain Research**: Deep Purple (#722880), Magenta (#D72D51), White
-- **Machine Learning/AI**: Bold Red (#E74C3C), Orange (#F39C12), Dark Gray (#2C2C2C)
-- **Physics/Engineering**: Navy (#1C3D5A), Orange (#E67E22), Light Gray (#F7FAFC)
+- **Biotechnology/Life Sciences**: Teal (#0A9396), Coral (#EE6C4D), White (#FFFFFF)
+- **Neuroscience/Brain Research**: Deep Purple (#722880), Magenta (#D72D51), White (#FFFFFF)
+- **Machine Learning/AI**: Bold Red (#E74C3C), Navy (#0F172A), White (#FFFFFF)
+- **Physics/Engineering**: Navy (#1C3D5A), Orange (#E67E22), White (#FFFFFF)
 - **Medicine/Healthcare**: Teal (#5EA8A7), Coral (#FE4447), White (#FFFFFF)
 - **Environmental Science**: Sage (#87A96B), Terracotta (#E07A5F), Cream (#F4F1DE)
 
@@ -517,31 +517,31 @@ python scripts/replace.py working.pptx replacements.json output.pptx
 
 ### Do's (Make Presentations Engaging)
 
-- ✅ Use research-lookup to find 8-15 papers for citations
-- ✅ Add HIGH-QUALITY visuals to EVERY slide (figures, images, diagrams, icons)
-- ✅ Choose MODERN color palette reflecting your topic (not defaults)
-- ✅ Keep text MINIMAL (3-4 bullets, 4-6 words each)
-- ✅ Use LARGE fonts (24-28pt body, 36-44pt titles)
-- ✅ Vary slide layouts (full-figure, two-column, visual overlays)
-- ✅ Maintain high contrast (7:1 preferred)
-- ✅ Generous white space (40-50% of slide)
-- ✅ Cite papers in intro and discussion (establish credibility)
-- ✅ Test readability from distance
-- ✅ Validate visually before presenting
+- [OK] Use research-lookup to find 8-15 papers for citations
+- [OK] Add HIGH-QUALITY visuals to EVERY slide (figures, images, diagrams, icons)
+- [OK] Choose MODERN white/light palette reflecting your topic (not defaults)
+- [OK] Keep text MINIMAL (3-4 bullets, 6-7 words each)
+- [OK] Use LARGE fonts (24-28pt body, 36-44pt titles)
+- [OK] Vary slide layouts (full-figure, two-column, visual overlays)
+- [OK] Maintain high contrast (7:1 preferred)
+- [OK] Generous white space (40-50% of slide)
+- [OK] Cite papers in intro and discussion (establish credibility)
+- [OK] Test readability from distance
+- [OK] Validate visually before presenting
 
 ### Don'ts (Avoid Dry Presentations)
 
-- ❌ Don't create text-only slides (add visuals to EVERY slide)
-- ❌ Don't use default themes unchanged (customize for your topic)
-- ❌ Don't have all bullet-point slides (vary layouts)
-- ❌ Don't skip research-lookup (presentations need citations too)
-- ❌ Don't cram too much text on one slide
-- ❌ Don't use tiny fonts (<24pt for body)
-- ❌ Don't rely solely on color
-- ❌ Don't use complex animations
-- ❌ Don't mix too many font styles
-- ❌ Don't ignore accessibility
-- ❌ Don't skip visual validation
+- [X] Don't create text-only slides (add visuals to EVERY slide)
+- [X] Don't use default themes unchanged (customize for your topic)
+- [X] Don't have all bullet-point slides (vary layouts)
+- [X] Don't skip research-lookup (presentations need citations too)
+- [X] Don't cram too much text on one slide
+- [X] Don't use tiny fonts (<24pt for body)
+- [X] Don't rely solely on color
+- [X] Don't use complex animations
+- [X] Don't mix too many font styles
+- [X] Don't ignore accessibility
+- [X] Don't skip visual validation
 
 ## Accessibility Considerations
 
@@ -626,8 +626,8 @@ python scripts/replace.py working.pptx replacements.json output.pptx
 
 ### Color Usage
 
-- **Backgrounds**: White or very light colors
-- **Text**: Dark (black/dark gray) on light, or white on dark
+- **Backgrounds**: White exclusively (#FFFFFF)
+- **Text**: Dark navy or black on white
 - **Accents**: One or two accent colors max
 - **Data**: Color-blind safe palettes (blue/orange)
 

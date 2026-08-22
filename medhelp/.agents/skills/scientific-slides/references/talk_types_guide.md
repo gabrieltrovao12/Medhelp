@@ -57,29 +57,29 @@ Conclusion (1 minute, 1-2 slides):
 ### Conference Talk Best Practices
 
 **Opening**:
-- ✅ Start with attention-grabbing hook (surprising fact, compelling image)
-- ✅ Clearly state why this work matters
-- ✅ Preview main finding early ("spoiler alert" acceptable)
-- ❌ Don't spend >2 minutes on background
-- ❌ Don't start with "I'm honored to be here..."
+- [OK] Start with attention-grabbing hook (surprising fact, compelling image)
+- [OK] Clearly state why this work matters
+- [OK] Preview main finding early ("spoiler alert" acceptable)
+- [X] Don't spend >2 minutes on background
+- [X] Don't start with "I'm honored to be here..."
 
 **Content**:
-- ✅ Focus on 1-2 key findings (not everything from paper)
-- ✅ Use compelling visuals
-- ✅ Show data, not just conclusions
-- ✅ Explain implications clearly
-- ❌ Don't go into excessive methodological detail
-- ❌ Don't include every analysis from paper
-- ❌ Don't use small fonts or busy slides
+- [OK] Focus on 1-2 key findings (not everything from paper)
+- [OK] Use compelling visuals
+- [OK] Show data, not just conclusions
+- [OK] Explain implications clearly
+- [X] Don't go into excessive methodological detail
+- [X] Don't include every analysis from paper
+- [X] Don't use small fonts or busy slides
 
 **Delivery**:
-- ✅ Practice to ensure exact timing
-- ✅ Make eye contact with audience
-- ✅ Show enthusiasm for your work
-- ✅ End with clear, memorable conclusion
-- ❌ Don't run over time (extremely unprofessional)
-- ❌ Don't rush through slides at end
-- ❌ Don't read slides verbatim
+- [OK] Practice to ensure exact timing
+- [OK] Make eye contact with audience
+- [OK] Show enthusiasm for your work
+- [OK] End with clear, memorable conclusion
+- [X] Don't run over time (extremely unprofessional)
+- [X] Don't rush through slides at end
+- [X] Don't read slides verbatim
 
 **Q&A Strategy**:
 - Prepare backup slides with extra data
@@ -186,32 +186,32 @@ Conclusion (2-3 minutes, 2-3 slides):
 ### Seminar Best Practices
 
 **Opening**:
-- ✅ Establish credibility and context
-- ✅ Make personal connection to research
-- ✅ Show enthusiasm and passion
-- ✅ Provide roadmap of talk structure
-- ❌ Don't assume all background knowledge
-- ❌ Don't be overly formal or stiff
+- [OK] Establish credibility and context
+- [OK] Make personal connection to research
+- [OK] Show enthusiasm and passion
+- [OK] Provide roadmap of talk structure
+- [X] Don't assume all background knowledge
+- [X] Don't be overly formal or stiff
 
 **Content**:
-- ✅ Go deeper into methods than conference talk
-- ✅ Show multiple related findings or studies
-- ✅ Discuss failed experiments and pivots (shows thinking)
-- ✅ Present ongoing/unpublished work
-- ✅ Connect to broader theoretical questions
-- ❌ Don't present every detail of every analysis
-- ❌ Don't ignore alternative explanations
-- ❌ Don't oversell findings
+- [OK] Go deeper into methods than conference talk
+- [OK] Show multiple related findings or studies
+- [OK] Discuss failed experiments and pivots (shows thinking)
+- [OK] Present ongoing/unpublished work
+- [OK] Connect to broader theoretical questions
+- [X] Don't present every detail of every analysis
+- [X] Don't ignore alternative explanations
+- [X] Don't oversell findings
 
 **Engagement**:
-- ✅ Welcome interruptions: "Please feel free to ask questions"
-- ✅ Use checkpoint questions: "Does this make sense?"
-- ✅ Engage with questioners genuinely
-- ✅ Admit what you don't know
-- ✅ Ask audience for input on challenges
-- ❌ Don't be defensive about criticism
-- ❌ Don't dismiss questions as "off topic"
-- ❌ Don't monopolize Q&A time
+- [OK] Welcome interruptions: "Please feel free to ask questions"
+- [OK] Use checkpoint questions: "Does this make sense?"
+- [OK] Engage with questioners genuinely
+- [OK] Admit what you don't know
+- [OK] Ask audience for input on challenges
+- [X] Don't be defensive about criticism
+- [X] Don't dismiss questions as "off topic"
+- [X] Don't monopolize Q&A time
 
 **Pacing**:
 - Build in natural pause points
@@ -306,36 +306,36 @@ Conclusions (2-3 minutes, 2-3 slides):
 ### Defense Best Practices
 
 **Preparation**:
-- ✅ Practice extensively (5+ times)
-- ✅ Anticipate every possible question
-- ✅ Prepare backup slides with extra analyses
-- ✅ Review key literature thoroughly
-- ✅ Understand limitations deeply
-- ✅ Practice Q&A with colleagues
-- ❌ Don't assume committee remembers all details
-- ❌ Don't leave preparation to last minute
+- [OK] Practice extensively (5+ times)
+- [OK] Anticipate every possible question
+- [OK] Prepare backup slides with extra analyses
+- [OK] Review key literature thoroughly
+- [OK] Understand limitations deeply
+- [OK] Practice Q&A with colleagues
+- [X] Don't assume committee remembers all details
+- [X] Don't leave preparation to last minute
 
 **Content**:
-- ✅ Comprehensive coverage of all studies
-- ✅ Clear connection between studies
-- ✅ Address limitations proactively
-- ✅ Show theoretical contribution
-- ✅ Demonstrate independent thinking
-- ✅ Acknowledge contributions of others
-- ❌ Don't minimize limitations
-- ❌ Don't oversell findings
-- ❌ Don't ignore null results
+- [OK] Comprehensive coverage of all studies
+- [OK] Clear connection between studies
+- [OK] Address limitations proactively
+- [OK] Show theoretical contribution
+- [OK] Demonstrate independent thinking
+- [OK] Acknowledge contributions of others
+- [X] Don't minimize limitations
+- [X] Don't oversell findings
+- [X] Don't ignore null results
 
 **Q&A Approach**:
-- ✅ Listen carefully to full question
-- ✅ Pause before answering (shows thoughtfulness)
-- ✅ Admit when you don't know
-- ✅ Engage with criticism constructively
-- ✅ Refer to specific slides or dissertation sections
-- ✅ Thank questioner for insights
-- ❌ Don't be defensive or argumentative
-- ❌ Don't dismiss concerns
-- ❌ Don't ramble in answers
+- [OK] Listen carefully to full question
+- [OK] Pause before answering (shows thoughtfulness)
+- [OK] Admit when you don't know
+- [OK] Engage with criticism constructively
+- [OK] Refer to specific slides or dissertation sections
+- [OK] Thank questioner for insights
+- [X] Don't be defensive or argumentative
+- [X] Don't dismiss concerns
+- [X] Don't ramble in answers
 
 **Handling Difficult Questions**:
 - **Critique of methods**: Acknowledge limitation, explain rationale, note in future work
@@ -393,30 +393,30 @@ Conclusion (1 minute, 1 slide):
 ### Grant Pitch Best Practices
 
 **Significance**:
-- ✅ Lead with impact (lives saved, costs reduced, knowledge gained)
-- ✅ Use compelling statistics and real-world examples
-- ✅ Clearly state innovation (what's new?)
-- ✅ Connect to funder's mission and priorities
-- ❌ Don't assume audience knows why it matters
-- ❌ Don't be vague about expected outcomes
+- [OK] Lead with impact (lives saved, costs reduced, knowledge gained)
+- [OK] Use compelling statistics and real-world examples
+- [OK] Clearly state innovation (what's new?)
+- [OK] Connect to funder's mission and priorities
+- [X] Don't assume audience knows why it matters
+- [X] Don't be vague about expected outcomes
 
 **Approach**:
-- ✅ Show feasibility (you can actually do this)
-- ✅ Present clear, logical aims
-- ✅ Show preliminary data demonstrating proof-of-concept
-- ✅ Explain why your approach will work
-- ✅ Address potential challenges proactively
-- ❌ Don't be overly technical
-- ❌ Don't ignore obvious challenges
-- ❌ Don't propose unrealistic timelines
+- [OK] Show feasibility (you can actually do this)
+- [OK] Present clear, logical aims
+- [OK] Show preliminary data demonstrating proof-of-concept
+- [OK] Explain why your approach will work
+- [OK] Address potential challenges proactively
+- [X] Don't be overly technical
+- [X] Don't ignore obvious challenges
+- [X] Don't propose unrealistic timelines
 
 **Team and Resources**:
-- ✅ Highlight key personnel expertise
-- ✅ Show institutional support
-- ✅ Mention prior funding success
-- ✅ Demonstrate appropriate resources available
-- ❌ Don't undersell your qualifications
-- ❌ Don't propose work beyond your expertise without collaborators
+- [OK] Highlight key personnel expertise
+- [OK] Show institutional support
+- [OK] Mention prior funding success
+- [OK] Demonstrate appropriate resources available
+- [X] Don't undersell your qualifications
+- [X] Don't propose work beyond your expertise without collaborators
 
 **Q&A Focus**:
 - Expect questions about:
@@ -491,33 +491,33 @@ Critical Analysis (3-5 minutes, 1-2 slides):
 ### Journal Club Best Practices
 
 **Preparation**:
-- ✅ Read paper multiple times
-- ✅ Read key cited references
-- ✅ Look up unfamiliar methods or concepts
-- ✅ Check other papers from same group
-- ✅ Prepare critical questions for discussion
-- ❌ Don't just summarize without analysis
+- [OK] Read paper multiple times
+- [OK] Read key cited references
+- [OK] Look up unfamiliar methods or concepts
+- [OK] Check other papers from same group
+- [OK] Prepare critical questions for discussion
+- [X] Don't just summarize without analysis
 
 **Presentation**:
-- ✅ Explain paper clearly (not everyone may have read it)
-- ✅ Highlight key figures and data
-- ✅ Point out strengths and innovations
-- ✅ Identify limitations or concerns
-- ✅ Be fair but critical
-- ✅ Connect to group's research interests
-- ❌ Don't just read the paper aloud
-- ❌ Don't be overly harsh or dismissive
-- ❌ Don't skip methods (often most important)
+- [OK] Explain paper clearly (not everyone may have read it)
+- [OK] Highlight key figures and data
+- [OK] Point out strengths and innovations
+- [OK] Identify limitations or concerns
+- [OK] Be fair but critical
+- [OK] Connect to group's research interests
+- [X] Don't just read the paper aloud
+- [X] Don't be overly harsh or dismissive
+- [X] Don't skip methods (often most important)
 
 **Critical Analysis**:
-- ✅ Question methodological choices
-- ✅ Consider alternative interpretations
-- ✅ Identify what's missing
-- ✅ Discuss implications thoughtfully
-- ✅ Suggest follow-up experiments
-- ❌ Don't accept everything at face value
-- ❌ Don't nitpick minor issues while missing major flaws
-- ❌ Don't let personal biases dominate
+- [OK] Question methodological choices
+- [OK] Consider alternative interpretations
+- [OK] Identify what's missing
+- [OK] Discuss implications thoughtfully
+- [OK] Suggest follow-up experiments
+- [X] Don't accept everything at face value
+- [X] Don't nitpick minor issues while missing major flaws
+- [X] Don't let personal biases dominate
 
 **Discussion Facilitation**:
 - Pose open-ended questions
@@ -583,13 +583,13 @@ Funding Ask (2-3 minutes):
 ### Industry Pitch Best Practices
 
 **Language**:
-- ✅ Simple, clear language (no jargon)
-- ✅ Focus on benefits and outcomes
-- ✅ Use business metrics (TAM, SAM, SOM)
-- ✅ Emphasize competitive advantages
-- ❌ Don't use academic terminology
-- ❌ Don't focus on mechanistic details
-- ❌ Don't ignore commercial viability
+- [OK] Simple, clear language (no jargon)
+- [OK] Focus on benefits and outcomes
+- [OK] Use business metrics (TAM, SAM, SOM)
+- [OK] Emphasize competitive advantages
+- [X] Don't use academic terminology
+- [X] Don't focus on mechanistic details
+- [X] Don't ignore commercial viability
 
 **Emphasis**:
 - Lead with problem and market opportunity
@@ -645,21 +645,21 @@ Summary (5 minutes):
 ### Tutorial Best Practices
 
 **Content**:
-- ✅ Build complexity gradually
-- ✅ Use many examples
-- ✅ Repeat key concepts
-- ✅ Check understanding frequently
-- ✅ Provide resources and references
-- ❌ Don't assume prior knowledge
-- ❌ Don't move too quickly
+- [OK] Build complexity gradually
+- [OK] Use many examples
+- [OK] Repeat key concepts
+- [OK] Check understanding frequently
+- [OK] Provide resources and references
+- [X] Don't assume prior knowledge
+- [X] Don't move too quickly
 
 **Engagement**:
-- ✅ Ask questions to audience
-- ✅ Include interactive elements
-- ✅ Use demonstrations
-- ✅ Encourage questions throughout
-- ✅ Provide practice opportunities
-- ❌ Don't lecture non-stop for 60 minutes
+- [OK] Ask questions to audience
+- [OK] Include interactive elements
+- [OK] Use demonstrations
+- [OK] Encourage questions throughout
+- [OK] Provide practice opportunities
+- [X] Don't lecture non-stop for 60 minutes
 
 ## Summary: Choosing the Right Approach
 

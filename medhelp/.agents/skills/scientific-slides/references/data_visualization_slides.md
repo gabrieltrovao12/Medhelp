@@ -15,11 +15,11 @@ Effective data visualization in presentations differs fundamentally from journal
 **Simplification Strategies**:
 
 **Remove Non-Essential Elements**:
-- ❌ Minor gridlines
-- ❌ Detailed legends (label directly instead)
-- ❌ Multiple panels (split into separate slides)
-- ❌ Secondary axes (rarely work in presentations)
-- ❌ Dense tick marks and minor labels
+- [X] Minor gridlines
+- [X] Detailed legends (label directly instead)
+- [X] Multiple panels (split into separate slides)
+- [X] Secondary axes (rarely work in presentations)
+- [X] Dense tick marks and minor labels
 
 **Focus on Key Message**:
 - Show only the data supporting your current point
@@ -127,14 +127,14 @@ Instead of showing complete figure at once:
 
 **Presentation Optimization**:
 ```
-✅ DO:
+[OK] DO:
 - Large, clear bars with adequate spacing
 - Horizontal bars for long category names
 - Direct labeling on bars (not legend)
 - Order by value (highest to lowest) unless natural order exists
 - Start y-axis at zero for accurate visual comparison
 
-❌ DON'T:
+[X] DON'T:
 - Too many categories (max 8-10)
 - 3D bars (distorts perception)
 - Multiple grouped comparisons (split to separate slides)
@@ -156,7 +156,7 @@ After: Top 6 categories only, large fonts, direct labels, key bar highlighted
 
 **Presentation Optimization**:
 ```
-✅ DO:
+[OK] DO:
 - Thick lines (2-4pt)
 - Distinct colors AND line styles (solid, dashed, dotted)
 - Direct line labeling (at end of lines, not legend)
@@ -164,7 +164,7 @@ After: Top 6 categories only, large fonts, direct labels, key bar highlighted
 - Minimal gridlines or none
 - Clear markers at data points
 
-❌ DON'T:
+[X] DON'T:
 - More than 4-5 lines per plot
 - Similar colors (ensure high contrast)
 - Small markers or thin lines
@@ -186,14 +186,14 @@ After: Top 6 categories only, large fonts, direct labels, key bar highlighted
 
 **Presentation Optimization**:
 ```
-✅ DO:
+[OK] DO:
 - Large, distinct markers (8-12pt)
 - Color code groups clearly
 - Show trendline if discussing correlation
 - Annotate key points (outliers, examples)
 - Report R² or p-value directly on plot
 
-❌ DON'T:
+[X] DON'T:
 - Overplot (too many overlapping points)
 - Small markers
 - Multiple marker types that look similar
@@ -215,14 +215,14 @@ After: Top 6 categories only, large fonts, direct labels, key bar highlighted
 
 **Presentation Optimization**:
 ```
-✅ DO:
+[OK] DO:
 - Large, clear boxes
 - Color code groups
 - Add individual data points if n is small (< 30)
 - Annotate median or mean values
 - Explain components (quartiles, whiskers) first time shown
 
-❌ DON'T:
+[X] DON'T:
 - Assume audience knows box plot conventions
 - Use without brief explanation
 - Too many groups (max 6-8)
@@ -241,7 +241,7 @@ If your audience may be unfamiliar, briefly explain: "Box shows middle 50% of da
 
 **Presentation Optimization**:
 ```
-✅ DO:
+[OK] DO:
 - Large cells (readable grid)
 - Clear, intuitive color scale (diverging or sequential)
 - Label rows and columns with large fonts
@@ -249,7 +249,7 @@ If your audience may be unfamiliar, briefly explain: "Box shows middle 50% of da
 - Cluster or order meaningfully
 - Highlight key region with border
 
-❌ DON'T:
+[X] DON'T:
 - Too many rows/columns (200×200 matrix unreadable)
 - Poor color scales (rainbow, red-green)
 - Missing dendrograms if claiming clusters
@@ -270,7 +270,7 @@ If your audience may be unfamiliar, briefly explain: "Box shows middle 50% of da
 
 **Presentation Optimization**:
 ```
-✅ DO:
+[OK] DO:
 - Large nodes and labels
 - Clear edge directionality (arrows)
 - Color or size code importance
@@ -278,7 +278,7 @@ If your audience may be unfamiliar, briefly explain: "Box shows middle 50% of da
 - Simplify to essential connections
 - Use layout that minimizes crossing edges
 
-❌ DON'T:
+[X] DON'T:
 - Show entire complex network at once
 - Hairball diagrams (too many connections)
 - Small labels on nodes
@@ -295,7 +295,7 @@ If your audience may be unfamiliar, briefly explain: "Box shows middle 50% of da
 
 **Kaplan-Meier Survival Curves**:
 ```
-✅ Optimize:
+[OK] Optimize:
 - Thick lines (3-4pt)
 - Show confidence intervals as shaded regions
 - Mark censored observations clearly
@@ -305,7 +305,7 @@ If your audience may be unfamiliar, briefly explain: "Box shows middle 50% of da
 
 **Forest Plots**:
 ```
-✅ Optimize:
+[OK] Optimize:
 - Large markers (diamonds or squares)
 - Clear confidence interval bars
 - Large font for study names
@@ -315,7 +315,7 @@ If your audience may be unfamiliar, briefly explain: "Box shows middle 50% of da
 
 **ROC Curves**:
 ```
-✅ Optimize:
+[OK] Optimize:
 - Thick curve line
 - Show diagonal reference line (AUC = 0.5)
 - Report AUC with confidence interval on plot
@@ -577,11 +577,11 @@ Slide 3: Highlight specific points in zoomed view
 ### Step 3: Optimize for Projection
 
 **Check**:
-- ✅ Readable from 10 feet away
-- ✅ High contrast between elements
-- ✅ Large enough to fill significant slide area
-- ✅ Maintains quality when projected
-- ✅ Works in various lighting conditions
+- [OK] Readable from 10 feet away
+- [OK] High contrast between elements
+- [OK] Large enough to fill significant slide area
+- [OK] Maintains quality when projected
+- [OK] Works in various lighting conditions
 
 **Test**:
 - View on different screens

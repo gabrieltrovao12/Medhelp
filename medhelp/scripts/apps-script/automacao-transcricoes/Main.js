@@ -105,7 +105,7 @@ function processarArquivoIndividual(arquivo, apiKey, apiKeyYoutube, tempoInicio)
       resumoFinal = `# ${tituloLimpo}\n\n${videoMd}\n\n${resumoGerado}`;
     }
 
-    salvarResumo(tituloLimpo, resumoFinal);
+    salvarResumo(`${tituloLimpo} (resumo)`, resumoFinal);
     arquivarArquivo(arquivo);
     excluirAudiosDaAula(textoBruto, nomeOriginal);
 

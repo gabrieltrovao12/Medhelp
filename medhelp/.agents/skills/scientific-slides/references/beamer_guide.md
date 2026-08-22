@@ -925,24 +925,24 @@ pdflatex -output-directory=build presentation.tex
 
 ### Do's
 
-- ✅ Use consistent theme throughout
-- ✅ Keep equations simple and large
-- ✅ Use progressive disclosure (\pause, overlays)
-- ✅ Include frame numbers
-- ✅ Use vector graphics (PDF) for figures
-- ✅ Test compilation early and often
-- ✅ Use meaningful section names
-- ✅ Keep backup slides in appendix
+- [OK] Use consistent theme throughout
+- [OK] Keep equations simple and large
+- [OK] Use progressive disclosure (\pause, overlays)
+- [OK] Include frame numbers
+- [OK] Use vector graphics (PDF) for figures
+- [OK] Test compilation early and often
+- [OK] Use meaningful section names
+- [OK] Keep backup slides in appendix
 
 ### Don'ts
 
-- ❌ Don't use too many different fonts or colors
-- ❌ Don't fill slides with dense text
-- ❌ Don't use tiny font sizes
-- ❌ Don't include complex animations (limited support)
-- ❌ Don't forget fragile frames for code
-- ❌ Don't mix themes inconsistently
-- ❌ Don't ignore compilation warnings
+- [X] Don't use too many different fonts or colors
+- [X] Don't fill slides with dense text
+- [X] Don't use tiny font sizes
+- [X] Don't include complex animations (limited support)
+- [X] Don't forget fragile frames for code
+- [X] Don't mix themes inconsistently
+- [X] Don't ignore compilation warnings
 
 ## Troubleshooting
 

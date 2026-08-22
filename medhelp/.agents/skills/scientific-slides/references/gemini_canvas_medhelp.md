@@ -36,13 +36,13 @@ SLIDE 1 ─── CAPA (tema geral da aula)
 
 ### Slide Estrutural: Capa
 **1. Arquitetura Visual**
-*   Fundo: Cor sólida (Preto).
+*   Fundo: Branco (#FFFFFF) ou cinza muito claro (#F8FAFC).
 *   Elementos Gráficos: Logo do projeto/curso (se aplicável), centralizado no topo.
 
 **2. Hierarquia Tipográfica**
-*   H1: Caixa alta, destaque centralizado, cor branca.
-*   H2: Caixa alta, centralizado, logo abaixo do H1, destaque em amarelo (ex: GASTRO).
-*   Corpo: Centralizado, fonte menor, cor branca (ex: Prof: Lucas Albuquerque).
+*   H1: Caixa alta, destaque centralizado, cor azul-marinho (#0F172A).
+*   H2: Caixa alta, centralizado, logo abaixo do H1, destaque em azul (#2563EB).
+*   Corpo: Centralizado, fonte menor, cor cinza-escuro (#334155) (ex: Prof: Lucas Albuquerque).
 
 **3. Conteúdo Textual (Semântico)**
 *   TREINAMENTO EM QUESTÕES DE RESIDÊNCIA MÉDICA
@@ -53,12 +53,12 @@ SLIDE 1 ─── CAPA (tema geral da aula)
 
 ### Slide Estrutural: Subcapa (Abertura de Pergunta Norteadora)
 **1. Arquitetura Visual**
-*   Fundo: Cor sólida (Preto).
+*   Fundo: Branco (#FFFFFF) ou cinza muito claro (#F8FAFC).
 *   Elementos Gráficos: Avatar em pixel art de um médico (centro-direita), fazendo sinal positivo com o polegar.
 
 **2. Hierarquia Tipográfica**
-*   H1: Caixa alta, alinhado à esquerda, cor amarela – exibe o número da pergunta (ex: `PERGUNTA NORTEADORA 01`).
-*   H2: Alinhado à esquerda, cor branca, fonte menor que H1 – exibe o **texto completo** da pergunta norteadora.
+*   H1: Caixa alta, alinhado à esquerda, cor azul (#2563EB) – exibe o número da pergunta (ex: `PERGUNTA NORTEADORA 01`).
+*   H2: Alinhado à esquerda, cor cinza-escuro (#334155), fonte menor que H1 – exibe o **texto completo** da pergunta norteadora.
 
 **3. Conteúdo Textual (Semântico)**
 *   PERGUNTA NORTEADORA [Nº]
@@ -74,13 +74,13 @@ Use os arquétipos abaixo para mapear o conteúdo que responde a cada pergunta n
 
 ### Tipo A: Epidemiologia e Fatores de Risco
 **1. Arquitetura Visual**
-*   Fundo: Cor sólida (Preto).
-*   Elementos Gráficos: Sequência vertical de ícones circulares brancos com setas direcionais apontando para a direita, separando as seções.
+*   Fundo: Branco (#FFFFFF).
+*   Elementos Gráficos: Sequência vertical de ícones circulares azul-escuro (#0F172A) com setas direcionais apontando para a direita, separando as seções.
 
 **2. Hierarquia Tipográfica**
-*   H1: Caixa alta, topo superior esquerdo, cor amarela (ex: nome da doença/condição).
-*   H2: Alinhados no eixo vertical central, cor branca.
-*   Corpo: Estrutura em *bullet points* padrão.
+*   H1: Caixa alta, topo superior esquerdo, cor azul (#2563EB) (ex: nome da doença/condição).
+*   H2: Alinhados no eixo vertical central, cor azul-marinho (#0F172A).
+*   Corpo: Estrutura em *bullet points* padrão, cor cinza-escuro (#334155).
 
 **3. Conteúdo Textual (Semântico)**
 *   **[Tópico 1 - ex: Epidemiologia]**:
@@ -94,11 +94,11 @@ Use os arquétipos abaixo para mapear o conteúdo que responde a cada pergunta n
 
 ### Tipo B: Fisiopatologia / Mecanismos / Anatomia Funcional
 **1. Arquitetura Visual**
-*   Fundo: Cor sólida (Preto).
+*   Fundo: Branco (#FFFFFF).
 *   Elementos Gráficos: Setas direcionais ao centro. Esquemas gráficos (fluxogramas lógicos de caixas e setas, diagramas anatômicos/fisiológicos, esquemas de vias metabólicas).
 
 **2. Hierarquia Tipográfica**
-*   H1: Caixa alta, topo superior esquerdo, cor amarela.
+*   H1: Caixa alta, topo superior esquerdo, cor azul (#2563EB).
 *   H2: Alinhado no eixo vertical central.
 *   Destaques: Tags de influência dispostas visualmente como blocos opositores (ex: Fatores Agressivos vs. Protetores).
 
@@ -114,12 +114,12 @@ Use os arquétipos abaixo para mapear o conteúdo que responde a cada pergunta n
 
 ### Tipo C: Clínica e Diagnóstico
 **1. Arquitetura Visual**
-*   Fundo: Cor sólida (Preto).
+*   Fundo: Branco (#FFFFFF).
 *   Elementos Gráficos: Setas direcionais no eixo vertical central.
 
 **2. Hierarquia Tipográfica**
-*   H1: Topo esquerdo, amarelo.
-*   H2: Eixo central, empilhados (ex: Clínica, Diagnóstico).
+*   H1: Topo esquerdo, azul (#2563EB).
+*   H2: Eixo central, empilhados (ex: Clínica, Diagnóstico), cor azul-marinho (#0F172A).
 *   Destaques: Tags em caixas ao redor do eixo central para conceitos-chave.
 
 **3. Conteúdo Textual (Semântico)**
@@ -134,11 +134,11 @@ Use os arquétipos abaixo para mapear o conteúdo que responde a cada pergunta n
 
 ### Tipo D: Sinais de Alarme / Red Flags / Achados Específicos
 **1. Arquitetura Visual**
-*   Fundo: Cor sólida (Preto).
+*   Fundo: Branco (#FFFFFF).
 *   Elementos Gráficos: Setas direcionais no eixo vertical. Agrupamento de ícones 3D de alerta (triângulos, sinos, megafones) na metade superior.
 
 **2. Hierarquia Tipográfica**
-*   H2: Alinhado na coluna central.
+*   H2: Alinhado na coluna central, cor azul-marinho (#0F172A).
 *   Destaques: Caixa alta para ênfases críticas na conduta (ex: SEMPRE BIOPSIAR).
 
 **3. Conteúdo Textual (Semântico)**
@@ -153,12 +153,12 @@ Use os arquétipos abaixo para mapear o conteúdo que responde a cada pergunta n
 
 ### Tipo E: Tratamento
 **1. Arquitetura Visual**
-*   Fundo: Cor sólida (Preto).
+*   Fundo: Branco (#FFFFFF).
 *   Elementos Gráficos: Eixo central com setas direcionais.
 
 **2. Hierarquia Tipográfica**
-*   H1: Topo esquerdo.
-*   H2: Eixo central (Tratamento).
+*   H1: Topo esquerdo, azul (#2563EB).
+*   H2: Eixo central (Tratamento), cor azul-marinho (#0F172A).
 *   Corpo: Estrutura em *bullet points*.
 
 **3. Conteúdo Textual (Semântico)**
@@ -173,11 +173,11 @@ Use os arquétipos abaixo para mapear o conteúdo que responde a cada pergunta n
 
 ### Tipo F: Complicações
 **1. Arquitetura Visual**
-*   Fundo: Cor sólida (Preto) com áreas contendo ilustrações com fundo branco.
+*   Fundo: Branco (#FFFFFF) com áreas contendo ilustrações com borda cinza-claro (#E2E8F0).
 *   Elementos Gráficos: Ilustração médica correspondente e diagrama anatômico das intervenções.
 
 **2. Hierarquia Tipográfica**
-*   H2: Coluna central.
+*   H2: Coluna central, cor azul-marinho (#0F172A).
 
 **3. Conteúdo Textual (Semântico)**
 *   **[Complicação 1]**:
@@ -190,13 +190,13 @@ Use os arquétipos abaixo para mapear o conteúdo que responde a cada pergunta n
 
 ### Tipo G: Classificações e Tabelas de Risco / Sorologia
 **1. Arquitetura Visual**
-*   Fundo: Cor sólida (Preto).
-*   Elementos Gráficos: Tabela centralizada sem bordas visíveis pesadas, estrutura em grid simples.
+*   Fundo: Branco (#FFFFFF).
+*   Elementos Gráficos: Tabela centralizada sem bordas visíveis pesadas, estrutura em grid simples com linhas cinza-claro (#E2E8F0).
 
 **2. Hierarquia Tipográfica**
-*   H1: Topo esquerdo, amarelo.
-*   H2: Topo esquerdo, sob H1.
-*   Corpo: Texto tabulado.
+*   H1: Topo esquerdo, azul (#2563EB).
+*   H2: Topo esquerdo, sob H1, cor azul-marinho (#0F172A).
+*   Corpo: Texto tabulado, cor cinza-escuro (#334155).
 
 **3. Conteúdo Textual (Semântico)**
 *   [Nome da Tabela/Classificação]:
@@ -212,13 +212,13 @@ Use os arquétipos abaixo para mapear o conteúdo que responde a cada pergunta n
 
 ### Tipo H: Esquemas Mnemônicos e Acrônimos
 **1. Arquitetura Visual**
-*   Fundo: Cor sólida (Preto).
-*   Elementos Gráficos: Setas direcionais verticais atuando como divisórias.
+*   Fundo: Branco (#FFFFFF).
+*   Elementos Gráficos: Setas direcionais verticais atuando como divisórias, cor cinza (#94A3B8).
 
 **2. Hierarquia Tipográfica**
-*   H1: Topo esquerdo.
-*   H2: Centralizado.
-*   Corpo: Acrônimos verticais destacados por iniciais em azul, formando mnemônicos.
+*   H1: Topo esquerdo, azul (#2563EB).
+*   H2: Centralizado, cor azul-marinho (#0F172A).
+*   Corpo: Acrônimos verticais destacados por iniciais em azul (#2563EB), formando mnemônicos.
 
 **3. Conteúdo Textual (Semântico)**
 *   **[Esquema / Protocolo 1 - ex: Acrônimo]**:
@@ -230,12 +230,12 @@ Use os arquétipos abaixo para mapear o conteúdo que responde a cada pergunta n
 
 ### Tipo I: Profilaxia / Prevenção / Vacinação
 **1. Arquitetura Visual**
-*   Fundo: Cor sólida (Preto).
-*   Elementos Gráficos: Eixo central com setas direcionais e ícones de escudo/proteção.
+*   Fundo: Branco (#FFFFFF).
+*   Elementos Gráficos: Eixo central com setas direcionais e ícones de escudo/proteção, cor azul-marinho (#0F172A).
 
 **2. Hierarquia Tipográfica**
-*   H1: Topo esquerdo, amarelo.
-*   H2: Centralizado (Prevenção / Profilaxia).
+*   H1: Topo esquerdo, azul (#2563EB).
+*   H2: Centralizado (Prevenção / Profilaxia), cor azul-marinho (#0F172A).
 *   Corpo: *Bullet points*.
 
 **3. Conteúdo Textual (Semântico)**
@@ -250,13 +250,13 @@ Use os arquétipos abaixo para mapear o conteúdo que responde a cada pergunta n
 
 ### Tipo J: Marcadores Laboratoriais / Perfis Sorológicos
 **1. Arquitetura Visual**
-*   Fundo: Cor sólida (Preto).
+*   Fundo: Branco (#FFFFFF).
 *   Elementos Gráficos: Tabela e/ou fluxograma de interpretação diagnóstica.
 
 **2. Hierarquia Tipográfica**
-*   H1: Topo esquerdo, amarelo.
-*   H2: Subtítulo sob H1.
-*   Corpo: Tabela ou *bullet points* com marcadores e interpretação.
+*   H1: Topo esquerdo, azul (#2563EB).
+*   H2: Subtítulo sob H1, cor azul-marinho (#0F172A).
+*   Corpo: Tabela ou *bullet points* com marcadores e interpretação, cor cinza-escuro (#334155).
 
 **3. Conteúdo Textual (Semântico)**
 *   **[Marcador 1 (ex: HBsAg)]**: [Significado clínico]
@@ -281,16 +281,30 @@ Ao receber um pedido de slides com perguntas norteadoras, o agente deve:
     c.  Para cada subtema, selecionar o **Arquétipo de Slide** mais adequado (Tipo A a J) e gerar o(s) slide(s) de conteúdo necessários.
     d.  Garantir **exaustividade**: tudo que a pergunta menciona deve ser respondido.
 3.  **Numerar sequencialmente** todos os slides (1, 2, 3...).
-4.  **Saída**: Entregar o Markdown completo estruturado, pronto para renderização no Gemini Canvas.
+4.  **Cabeçalho de Regras (System Prompt para Gemini)**: Inserir OBRIGATORIAMENTE no topo do arquivo gerado o seguinte bloco de texto:
+    ```markdown
+    <!-- INSTRUÇÕES DE RENDERIZAÇÃO PARA O GEMINI: 
+    1. STRICT RULE: NEVER add random images, illustrations, or cliparts to the slides. Use ONLY the text provided.
+    2. STRICT RULE: NEVER use emojis in the slides.
+    3. STRICT RULE: Maintain the white background. Do NOT change colors unless explicitly specified in the slide architecture.
+    -->
+    ```
+5.  **Saída**: Entregar o Markdown completo estruturado, com o bloco de instruções acima no topo, pronto para renderização no Gemini Canvas.
 
 ---
 
 ## 5. Exemplo de Saída Estruturada
 
 ```markdown
+<!-- INSTRUÇÕES DE RENDERIZAÇÃO PARA O GEMINI: 
+1. STRICT RULE: NEVER add random images, illustrations, or cliparts to the slides. Use ONLY the text provided.
+2. STRICT RULE: NEVER use emojis in the slides.
+3. STRICT RULE: Maintain the white background. Do NOT change colors unless explicitly specified in the slide architecture.
+-->
+
 ### Slide 1: Capa
-**1. Arquitetura Visual**: Fundo preto, logo centralizado.
-**2. Hierarquia Tipográfica**: H1 branco, H2 amarelo, corpo branco.
+**1. Arquitetura Visual**: Fundo branco, logo centralizado.
+**2. Hierarquia Tipográfica**: H1 azul-marinho, H2 azul, corpo cinza-escuro.
 **3. Conteúdo Textual**:
 *   TREINAMENTO EM QUESTÕES DE RESIDÊNCIA MÉDICA
 *   HEPATITES VIRAIS
@@ -299,8 +313,8 @@ Ao receber um pedido de slides com perguntas norteadoras, o agente deve:
 ---
 
 ### Slide 2: Subcapa – Pergunta Norteadora 01
-**1. Arquitetura Visual**: Fundo preto, avatar pixel art.
-**2. Hierarquia Tipográfica**: H1 amarelo, H2 branco.
+**1. Arquitetura Visual**: Fundo branco, avatar pixel art.
+**2. Hierarquia Tipográfica**: H1 azul, H2 cinza-escuro.
 **3. Conteúdo Textual**:
 *   PERGUNTA NORTEADORA 01
 *   Como a anatomia, a histologia e a organização funcional do fígado
@@ -321,8 +335,8 @@ Ao receber um pedido de slides com perguntas norteadoras, o agente deve:
 ---
 
 ### Slide 6: Subcapa – Pergunta Norteadora 02
-**1. Arquitetura Visual**: Fundo preto, avatar pixel art.
-**2. Hierarquia Tipográfica**: H1 amarelo, H2 branco.
+**1. Arquitetura Visual**: Fundo branco, avatar pixel art.
+**2. Hierarquia Tipográfica**: H1 azul, H2 cinza-escuro.
 **3. Conteúdo Textual**:
 *   PERGUNTA NORTEADORA 02
 *   Como diferenciar os padrões hepatocelular, colestático e misto

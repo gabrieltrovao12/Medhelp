@@ -15,8 +15,8 @@ Scientific presentations are a critical medium for communicating research, shari
 **CRITICAL DESIGN PHILOSOPHY**: Scientific presentations should be VISUALLY ENGAGING and RESEARCH-BACKED. Avoid dry, text-heavy slides at all costs. Great scientific presentations combine:
 - **Compelling visuals**: High-quality figures, images, diagrams (not just bullet points)
 - **Research context**: Proper citations from research-lookup establishing credibility
-- **Minimal text**: Bullet points as prompts, YOU provide the explanation verbally
-- **Professional design**: Modern color schemes, strong visual hierarchy, generous white space
+- **Minimal text**: Ultra-short bullet points as prompts, YOU provide the explanation verbally
+- **Professional design**: White/light theme, strong visual hierarchy, generous white space
 - **Story-driven**: Clear narrative arc, not just data dumps
 
 **Remember**: Boring presentations = forgotten science. Make your slides visually memorable while maintaining scientific rigor through proper citations.
@@ -82,9 +82,9 @@ Use the `generate_slide_image.py` script to create each slide.
 To ensure unified formatting across all slides in a presentation:
 
 1. **Define a Formatting Goal** at the start of your presentation and include it in EVERY prompt:
-   - Color scheme (e.g., "dark blue background, white text, gold accents")
+   - Color scheme (e.g., "white background, dark navy text, blue accents")
    - Typography style (e.g., "bold sans-serif titles, clean body text")
-   - Visual style (e.g., "minimal, professional, corporate aesthetic")
+   - Visual style (e.g., "minimal, professional, clean white aesthetic")
    - Layout approach (e.g., "generous white space, left-aligned content")
 
 2. **Always attach the previous slide** when generating subsequent slides using `--attach`:
@@ -120,13 +120,13 @@ To ensure unified formatting across all slides in a presentation:
 
 ```bash
 # Title slide (first slide - establishes the style)
-python scripts/generate_slide_image.py "Title slide for presentation: 'Machine Learning: From Theory to Practice'. Subtitle: 'AI Conference 2025'. Speaker: K-Dense. FORMATTING GOAL: Dark blue background (#1a237e), white text, gold accents (#ffc107), minimal design, sans-serif fonts, generous margins, no decorative elements." -o slides/01_title.png
+python scripts/generate_slide_image.py "Title slide for presentation: 'Machine Learning: From Theory to Practice'. Subtitle: 'AI Conference 2025'. Speaker: K-Dense. FORMATTING GOAL: White background (#FFFFFF), dark navy text (#0F172A), blue accents (#2563EB), minimal design, sans-serif fonts, generous margins, no decorative elements." -o slides/01_title.png
 
 # Content slide with citations (attach previous slide for consistency)
-python scripts/generate_slide_image.py "Presentation slide titled 'Why Machine Learning Matters'. Three key points with simple icons: 1) Industry adoption, 2) Breakthrough applications, 3) Future potential. CITATIONS: Include at bottom in small text: (LeCun et al., 2015; Goodfellow et al., 2016). FORMATTING GOAL: Match attached slide style - dark blue background, white text, gold accents, minimal professional design, no visual clutter." -o slides/02_intro.png --attach slides/01_title.png
+python scripts/generate_slide_image.py "Presentation slide titled 'Why Machine Learning Matters'. Three key points with simple icons: 1) Industry adoption, 2) Breakthrough applications, 3) Future potential. CITATIONS: Include at bottom in small text: (LeCun et al., 2015; Goodfellow et al., 2016). FORMATTING GOAL: Match attached slide style - white background, dark navy text, blue accents, minimal professional design, no visual clutter." -o slides/02_intro.png --attach slides/01_title.png
 
 # Background slide with multiple citations
-python scripts/generate_slide_image.py "Presentation slide titled 'Deep Learning Revolution'. Key milestones: ImageNet breakthrough (2012), transformer architecture (2017), GPT models (2018-present). CITATIONS: Show references at bottom: (Krizhevsky et al., 2012; Vaswani et al., 2017; Brown et al., 2020). FORMATTING GOAL: Match attached slide style exactly - same colors, fonts, minimal design." -o slides/03_background.png --attach slides/02_intro.png
+python scripts/generate_slide_image.py "Presentation slide titled 'Deep Learning Revolution'. Key milestones: ImageNet breakthrough (2012), transformer architecture (2017), GPT models (2018-present). CITATIONS: Show references at bottom: (Krizhevsky et al., 2012; Vaswani et al., 2017; Brown et al., 2020). FORMATTING GOAL: Match attached slide style exactly - same white background, dark text, blue accents, minimal design." -o slides/03_background.png --attach slides/02_intro.png
 
 # RESULTS SLIDE - Attach actual data figure from working directory
 # First, check what figures exist: ls figures/ or ls results/
@@ -151,7 +151,7 @@ Include these elements in every prompt (customize as needed):
 ```
 [Slide content description]
 CITATIONS: Include at bottom: (Author1 et al., Year; Author2 et al., Year)
-FORMATTING GOAL: [Background color], [text color], [accent color], minimal professional design, no decorative elements, consistent with attached slide style.
+FORMATTING GOAL: White background (#FFFFFF), dark navy text (#0F172A), [accent color], minimal professional design, no decorative elements, consistent with attached slide style.
 ```
 
 **Step 3: Combine to PDF**
@@ -273,13 +273,13 @@ For complete slides, include:
 
 ```
 Title slide:
-"Title slide for a medical research presentation. Title: 'Advances in Cancer Immunotherapy'. Subtitle: 'Clinical Trial Results 2024'. Professional medical theme with subtle DNA helix in background. Navy blue and white color scheme."
+"Title slide for a medical research presentation. Title: 'Advances in Cancer Immunotherapy'. Subtitle: 'Clinical Trial Results 2024'. Professional medical theme, clean white background with subtle DNA helix accent. Navy blue text, teal accents."
 
 Content slide:
-"Presentation slide titled 'Key Findings'. Three bullet points: 1) 40% improvement in response rate, 2) Reduced side effects, 3) Extended survival outcomes. Include relevant medical icons. Clean, professional design with green and white colors."
+"Presentation slide titled 'Key Findings'. Three bullet points: 1) 40% improvement, 2) Reduced side effects, 3) Extended survival. Include relevant medical icons. Clean, professional white background with green and navy accents."
 
 Diagram slide:
-"Presentation slide showing the research methodology. Title: 'Study Design'. Flowchart showing: Patient Screening → Randomization → Treatment Groups (A, B, Control) → Follow-up → Analysis. CONSORT-style flow diagram. Professional academic style."
+"Presentation slide showing the research methodology. Title: 'Study Design'. Flowchart showing: Patient Screening - Randomization - Treatment Groups (A, B, Control) - Follow-up - Analysis. CONSORT-style flow diagram. White background, professional academic style."
 ```
 
 ### Visual-Only Prompts (PPT Workflow)
@@ -342,20 +342,20 @@ Create professional, readable, and accessible slides that enhance understanding.
 
 **ANTI-PATTERN: Avoid Dry, Text-Heavy Presentations**
 
-❌ **What Makes Presentations Dry and Forgettable:**
+**[X] What Makes Presentations Dry and Forgettable:**
 - Walls of text (more than 6 bullets per slide)
 - Small fonts (<24pt body text)
-- Black text on white background only (no visual interest)
+- Low-contrast color combinations (no visual interest)
 - No images or graphics (bullet points only)
 - Generic templates with no customization
 - Dense, paragraph-like bullet points
 - Missing research context (no citations)
 - All slides look the same (repetitive)
 
-✅ **What Makes Presentations Engaging and Memorable:**
+**[OK] What Makes Presentations Engaging and Memorable:**
 - HIGH-QUALITY VISUALS dominate (figures, photos, diagrams, icons)
 - Large, clear text as accent (not the main content)
-- Modern, purposeful color schemes (not default themes)
+- Clean white/light backgrounds with purposeful color accents
 - Generous white space (slides breathe)
 - Research-backed context (proper citations from research-lookup)
 - Variety in slide layouts (not all bullet lists)
@@ -373,7 +373,7 @@ Create professional, readable, and accessible slides that enhance understanding.
 
 **Simplicity with Impact**:
 - One main idea per slide
-- MINIMAL text (3-4 bullets, 4-6 words each preferred)
+- MINIMAL text (3-4 bullets, 6-7 words cada preferencialmente)
 - Generous white space (40-50% of slide)
 - Clear visual focus
 - Bold, confident design choices
@@ -386,12 +386,12 @@ Create professional, readable, and accessible slides that enhance understanding.
 - Use size for hierarchy, not just weight
 
 **Color for Impact**:
-- MODERN color palettes (not default blue/gray)
-- Consider your topic: biotech? vibrant colors. Physics? sleek darks. Health? warm tones.
-- Limited palette (3-5 colors total)
-- High contrast combinations
+- WHITE/LIGHT THEME as default (clean white background with dark text)
+- Use accent colors purposefully (blue, teal, or topic-appropriate)
+- Limited palette (3-4 colors total: background, primary text, accent, secondary accent)
+- High contrast combinations (dark text on white)
 - Color-blind safe (avoid red-green combinations)
-- Use color purposefully (not decoration)
+- Use color sparingly for emphasis (not decoration)
 
 **Layout for Visual Interest**:
 - Vary layouts (not all bullet lists)
@@ -774,16 +774,16 @@ and discussion (slides 13-14) BEFORE creating slides.
 5. Compile to PDF
 
 **Design Considerations** (Make It Visually Appealing):
-- **Select MODERN color palette**: Match your topic (biotech=vibrant, physics=sleek, health=warm)
-  - Use pptx skill's color palette examples (Teal & Coral, Bold Red, Deep Purple & Emerald, etc.)
-  - NOT just default blue/gray themes
-  - 3-5 colors with high contrast
+- **Default WHITE/LIGHT theme**: Clean white background, dark text, purposeful accent colors
+  - Use accent palette for emphasis (Teal, Navy Blue, Deep Purple, etc.)
+  - NOT busy dark themes
+  - 3-4 colors with high contrast
 - **Choose clean fonts**: Sans-serif, large sizes (24pt+ body)
 - **Plan visual elements**: What images, diagrams, icons for each slide?
 - **Create varied layouts**: Mix full-figure, two-column, text-overlay (not all bullets)
 - **Design section dividers**: Visual breaks with striking graphics
 - **Plan animations/builds**: Control information flow for complex slides
-- **Add visual interest**: Background images, color blocks, shapes, icons
+- **Add visual interest**: Color accent blocks, shapes, icons on white canvas
 
 ### Stage 3: Content Development
 
@@ -815,13 +815,13 @@ and discussion (slides 13-14) BEFORE creating slides.
   - Citations establish credibility and scientific rigor
 - **Figures**: Simplified from papers, LARGE labels (18-24pt minimum)
 - **Equations**: Large, clear, explain each term (use sparingly)
-- **Tables**: Minimal, highlight key comparisons (not data dumps)
+- **Tables**: Podem ser apresentadas na íntegra, mantendo clareza visual
 - **Code/Algorithms**: Use syntax highlighting, keep brief
 
 **Text Guidelines** (Less is More):
 - Bullet points, NEVER paragraphs
-- 3-4 bullets per slide (max 6 only if essential)
-- 4-6 words per bullet (shorter than 6×6 rule)
+- 3-4 bullets per slide (ideal)
+- 6-7 words per bullet (equilíbrio entre concisão e clareza)
 - Key terms in bold
 - Text is SUPPORTING ROLE, visuals are stars
 - Use builds to control pacing
@@ -952,7 +952,7 @@ python ../document-skills/pptx/scripts/thumbnail.py presentation.pptx review/gri
 
 **Too Much Text**:
 - Problem: Full paragraphs on slides, dense bullet points, reading verbatim
-- Solution: 3-4 bullets with 4-6 words each, let visuals carry the message
+- Solution: 3-4 bullets with 6-7 words each, let visuals carry the message
 
 **Missing Research Context**:
 - Problem: No citations, claims without support, unclear positioning
@@ -1130,7 +1130,7 @@ Comprehensive guides for specific aspects:
    
    ```bash
    # Title slide (establishes style - default author: K-Dense)
-   python scripts/generate_slide_image.py "Title slide: 'Your Research Title'. Conference name, K-Dense. FORMATTING GOAL: [your color scheme], minimal professional design, no decorative elements, clean and corporate." -o slides/01_title.png
+   python scripts/generate_slide_image.py "Title slide: 'Your Research Title'. Conference name, K-Dense. FORMATTING GOAL: White background (#FFFFFF), dark navy text (#0F172A), blue accents (#2563EB), minimal professional design, no decorative elements, clean and corporate." -o slides/01_title.png
    
    # Introduction slide with citations (attach previous for consistency)
    python scripts/generate_slide_image.py "Slide titled 'Why This Matters'. Three key points with simple icons. CITATIONS: Include at bottom: (Smith et al., 2023; Jones et al., 2024). FORMATTING GOAL: Match attached slide style exactly." -o slides/02_intro.png --attach slides/01_title.png
@@ -1178,14 +1178,15 @@ See `document-skills/pptx/SKILL.md` for complete PowerPoint workflow.
 
 1. **Visual-First Design**: Every slide needs strong visual element (figure, image, diagram) - avoid text-only slides
 2. **Research-Backed**: Use research-lookup to find 8-15 papers, cite 3-5 in intro, 3-5 in discussion
-3. **Modern Aesthetics**: Choose contemporary color palette matching topic, not default themes
-4. **Minimal Text**: 3-4 bullets, 4-6 words each (24-28pt font), let visuals tell story
-5. **Structure**: Follow story arc, spend 40-50% on results
-6. **High Contrast**: 7:1 preferred for professional appearance
-7. **Varied Layouts**: Mix full-figure, two-column, visual overlays (not all bullets)
-8. **Timing**: Practice 3-5 times, ~1 slide per minute, never skip conclusions
-9. **Validation**: Visual review workflow to catch overflow and overlap
-10. **White Space**: 40-50% of slide empty for visual breathing room
+3. **White/Light Theme**: Default to clean white backgrounds with dark text and purposeful accent colors
+4. **Minimal Text**: 3-4 bullets, 6-7 words each (24-28pt font), let visuals tell story. Tabelas podem constar na íntegra.
+5. **No Emojis**: Use plain text markers only, no emoji characters in slides or instructions
+6. **Structure**: Follow story arc, spend 40-50% on results
+7. **High Contrast**: Dark text on white, accents for emphasis only
+8. **Varied Layouts**: Mix full-figure, two-column, visual overlays (not all bullets)
+9. **Timing**: Practice 3-5 times, ~1 slide per minute, never skip conclusions
+10. **Validation**: Visual review workflow to catch overflow and overlap
+11. **White Space**: 40-50% of slide empty for visual breathing room
 
 **Remember**: 
 - **Boring = Forgotten**: Dry, text-heavy slides fail to communicate your science

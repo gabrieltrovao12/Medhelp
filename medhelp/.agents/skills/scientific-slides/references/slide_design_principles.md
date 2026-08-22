@@ -16,11 +16,11 @@ Effective slide design enhances comprehension, maintains audience attention, and
 - Simple slides are remembered; busy slides are forgotten
 
 **Application**:
-- ✅ One message per slide
-- ✅ Minimal text (audiences read OR listen, not both simultaneously)
-- ✅ Clear visual focus
-- ✅ Generous white space
-- ❌ Avoid cramming multiple concepts onto one slide
+- [OK] One message per slide
+- [OK] Minimal text (audiences read OR listen, not both simultaneously)
+- [OK] Clear visual focus
+- [OK] Generous white space
+- [X] Avoid cramming multiple concepts onto one slide
 
 **Example Comparison**:
 ```
@@ -110,10 +110,10 @@ Maintain visual consistency throughout the presentation.
 - Avoid for body text in presentations
 
 **Avoid**:
-- ❌ Script or handwriting fonts (illegible from distance)
-- ❌ Decorative fonts (distracting)
-- ❌ Condensed fonts (hard to read)
-- ❌ Multiple font families (>2 looks unprofessional)
+- [X] Script or handwriting fonts (illegible from distance)
+- [X] Decorative fonts (distracting)
+- [X] Condensed fonts (hard to read)
+- [X] Multiple font families (>2 looks unprofessional)
 
 ### Font Sizes
 
@@ -163,16 +163,16 @@ Caption: 16pt
 - **Justified**: Avoid (creates awkward spacing)
 
 **Emphasis**:
-- ✅ **Bold** for key terms (use sparingly)
-- ✅ Color for emphasis (consistent meaning)
-- ✅ Size increase for importance
-- ❌ Avoid italics (hard to read from distance)
-- ❌ Avoid underline (confused with hyperlinks)
-- ❌ AVOID ALL CAPS FOR BODY TEXT (READS AS SHOUTING)
+- [OK] **Bold** for key terms (use sparingly)
+- [OK] Color for emphasis (consistent meaning)
+- [OK] Size increase for importance
+- [X] Avoid italics (hard to read from distance)
+- [X] Avoid underline (confused with hyperlinks)
+- [X] AVOID ALL CAPS FOR BODY TEXT (READS AS SHOUTING)
 
-### The 6×6 Rule
+### The Ultra-Concise Rule
 
-**Guideline**: Maximum 6 bullets per slide, maximum 6 words per bullet.
+**Guideline**: Maximum 4 bullets per slide, maximum 7 words per bullet.
 
 **Rationale**:
 - More text = audience reads instead of listens
@@ -181,8 +181,8 @@ Caption: 16pt
 
 **Better Approach**:
 - 3-4 bullets optimal
-- 4-8 words per bullet
-- Use fragments, not complete sentences
+- 6-7 words per bullet
+- Tabelas podem ser fornecidas na íntegra sem limite de texto.
 - Consider replacing text with visuals
 
 **Example Transformation**:
@@ -220,7 +220,6 @@ BETTER:
 **High Contrast** (Maximum Legibility):
 - Black text (#000000) on white (#FFFFFF)
 - Dark blue (#003366) on white
-- White on dark gray (#2D3748)
 - Use: Large venues, virtual presentations, accessibility priority
 
 **Data Visualization** (Color-blind Safe):
@@ -262,16 +261,15 @@ BETTER:
 - **Level AAA**: 7:1 contrast ratio (preferred for presentations)
 
 **High Contrast Combinations**:
-- ✅ Black on white (21:1)
-- ✅ Dark blue (#003366) on white (12.6:1)
-- ✅ White on dark gray (#2D3748) (11.8:1)
-- ✅ Dark text (#333333) on cream (#F4F1DE) (9.7:1)
+- [OK] Black on white (21:1)
+- [OK] Dark blue (#003366) on white (12.6:1)
+- [OK] Dark text (#333333) on cream (#F4F1DE) (9.7:1)
 
 **Low Contrast Combinations** (Avoid):
-- ❌ Light gray on white
-- ❌ Yellow on white
-- ❌ Pastel colors on white backgrounds
-- ❌ Red on black (difficult to read)
+- [X] Light gray on white
+- [X] Yellow on white
+- [X] Pastel colors on white backgrounds
+- [X] Red on black (difficult to read)
 
 **Testing Contrast**:
 - Use online tools (e.g., WebAIM Contrast Checker)
@@ -285,10 +283,10 @@ BETTER:
 **Most Common**: Red-green color blindness (protanopia/deuteranopia)
 
 **Safe Practices**:
-- ✅ Use blue/orange instead of red/green
-- ✅ Add patterns or shapes in addition to color
-- ✅ Use color AND other differentiators (shape, size, position)
-- ✅ Test with color blindness simulator
+- [OK] Use blue/orange instead of red/green
+- [OK] Add patterns or shapes in addition to color
+- [OK] Use color AND other differentiators (shape, size, position)
+- [OK] Test with color blindness simulator
 
 **Color-Blind Safe Palettes**:
 ```
@@ -454,10 +452,8 @@ Use: Multiple related items, comparisons
 
 **Best Practices**:
 
-**Light Backgrounds** (Most Common):
-- White or off-white (#FFFFFF, #F8F9FA)
-- Very light gray (#F5F5F5)
-- Cream/beige (#FAF8F3)
+**Light Backgrounds** (ONLY ACCEPTABLE THEME):
+- White (#FFFFFF)
 
 **Advantages**:
 - Maximum contrast for dark text
@@ -465,26 +461,14 @@ Use: Multiple related items, comparisons
 - Professional and clean
 - Easier on projectors
 
-**Dark Backgrounds**:
-- Dark gray (#2D3748)
-- Navy blue (#1A202C)
-- Black (#000000)
-
-**Advantages**:
-- Modern, sophisticated
-- Good for dark venues
-- Reduces eye strain in dark rooms
-- Makes colors pop
-
-**Disadvantages**:
-- Requires light-colored text
-- Can be difficult in bright rooms
-- Some projectors handle poorly
+**Avoid Dark Backgrounds**:
+- NEVER use dark gray, navy blue, or black backgrounds
+- Clean white is mandatory
 
 **Gradient Backgrounds**:
-- ✅ Subtle gradients acceptable (light to lighter)
-- ❌ Avoid busy or high-contrast gradients
-- ❌ Don't distract from content
+- [OK] Subtle gradients acceptable (light to lighter)
+- [X] Avoid busy or high-contrast gradients
+- [X] Don't distract from content
 
 **Image Backgrounds**:
 - Use only for title/section slides
@@ -522,12 +506,12 @@ Use: Multiple related items, comparisons
 - Add visual interest
 
 **Best Practices**:
-- ✅ Consistent style (all outline or all filled)
-- ✅ Simple, recognizable designs
-- ✅ Appropriate size (not too large or small)
-- ✅ Limited color palette matching theme
-- ❌ Avoid clipart or cartoonish graphics (unless appropriate)
-- ❌ Don't use for decoration only (should convey meaning)
+- [OK] Consistent style (all outline or all filled)
+- [OK] Simple, recognizable designs
+- [OK] Appropriate size (not too large or small)
+- [OK] Limited color palette matching theme
+- [X] Avoid clipart or cartoonish graphics (unless appropriate)
+- [X] Don't use for decoration only (should convey meaning)
 
 **Sources**:
 - Font Awesome
@@ -581,10 +565,10 @@ Use: Multiple related items, comparisons
 - **Control pacing**: Prevent audience from reading ahead
 
 **Inappropriate Uses**:
-- ❌ Decoration or entertainment
-- ❌ Every slide transition
-- ❌ Multiple animations per slide
-- ❌ Distracting effects (spin, bounce, etc.)
+- [X] Decoration or entertainment
+- [X] Every slide transition
+- [X] Multiple animations per slide
+- [X] Distracting effects (spin, bounce, etc.)
 
 ### Types of Animations
 

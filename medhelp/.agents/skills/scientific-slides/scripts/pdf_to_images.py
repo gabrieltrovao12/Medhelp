@@ -192,7 +192,7 @@ Requirements:
         
         print()
         print("=" * 60)
-        print(f"✅ Success! Created {len(output_files)} image(s)")
+        print(f"[OK] Success! Created {len(output_files)} image(s)")
         print("=" * 60)
         
         if output_files:
@@ -213,7 +213,7 @@ Requirements:
         sys.exit(0)
         
     except Exception as e:
-        print(f"\n❌ Error: {str(e)}", file=sys.stderr)
+        print(f"\n[X] Error: {str(e)}", file=sys.stderr)
         sys.exit(1)
 
 
