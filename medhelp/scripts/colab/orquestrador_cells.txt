@@ -23,8 +23,29 @@ print('✅ Chaves configuradas!')
 import os
 import json
 
-# ✏️ EDITE AQUI
-PASTA_BASE = '/content/drive/MyDrive/Logística - Drive/Livros'
+# ╔══════════════════════════════════╗
+# ║   CONFIGURAÇÕES DA TURMA         ║
+# ╚══════════════════════════════════╝
+FACULDADE = "UNDB"  # ← Altere apenas isto para "CEUMA" ou "UNDB"
+
+# --- Roteador Automático ---
+ROUTER = {
+    "UNDB": {
+        "monitor": "João Gabriel R. Trovão",
+        "pasta_livros": "/content/drive/MyDrive/Logística - Drive/Livros"
+    },
+    "CEUMA": {
+        "monitor": "Gabriel Torquato",
+        "pasta_livros": "/content/drive/MyDrive/Logística - CEUMA/Livros - CEUMA"
+    }
+}
+
+_cfg = ROUTER.get(FACULDADE)
+if not _cfg:
+    raise ValueError(f"Faculdade '{FACULDADE}' não reconhecida no ROUTER.")
+
+MONITOR_NOME = _cfg["monitor"]
+PASTA_BASE   = _cfg["pasta_livros"]
 
 PASTA_LIVROS = PASTA_BASE
 PASTA_SAIDA  = os.path.join(PASTA_BASE, 'saida')
@@ -221,7 +242,7 @@ import pydantic
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 logging.getLogger('pypdf').setLevel(logging.ERROR)
 
-AUTORIA = '© Conteúdo Autoral  •  João Gabriel R. Trovão'
+AUTORIA = f'© Conteúdo Autoral  •  {MONITOR_NOME}'
 GEMINI_FALLBACK_MODELS = ['gemini-3.5-flash-lite', 'gemini-3.6-flash', 'gemini-2.5-flash', 'gemini-3.5-flash']
 
 # ── Gemini API com Exponential Backoff ──────────────────────
