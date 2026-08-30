@@ -1,21 +1,12 @@
 /**
  * Config.js
- * Centraliza configurações e IDs do projeto.
+ * Configurações GLOBAIS de runtime — modelos, timeouts, throttling.
+ *
+ * IMPORTANTE: IDs de pastas do Google Drive NÃO ficam aqui.
+ * Toda configuração de pastas por turma está em TurmaRouter.js.
  */
 
 const CONFIG = {
-  // Pasta onde o Colab deposita os .txt com transcrição + slides
-  ID_PASTA_ENTRADA:     '1qRBLRtpsNRUDiOn99mg2wA5qhwLvRJIh',
-
-  // Pasta de saída final — onde os .md vão para o Obsidian
-  ID_PASTA_RESUMOS:     '1QnAfngespsRRQfEHouqcXq1x2MTxgPa6',
-
-  // Pasta de arquivamento dos .txt já processados
-  ID_PASTA_ARQUIVADOS:  '1R58WOeO0p3U51T05g-d-N9svziLSf9fL',
-  
-  // Pasta onde estão os áudios m4a para exclusão pós-processamento
-  ID_PASTA_AUDIOS:      '1rXV-eovjzQvAQxVNWQtROIh7L_1oNAEC',
-
   // Modelo primário do LLM (pinado em versão estável — NÃO usar aliases "-latest")
   MODELO_GEMINI:        'gemini-3.5-flash',
 

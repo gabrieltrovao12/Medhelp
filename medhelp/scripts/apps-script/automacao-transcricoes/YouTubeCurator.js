@@ -63,7 +63,7 @@ const YouTubeCurator = {
     
     console.log(`[YouTubeCurator] Buscando no YouTube API para: ${temaLimpo}`);
     const query = encodeURIComponent(`${temaLimpo} medicina aula`);
-    const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${query}&type=video&maxResults=10&key=${apiKey}&relevanceLanguage=pt`;
+    const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${query}&type=video&maxResults=10&key=${apiKey}&relevanceLanguage=pt&regionCode=BR`;
     
     const response = UrlFetchApp.fetch(searchUrl, { muteHttpExceptions: true });
     const code = response.getResponseCode();
@@ -131,23 +131,24 @@ const YouTubeCurator = {
     });
 
     const systemPrompt = `**OBJETIVO:**
-Atuar como Curador Acadêmico Médico rigoroso. Sua missão é analisar uma lista de vídeos e selecionar O MELHOR material para estudantes de medicina e residentes.
+Atuar como Curador Acadêmico Médico rigoroso. Sua missão é analisar uma lista de vídeos e selecionar O MELHOR material em PORTUGUÊS BRASILEIRO para estudantes de medicina e residentes.
 
 **CONTEXTO:**
-Você receberá o TEMA DA AULA e opções pré-filtradas de vídeos longos (>= 10 minutos) retornadas pelo YouTube.
+Você receberá o TEMA DA AULA e opções pré-filtradas de vídeos (>= 10 minutos) retornadas pelo YouTube. As aulas são para estudantes de medicina brasileiros.
 
 **AÇÕES:**
 1. Leia o TEMA DA AULA para entender o foco clínico ou teórico.
 2. Analise os metadados (Título, Canal, Duração, Descrição) de cada vídeo.
 3. Filtre pela autoridade médica do canal (priorize cursinhos como SanarFlix, Estratégia MED, Medway, ou ligas acadêmicas).
-4. Selecione o vídeo de maior profundidade científica e extensão adequada.
+4. Selecione o vídeo de maior profundidade científica e extensão adequada (>= 10 minutos).
 5. Se não houver candidato aceitável, defina o ID como 'NENHUM'.
 
 **NORMAS:**
-1. REJEITE sumariamente vídeos direcionados a pacientes leigos (ex: "sintomas", "como curar", "o que é").
-2. REJEITE vídeos com menos de 10 minutos de duração ou cortes/shorts incompletos.
-3. NUNCA invente um ID de vídeo que não esteja na lista.
-4. Retorne APENAS o objeto JSON bruto. NUNCA utilize blocos delimitadores markdown (ex: \`\`\`json).
+1. REJEITE sumariamente vídeos que NÃO sejam em português (título ou descrição em inglês, espanhol ou outro idioma = rejeição imediata).
+2. REJEITE sumariamente vídeos direcionados a pacientes leigos (ex: "sintomas", "como curar", "o que é").
+3. REJEITE vídeos com menos de 10 minutos de duração ou cortes/shorts incompletos.
+4. NUNCA invente um ID de vídeo que não esteja na lista.
+5. Retorne APENAS o objeto JSON bruto. NUNCA utilize blocos delimitadores markdown (ex: \`\`\`json).
 
 **SAÍDA:**
 Retorne estritamente neste formato JSON:
