@@ -46,9 +46,12 @@ function processarFlashcardsDeTutoria() {
  * @returns {{arquivos: GoogleAppsScript.Drive.File[], totalObjetivosGeral: number}|null}
  */
 function _getTutoriaPdfs() {
+  // Por enquanto, Tutoria processa apenas UNDB.
+  // Expandir para bi-turma em fase futura quando CEUMA tiver pasta de tutoria.
+  const turmaConfig = getConfigTurma('UNDB');
   let folder;
   try {
-    folder = DriveApp.getFolderById(CONFIG.ID_PASTA_ENTRADA_TUTORIA);
+    folder = DriveApp.getFolderById(turmaConfig.ID_PASTA_ENTRADA_TUTORIA);
   } catch(e) {
     console.error(`[ERRO] Falha ao acessar pasta Tutoria: ${e.message}`);
     return null;
@@ -159,8 +162,10 @@ function _salvarConsolidadoTutoria(nomeDestino, blocosConsolidados, metaNomes) {
   try {
     const conteudoFinal = blocosConsolidados.join('\n\n---\n\n');
     const metaDataHeader = `> **Fontes Originais:**\n${metaNomes.join('\n')}`;
-    
-    DriveUtils.saveMarkdown(nomeDestino, conteudoFinal, 'Tutoria', metaDataHeader, 'Tutoria');
+
+    // Usa a pasta de flashcards de Tutoria/Conferência da UNDB via TurmaRouter
+    const idPastaDestino = obterPastaSaidaFlashcard('UNDB', 'Tutoria');
+    DriveUtils.saveMarkdownToFolder(nomeDestino, conteudoFinal, 'Tutoria', metaDataHeader, idPastaDestino);
     console.log(`\n[SUCESSO GLOBAL] Consolidado "${nomeDestino}" salvo.`);
   } catch (e) {
     console.error(`[ERRO] Falha ao salvar consolidado no Drive: ${e.message}`);

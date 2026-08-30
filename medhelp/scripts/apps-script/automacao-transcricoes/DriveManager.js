@@ -1,17 +1,24 @@
 /**
  * DriveManager.js
- * Gerencia todas as interações com o Google Drive (pastas de entrada, arquivamento e exclusão).
+ * Gerencia todas as interações com o Google Drive (leitura, arquivamento, exclusão).
+ * Funções agnósticas de turma — recebem IDs de pasta via parâmetro (TurmaRouter), nunca via CONFIG.
  */
 
 /**
  * Lê o cabeçalho AUDIOS_ORIGEM do .txt e exclui (move para lixeira)
- * todos os áudios correspondentes na pasta configurada em CONFIG.ID_PASTA_AUDIOS.
+ * todos os áudios correspondentes na pasta de áudios da turma.
  * Falhas de exclusão são logadas mas não interrompem o fluxo principal.
  *
- * @param {string} textoBruto   - Conteúdo completo do .txt processado
- * @param {string} nomeArquivo  - Nome da aula (para logging)
+ * @param {string} textoBruto      - Conteúdo completo do .txt processado
+ * @param {string} nomeArquivo     - Nome da aula (para logging)
+ * @param {string} idPastaAudios   - ID da pasta de áudios da turma (vem do TurmaRouter)
  */
-function excluirAudiosDaAula(textoBruto, nomeArquivo) {
+function excluirAudiosDaAula(textoBruto, nomeArquivo, idPastaAudios) {
+  if (!idPastaAudios || idPastaAudios.includes('[PENDENTE]')) {
+    console.warn(`[ÁUDIO] ID da pasta de áudios não configurado. Exclusão ignorada para "${nomeArquivo}".`);
+    return;
+  }
+
   try {
     // Extrai a linha de metadados: **AUDIOS_ORIGEM:**nome1.m4a,nome2.m4a
     const match = textoBruto.match(/\*\*AUDIOS_ORIGEM:\*\*(.+)/);
@@ -23,7 +30,7 @@ function excluirAudiosDaAula(textoBruto, nomeArquivo) {
     const nomesAudios = match[1].trim().split(',').map(n => n.trim()).filter(Boolean);
     console.log(`[ÁUDIO] ${nomesAudios.length} áudio(s) identificado(s) para exclusão: ${nomesAudios.join(', ')}`);
 
-    const pastaAudios = DriveApp.getFolderById(CONFIG.ID_PASTA_AUDIOS);
+    const pastaAudios = DriveApp.getFolderById(idPastaAudios);
 
     nomesAudios.forEach(nomeAudio => {
       try {
@@ -74,21 +81,26 @@ function obterArquivosTextoPendentes(pastaEntrada) {
 }
 
 /**
- * Utilitário: Lista os arquivos pendentes na pasta de entrada.
+ * Utiltário: Lista os arquivos pendentes nas pastas de entrada de todas as turmas ativas.
  * Execute manualmente para checar a fila no Apps Script Editor antes de acionar o pipeline.
  */
 function listarFilaPendente() {
-  const pastaEntrada = DriveApp.getFolderById(CONFIG.ID_PASTA_ENTRADA);
-  const pendentes = obterArquivosTextoPendentes(pastaEntrada);
-  
-  console.log('[FILA] Arquivos .txt pendentes na pasta de entrada:');
-  pendentes.forEach(f => {
-    const tamanhoKB = Math.round(f.getSize() / 1024);
-    console.log(`  - ${f.getName()} (${tamanhoKB} KB) | MIME: ${f.getMimeType()} | Modificado: ${f.getLastUpdated()}`);
+  const turmasAtivas = getTurmasAtivas();
+  console.log(`[FILA] Turmas ativas: ${turmasAtivas.join(', ')}`);
+
+  turmasAtivas.forEach(turmaId => {
+    const cfg = getConfigTurma(turmaId);
+    const pastaEntrada = DriveApp.getFolderById(cfg.ID_PASTA_ENTRADA);
+    const pendentes = obterArquivosTextoPendentes(pastaEntrada);
+
+    console.log(`\n[FILA][${turmaId}] Arquivos .txt pendentes:`);
+    pendentes.forEach(f => {
+      const tamanhoKB = Math.round(f.getSize() / 1024);
+      console.log(`  - ${f.getName()} (${tamanhoKB} KB) | MIME: ${f.getMimeType()} | Modificado: ${f.getLastUpdated()}`);
+    });
+    if (pendentes.length === 0) console.log(`  [${turmaId}: fila vazia]`);
+    console.log(`[FILA][${turmaId}] Total: ${pendentes.length} arquivo(s).`);
   });
-  
-  if (pendentes.length === 0) console.log('  [vazia]');
-  console.log(`[FILA] Total: ${pendentes.length} arquivo(s) aguardando processamento.`);
 }
 
 /**
@@ -101,21 +113,25 @@ function lerConteudoArquivo(arquivo) {
 }
 
 /**
- * Salva o conteúdo formatado em um novo arquivo .md na pasta de resumos.
- * @param {string} titulo 
- * @param {string} conteudo 
+ * Salva o conteúdo formatado em um novo arquivo .md na pasta de resumos da turma.
+ *
+ * @param {string} titulo          - Nome do arquivo (sem .md)
+ * @param {string} conteudo        - Conteúdo markdown
+ * @param {string} idPastaResumos  - ID da pasta de resumos da turma (vem do TurmaRouter)
  * @returns {GoogleAppsScript.Drive.File}
  */
-function salvarResumo(titulo, conteudo) {
-  const pastaResumos = DriveApp.getFolderById(CONFIG.ID_PASTA_RESUMOS);
+function salvarResumo(titulo, conteudo, idPastaResumos) {
+  const pastaResumos = DriveApp.getFolderById(idPastaResumos);
   return pastaResumos.createFile(titulo + '.md', conteudo, MimeType.PLAIN_TEXT);
 }
 
 /**
- * Move um arquivo processado para a pasta de arquivados.
- * @param {GoogleAppsScript.Drive.File} arquivo 
+ * Move um arquivo processado para a pasta de arquivados da turma.
+ *
+ * @param {GoogleAppsScript.Drive.File} arquivo
+ * @param {string} idPastaArquivados - ID da pasta de arquivados da turma (vem do TurmaRouter)
  */
-function arquivarArquivo(arquivo) {
-  const pastaArquivados = DriveApp.getFolderById(CONFIG.ID_PASTA_ARQUIVADOS);
+function arquivarArquivo(arquivo, idPastaArquivados) {
+  const pastaArquivados = DriveApp.getFolderById(idPastaArquivados);
   arquivo.moveTo(pastaArquivados);
 }

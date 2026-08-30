@@ -55,7 +55,7 @@ const SheetsLogger = {
         dados.disciplina || '—',
         dados.status     || '—',
         dados.duracao    || 0,
-        CONFIG.GEMINI_MODEL || '—'
+        CONFIG.MODELO_GEMINI || '—'
       ]);
 
     } catch (e) {

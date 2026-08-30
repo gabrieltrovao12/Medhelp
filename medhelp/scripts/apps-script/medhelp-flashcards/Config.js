@@ -1,46 +1,22 @@
 // ============================================================
-// SEÇÃO 1: CONFIGURAÇÕES GLOBAIS
+// SEÇÃO 1: CONFIGURAÇÕES GLOBAIS DE RUNTIME
+// ============================================================
+//
+// IMPORTANTE: IDs de pastas do Google Drive NÃO ficam aqui.
+// Toda configuração de pastas por turma está em TurmaRouter.js.
 // ============================================================
 
 /**
- * Configurações globais do sistema.
+ * Configurações globais de runtime do sistema de Flashcards.
  */
 const CONFIG = {
-  // IDs de Pastas
-  ID_PASTA_ENTRADA_RESUMOS: '1QnAfngespsRRQfEHouqcXq1x2MTxgPa6', // Resumos prontos (.md)
-  ID_PASTA_ENTRADA_TUTORIA: '1woWImU-UQFDEEFPUBrOu9S1s7LJU16TB', // PDFs de Tutoria
-  ID_PASTA_SAIDA_FLASHCARDS: '1SR34LW4W_hcxm4nXbt1uqyQF8z3O2PfA', // Onde caem no Obsidian (Fallback Geral)
-  
-  // Pastas de Saída Específicas por Categoria
-  PASTAS_SAIDA_CATEGORIAS: {
-    'TFC': '1MU8tqPAss0E8gAkky15eVQjStQWbhJEa',
-    'LHM': '1xeKf5DCbIWl_OTLggw5PHeeN4XTRU9dZ',
-    'Conferência': '15sMBhmUoiO8MVHt2Lzo1X3K7SklRC5o8',
-    'Lacuna Zero': '1Bkz6ElXUXJzyGxo_isC24S3TyEWleLOL',
-    // Aliases para compatibilidade legada
-    'Tutoria': '15sMBhmUoiO8MVHt2Lzo1X3K7SklRC5o8',
-    'Lacuna': '1Bkz6ElXUXJzyGxo_isC24S3TyEWleLOL'
-  },
-
-  /**
-   * Retorna o ID da pasta do Drive com base na categoria resolvida.
-   * @param {string} categoria
-   * @returns {string} ID da pasta no Google Drive
-   */
-  obterPastaSaidaPorCategoria: function(categoria) {
-    if (categoria && this.PASTAS_SAIDA_CATEGORIAS[categoria]) {
-      return this.PASTAS_SAIDA_CATEGORIAS[categoria];
-    }
-    return this.ID_PASTA_SAIDA_FLASHCARDS;
-  },
-
   // Limites e Tempos (VLAEG)
   TEMPO_LIMITE_MS: 4.5 * 60 * 1000, // Proteção de 4.5 min do Apps Script
   HORAS_RECENTES: 168,              // Janela de 7 dias
   DELAY_ENTRE_ARQUIVOS_MS: 6000,    // Throttling preditivo para 15 RPM (Gemini Flash)
   MAX_RETRIES: 4,                   // Tentativas em caso de erro 429/500
-  
-  /** 
+
+  /**
    * Recupera a chave da API do Gemini armazenada no PropertiesService.
    * @returns {string|null}
    */
@@ -48,9 +24,17 @@ const CONFIG = {
     return PropertiesService.getScriptProperties().getProperty('GEMINI_API_KEY');
   },
 
-  // Modelo Gemini
-  GEMINI_MODEL: 'gemini-2.5-flash',
-  
+  // Cascata de Modelos Gemini (Fallback Sequencial)
+  // Ordem de prioridade: tenta o 1º; se falhar, tenta o 2º; e assim por diante.
+  GEMINI_MODELS: [
+    'gemini-3.5-flash',
+    'gemini-3.5-flash-lite',
+    'gemini-3.6-flash'
+  ],
+
+  // Alias de compatibilidade (usado pelo SheetsLogger e referências legadas)
+  get GEMINI_MODEL() { return this.GEMINI_MODELS[0]; },
+
   // Mapeamento de Disciplinas (usado principalmente pelos Resumos)
   DISCIPLINAS: {
     // Básicas
@@ -62,7 +46,7 @@ const CONFIG = {
     'embriologia':'Embriologia',
     'imuno':      'Imunologia',
     'microbio':   'Microbiologia',
-    
+
     // Herdadas / Específicas antigas
     'patologia':  'Patologia',
     'parasito':   'Parasitologia',
@@ -71,7 +55,7 @@ const CONFIG = {
     'farmaco':    'Farmacologia',
     'antimetab':  'Farmacologia',
     'antineopla': 'Farmacologia',
-    
+
     // Clínicas
     'cardio':     'Cardiologia',
     'pneumo':     'Pneumologia',

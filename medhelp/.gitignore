@@ -1,3 +1,4 @@
 .env
 .venv/
-objetivos_temp.txt
+node_modules/
+config/gcp-oauth.keys.json

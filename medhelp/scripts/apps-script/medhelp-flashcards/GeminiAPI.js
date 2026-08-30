@@ -4,8 +4,8 @@
 
 const GeminiAPI = {
   
-  _buildUrl: function(apiKey) {
-    return `https://generativelanguage.googleapis.com/v1beta/models/${CONFIG.GEMINI_MODEL}:generateContent?key=${apiKey}`;
+  _buildUrl: function(model, apiKey) {
+    return `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
   },
 
   _getSafetySettings: function() {
@@ -18,90 +18,107 @@ const GeminiAPI = {
   },
 
   /**
-   * Chamada com Exponential Backoff with Full Jitter e Graceful Exit.
+   * Chamada com Exponential Backoff, Full Jitter, Graceful Exit e Model Cascade.
+   * Tenta cada modelo em CONFIG.GEMINI_MODELS sequencialmente.
+   * Se um modelo esgota os retries ou retorna 404, avança para o próximo.
    * @param {Object} payload 
    * @param {string} apiKey 
    * @returns {string}
    */
   fetchWithRetry: function(payload, apiKey) {
-    const url = this._buildUrl(apiKey);
-    const options = {
-      method: 'post',
-      contentType: 'application/json',
-      payload: JSON.stringify(payload),
-      muteHttpExceptions: true
-    };
-
-    const startTime = Date.now();
+    const models = CONFIG.GEMINI_MODELS;
     const MAX_EXECUTION_TIME_MS = 300000; // Limite de 5 min (GAS mata em 6 min)
     const BASE_DELAY_MS = 1000;
     const CAP_DELAY_MS = 60000;
-    
-    let attempt = 1;
+    const globalStartTime = Date.now();
+    let lastError = null;
 
-    while (true) {
-      const response = UrlFetchApp.fetch(url, options);
-      const statusCode = response.getResponseCode();
-      const responseText = response.getContentText();
+    for (let modelIdx = 0; modelIdx < models.length; modelIdx++) {
+      const currentModel = models[modelIdx];
+      const url = this._buildUrl(currentModel, apiKey);
+      const options = {
+        method: 'post',
+        contentType: 'application/json',
+        payload: JSON.stringify(payload),
+        muteHttpExceptions: true
+      };
 
-      let jsonResponse;
-      try {
-        jsonResponse = JSON.parse(responseText);
-      } catch (e) {
-        jsonResponse = { error: { code: statusCode, message: responseText } };
-      }
+      let attempt = 1;
 
-      const errorCode = (jsonResponse.error && jsonResponse.error.code) ? jsonResponse.error.code : statusCode;
-
-      if (statusCode === 200) {
-        if (!jsonResponse.candidates || jsonResponse.candidates.length === 0 || !jsonResponse.candidates[0].content || !jsonResponse.candidates[0].content.parts || jsonResponse.candidates[0].content.parts.length === 0) {
-          throw new Error(`Resposta vazia ou bloqueada. Detalhes: ${jsonResponse.promptFeedback?.blockReason || 'desconhecido'}`);
-        }
-        return jsonResponse.candidates[0].content.parts[0].text;
-      }
-
-      if (errorCode === 400 || errorCode === 401) {
-        throw new Error(`Erro Crítico [HTTP ${errorCode}]: Cancelamento Imediato. Propagação: ${responseText}`);
-      }
-
-      if (errorCode === 503 || errorCode === 429) {
-        const elapsedMs = Date.now() - startTime;
-        
+      while (attempt <= CONFIG.MAX_RETRIES) {
+        // Verificação de tempo global antes de cada tentativa
+        const elapsedMs = Date.now() - globalStartTime;
         if (elapsedMs >= MAX_EXECUTION_TIME_MS) {
-          throw new Error(`Runtime Safety Timeout: O orçamento cronometrado (${elapsedMs}ms) estoirou o teto de 300 segundos. Saída limpa forçada executada.`);
+          throw new Error(`Runtime Safety Timeout: Orçamento cronometrado (${elapsedMs}ms) excedeu o teto de 300s. Último modelo: ${currentModel}.`);
         }
 
-        const tempCap = Math.min(CAP_DELAY_MS, BASE_DELAY_MS * Math.pow(2, attempt));
-        const sleepMs = Math.random() * tempCap; // Full Jitter
+        const response = UrlFetchApp.fetch(url, options);
+        const statusCode = response.getResponseCode();
+        const responseText = response.getContentText();
 
-        if (elapsedMs + sleepMs >= MAX_EXECUTION_TIME_MS) {
-          throw new Error(`Runtime Safety Timeout Intercetado: Adicionar sono de ${Math.round(sleepMs)}ms provocaria colapso do sistema (teto 300s). Saída forçada processada.`);
+        let jsonResponse;
+        try {
+          jsonResponse = JSON.parse(responseText);
+        } catch (e) {
+          jsonResponse = { error: { code: statusCode, message: responseText } };
         }
 
-        console.warn(`[HTTP ${errorCode}] Falha de rede. Tentativa nº ${attempt}: Suspensão mitigadora "Full Jitter" durante ${Math.round(sleepMs)}ms.`);
-        
-        Utilities.sleep(sleepMs);
-        attempt++;
-      } else {
-        // Fallback genérico para outros erros 5xx (mesma lógica do Jitter)
-        if (errorCode >= 500) {
-           const elapsedMs = Date.now() - startTime;
-           if (elapsedMs >= MAX_EXECUTION_TIME_MS) {
-             throw new Error(`Runtime Safety Timeout: Erro Interno ${errorCode}.`);
-           }
-           const tempCap = Math.min(CAP_DELAY_MS, BASE_DELAY_MS * Math.pow(2, attempt));
-           const sleepMs = Math.random() * tempCap;
-           if (elapsedMs + sleepMs >= MAX_EXECUTION_TIME_MS) {
-             throw new Error(`Runtime Safety Timeout Intercetado.`);
-           }
-           console.warn(`[HTTP ${errorCode}] Erro genérico no servidor. Tentativa ${attempt}. Aguardando ${Math.round(sleepMs)}ms.`);
-           Utilities.sleep(sleepMs);
-           attempt++;
+        const errorCode = (jsonResponse.error && jsonResponse.error.code) ? jsonResponse.error.code : statusCode;
+
+        // --- Sucesso ---
+        if (statusCode === 200) {
+          if (!jsonResponse.candidates || jsonResponse.candidates.length === 0 || !jsonResponse.candidates[0].content || !jsonResponse.candidates[0].content.parts || jsonResponse.candidates[0].content.parts.length === 0) {
+            throw new Error(`Resposta vazia ou bloqueada. Detalhes: ${jsonResponse.promptFeedback?.blockReason || 'desconhecido'}. Modelo: ${currentModel}`);
+          }
+          if (modelIdx > 0) {
+            console.info(`[MODEL CASCADE] Sucesso com modelo de fallback: ${currentModel} (posição ${modelIdx + 1}/${models.length}).`);
+          }
+          return jsonResponse.candidates[0].content.parts[0].text;
+        }
+
+        // --- Erros Fatais (não há sentido em retries) ---
+        if (errorCode === 400 || errorCode === 401) {
+          throw new Error(`Erro Crítico [HTTP ${errorCode}]: Cancelamento Imediato. Modelo: ${currentModel}. Detalhes: ${responseText}`);
+        }
+
+        // --- Modelo não encontrado: pula direto para o próximo ---
+        if (errorCode === 404) {
+          console.warn(`[MODEL CASCADE] Modelo "${currentModel}" retornou 404 (não encontrado). Avançando para o próximo.`);
+          lastError = new Error(`Modelo "${currentModel}" não encontrado (404).`);
+          break; // Sai do while, vai pro próximo modelo
+        }
+
+        // --- Erros transientes (429, 503, 5xx): backoff com jitter ---
+        if (errorCode === 429 || errorCode === 503 || errorCode >= 500) {
+          const tempCap = Math.min(CAP_DELAY_MS, BASE_DELAY_MS * Math.pow(2, attempt));
+          const sleepMs = Math.random() * tempCap; // Full Jitter
+
+          const projectedElapsed = (Date.now() - globalStartTime) + sleepMs;
+          if (projectedElapsed >= MAX_EXECUTION_TIME_MS) {
+            console.warn(`[MODEL CASCADE] Timeout iminente com modelo "${currentModel}". Tentando próximo modelo.`);
+            lastError = new Error(`Timeout iminente no modelo "${currentModel}" após ${attempt} tentativas.`);
+            break; // Sai do while, vai pro próximo modelo
+          }
+
+          console.warn(`[HTTP ${errorCode}] Modelo: ${currentModel} | Tentativa ${attempt}/${CONFIG.MAX_RETRIES} | Suspensão Full Jitter: ${Math.round(sleepMs)}ms.`);
+          Utilities.sleep(sleepMs);
+          attempt++;
         } else {
-           throw new Error(`Erro não-transiente [HTTP ${errorCode}]: ${responseText}`);
+          // Erro desconhecido não-transiente
+          lastError = new Error(`Erro não-transiente [HTTP ${errorCode}] no modelo "${currentModel}": ${responseText}`);
+          break; // Sai do while, tenta próximo modelo
         }
+      }
+
+      // Se esgotou retries sem sucesso para este modelo
+      if (attempt > CONFIG.MAX_RETRIES) {
+        console.warn(`[MODEL CASCADE] Modelo "${currentModel}" esgotou ${CONFIG.MAX_RETRIES} tentativas. Avançando para o próximo.`);
+        lastError = new Error(`Modelo "${currentModel}" esgotou todas as ${CONFIG.MAX_RETRIES} tentativas.`);
       }
     }
+
+    // Se todos os modelos falharam
+    throw new Error(`[MODEL CASCADE FALHA TOTAL] Todos os ${models.length} modelos falharam. Último erro: ${lastError ? lastError.message : 'desconhecido'}. Modelos tentados: ${models.join(', ')}.`);
   },
 
   /**

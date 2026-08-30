@@ -13,45 +13,56 @@ function processarNovasTranscricoes() {
   const scriptProperties = PropertiesService.getScriptProperties();
   const apiKey = scriptProperties.getProperty('GEMINI_API_KEY');
   const apiKeyYoutube = scriptProperties.getProperty('YOUTUBE_API_KEY');
-  
+
   if (!apiKey) {
     console.error('[FATAL] GEMINI_API_KEY não encontrada nas Propriedades do Script. Abortando fluxo.');
     return;
   }
 
-  const pastaEntrada = DriveApp.getFolderById(CONFIG.ID_PASTA_ENTRADA);
-  const listaArquivos = obterArquivosTextoPendentes(pastaEntrada);
+  // Bi-turma: itera sobre todas as turmas com pastas de entrada configuradas
+  const turmasAtivas = getTurmasAtivas();
+  console.log(`[TURMA_ROUTER] Turmas ativas neste ciclo: ${turmasAtivas.join(', ')}`);
 
   let processados = 0;
   let falhas      = 0;
+  let quarentena  = 0; // Não são falhas do sistema — arquivo apenas mal nomeado
 
-  console.log(`[ENTRADA] Total de arquivos .txt detectados na pasta: ${listaArquivos.length}`);
-
-  for (let i = 0; i < listaArquivos.length; i++) {
-    // Guarda de Timeout de 4.5 minutos para evitar Crash Limits do GAS (6 minutos)
+  for (const turmaId of turmasAtivas) {
+    // Guarda de Timeout global
     if (Date.now() - tempoInicio > CONFIG.TEMPO_LIMITE_MS) {
-      console.warn('[AVISO] Tempo limite de 4.5 min atingido. Encerrando o lote de forma segura. ' +
-                   'Os arquivos pendentes serão processados no próximo ciclo agendado.');
+      console.warn('[AVISO] Tempo limite de 4.5 min atingido antes de processar todas as turmas. ' +
+                   'Os itens pendentes serão retomados no próximo ciclo.');
       break;
     }
 
-    const arquivo = listaArquivos[i];
-    const sucesso = processarArquivoIndividual(arquivo, apiKey, apiKeyYoutube, tempoInicio);
-    
-    if (sucesso) {
-      processados++;
-    } else {
-      falhas++;
-    }
+    const turmaConfig = getConfigTurma(turmaId);
+    const pastaEntrada = DriveApp.getFolderById(turmaConfig.ID_PASTA_ENTRADA);
+    const listaArquivos = obterArquivosTextoPendentes(pastaEntrada);
 
-    // Pausa Preditiva (Throttling) entre arquivos para segurança do Rate Limit
-    if (i < listaArquivos.length - 1) {
-      console.log(`[ESPERA] Aguardando ${CONFIG.INTERVALO_ENTRE_ARQUIVOS_MS / 1000}s para proteção de cota...`);
-      Utilities.sleep(CONFIG.INTERVALO_ENTRE_ARQUIVOS_MS);
+    console.log(`\n[${turmaId}] ${listaArquivos.length} arquivo(s) .txt detectado(s) na pasta de entrada.`);
+
+    for (let i = 0; i < listaArquivos.length; i++) {
+      if (Date.now() - tempoInicio > CONFIG.TEMPO_LIMITE_MS) {
+        console.warn(`[AVISO] Tempo limite atingido durante o lote de ${turmaId}. Encerrando com segurança.`);
+        break;
+      }
+
+      const arquivo = listaArquivos[i];
+      const resultado = processarArquivoIndividual(arquivo, apiKey, apiKeyYoutube, tempoInicio, turmaConfig, turmaId);
+
+      if (resultado === true)        processados++;
+      else if (resultado === null)   quarentena++;  // arquivo mal nomeado
+      else                           falhas++;       // resultado === false: falha real
+
+      // Pausa Preditiva (Throttling) entre arquivos para segurança do Rate Limit
+      if (i < listaArquivos.length - 1) {
+        console.log(`[ESPERA] Aguardando ${CONFIG.INTERVALO_ENTRE_ARQUIVOS_MS / 1000}s para proteção de cota...`);
+        Utilities.sleep(CONFIG.INTERVALO_ENTRE_ARQUIVOS_MS);
+      }
     }
   }
 
-  console.log(`\n[FIM] Ciclo concluído. Processados: ${processados} | Falhas: ${falhas}`);
+  console.log(`\n[FIM] Ciclo concluído. Processados: ${processados} | Falhas: ${falhas} | Quarentena: ${quarentena}`);
 
   if (processados > 0 || falhas > 0) {
     enviarNotificacaoEmail(processados, falhas);
@@ -65,17 +76,30 @@ function processarNovasTranscricoes() {
 
 /**
  * Processa um único arquivo de transcrição.
+ *
  * @param {GoogleAppsScript.Drive.File} arquivo
  * @param {string} apiKey
  * @param {string} apiKeyYoutube
  * @param {number} tempoInicio
- * @returns {boolean} True se processado com sucesso, false caso contrário
+ * @param {Object} turmaConfig - Config da turma (vem do TurmaRouter)
+ * @param {string} turmaId    - Sigla da turma ('UNDB' | 'CEUMA')
+ * @returns {true|false|null} true=sucesso, false=falha real, null=arquivo em quarentena (mal nomeado)
  */
-function processarArquivoIndividual(arquivo, apiKey, apiKeyYoutube, tempoInicio) {
+function processarArquivoIndividual(arquivo, apiKey, apiKeyYoutube, tempoInicio, turmaConfig, turmaId) {
   const nomeOriginal = arquivo.getName().replace(/\.txt$/i, '');
-  const nomeLimpo = limparNomeArquivo(nomeOriginal);
+  const pastaOrigemId = arquivo.getParents().hasNext() ? arquivo.getParents().next().getId() : null;
 
-  console.log(`\n[INÍCIO] Processando: "${nomeOriginal}" → "${nomeLimpo}"`);
+  // Valida turma pelo arquivo (defesa dupla — a iteração já garante a pasta certa,
+  // mas o prefixo do nome confirma que o arquivo foi nomeado corretamente)
+  const turmaDetectada = detectarTurma(nomeOriginal, pastaOrigemId);
+  if (turmaDetectada === 'QUARENTENA') {
+    console.warn(`[QUARENTENA] Arquivo "${nomeOriginal}" ignorado. Sem prefixo de turma reconhecível.`);
+    SheetsLogger.registrar({ script: 'ResumosTranscricao', arquivo: nomeOriginal, disciplina: '—', status: 'TURMA_DESCONHECIDA', duracao: 0 });
+    return null; // Não é falha do sistema — arquivo apenas mal nomeado
+  }
+
+  const nomeLimpo = limparNomeArquivo(nomeOriginal);
+  console.log(`\n[INÍCIO][${turmaId}] Processando: "${nomeOriginal}" → "${nomeLimpo}"`);
 
   let textoBruto;
   try {
@@ -90,7 +114,7 @@ function processarArquivoIndividual(arquivo, apiKey, apiKeyYoutube, tempoInicio)
   const resumoGerado = chamarGeminiAPI(textoBruto, nomeOriginal, apiKey, promptAplicado);
 
   if (!resumoGerado) {
-    console.error(`[FALHA] API não retornou texto válido para "${nomeOriginal}". ` +
+    console.error(`[FALHA][${turmaId}] API não retornou texto válido para "${nomeOriginal}". ` +
                   'O arquivo .txt permanece na pasta de entrada para revisão ou próxima tentativa.');
     SheetsLogger.registrar({ script: 'ResumosTranscricao', arquivo: nomeOriginal, disciplina: 'Resumo', status: 'ERRO_API', duracao: 0 });
     return false;
@@ -105,18 +129,20 @@ function processarArquivoIndividual(arquivo, apiKey, apiKeyYoutube, tempoInicio)
       resumoFinal = `# ${tituloLimpo}\n\n${videoMd}\n\n${resumoGerado}`;
     }
 
-    salvarResumo(`${tituloLimpo} (resumo)`, resumoFinal);
-    arquivarArquivo(arquivo);
-    excluirAudiosDaAula(textoBruto, nomeOriginal);
+    // Salva e arquiva usando as pastas da turma correta (injetadas via turmaConfig)
+    salvarResumo(`${tituloLimpo} (resumo)`, resumoFinal, turmaConfig.ID_PASTA_RESUMOS);
+    arquivarArquivo(arquivo, turmaConfig.ID_PASTA_ARQUIVADOS);
+    excluirAudiosDaAula(textoBruto, nomeOriginal, turmaConfig.ID_PASTA_AUDIOS);
 
-    console.log(`[SUCESSO] "${nomeLimpo}.md" gerado e salvo. Original arquivado com sucesso.`);
-    SheetsLogger.registrar({ script: 'ResumosTranscricao', arquivo: nomeOriginal, disciplina: 'Resumo', status: 'SUCESSO', duracao: Math.round((Date.now() - tempoInicio) / 1000) });
+    const duracao = Math.round((Date.now() - tempoInicio) / 1000);
+    console.log(`[SUCESSO][${turmaId}] "${nomeLimpo}.md" gerado e salvo. Original arquivado.`);
+    SheetsLogger.registrar({ script: 'ResumosTranscricao', arquivo: nomeOriginal, disciplina: 'Resumo', status: `SUCESSO [${turmaId}]`, duracao });
     return true;
 
   } catch (e) {
-    console.error(`[ERRO] Falha de I/O ao salvar o arquivo "${nomeLimpo}": ${e.message}. ` +
+    console.error(`[ERRO][${turmaId}] Falha de I/O ao salvar "${nomeLimpo}": ${e.message}. ` +
                   'O arquivo .txt permanece na pasta de entrada para tentativa futura.');
-    SheetsLogger.registrar({ script: 'ResumosTranscricao', arquivo: nomeOriginal, disciplina: 'Resumo', status: 'ERRO_IO', duracao: 0 });
+    SheetsLogger.registrar({ script: 'ResumosTranscricao', arquivo: nomeOriginal, disciplina: 'Resumo', status: `ERRO_IO [${turmaId}]`, duracao: 0 });
     return false;
   }
 }
@@ -128,8 +154,12 @@ function processarArquivoIndividual(arquivo, apiKey, apiKeyYoutube, tempoInicio)
  * @returns {string}
  */
 function limparNomeArquivo(nomeOriginal) {
-  // 1. Detecta a categoria baseando-se no termo contido no nome original (insensível a acentos)
-  const nomeLower = (nomeOriginal || '')
+  // Etapa 0: remove o prefixo de turma ("UNDB - " ou "CEUMA - ") antes de qualquer outra lógica.
+  // O nome final dos arquivos gerados não carregará o identificador de turma.
+  let nomeBase = (nomeOriginal || '').replace(/^(UNDB|CEUMA)\s*-\s*/i, '').trim();
+
+  // 1. Detecta a categoria baseando-se no termo contido no nome (insensível a acentos)
+  const nomeLower = nomeBase
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '');
@@ -141,7 +171,7 @@ function limparNomeArquivo(nomeOriginal) {
   else if (nomeLower.includes('lacuna')) categoria = 'Lacuna Zero';
 
   // 2. Remove termos de categoria e colchetes para poder limpar o restante
-  let resto = nomeOriginal
+  let resto = nomeBase
     .replace(/conferênci[aa]|conferenci[aa]/ig, '')
     .replace(/tutoria/ig, '')
     .replace(/tfc/ig, '')
