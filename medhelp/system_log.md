@@ -21,6 +21,13 @@
   - Type casting robusto (`str()`) implementado em `aplicar_operacoes` para evitar falha silenciosa de keys caso o campo `objetivo` seja parseado como inteiro.
 - **Backup:** `Orquestrador_Hibrido.ipynb.bak`
 
+## 2026-08-31 — Sistema Guardião de Versões (Protocolo Anti-Cache Colab)
+- **Causa Raiz:** Notebooks abertos no navegador retêm código em cache. Ao executar "Run All" numa aba antiga, executava-se lógica desatualizada, mascarando falhas corrigidas.
+- **Implementação:**
+  - **Hook de Pre-Commit:** `.git/hooks/pre-commit` rastreia alterações em `.ipynb` no `git commit` e atualiza a string `VERSAO_LOCAL` com o timestamp atual (UTC).
+  - **Célula Injetada:** Em `Orquestrador_Hibrido.ipynb`, `Transcribe.ipynb`, `Roteiro_Tutoria.ipynb` e `colab_gerador_pdf_premium.ipynb`, a 1ª célula valida `VERSAO_LOCAL` via request no raw do GitHub.
+- **Tratamento de Exceções:** Bloqueia a execução integral com `raise Exception` caso haja divergência.
+
 ## 2026-08-31 — Otimização OCANES do Prompt do NotebookLM (Extrator de Evidências)
 - **Arquivos:** Prompt externo (NotebookLM) → alimenta [`Orquestrador_Hibrido.ipynb`](file:///home/vvgfilhos/medhelp/scripts/colab/Orquestrador_Hibrido.ipynb) Célula 4
 - **Descrição:** Refatoração completa do prompt "Sniper" usado no NotebookLM para extrair evidências brutas de livros fatiados. Aplicado framework OCANES com separação rigorosa [O][C][A][N][E][S].
@@ -179,3 +186,24 @@
   1. **Célula Interativa (Notebook)**: Adicionada a "CÉLULA 5 — MAPEAR OFFSETS DOS LIVROS (INTERATIVO)" no notebook. O script itera os PDFs da pasta `PASTA_LIVROS` e pede, via `input()`, a página impressa e a página física do leitor, calculando a matemática do offset.
   2. **Persistência (`offsets.json`)**: O resultado é salvo em um arquivo JSON na própria pasta de tutoria no Google Drive, sendo recarregado a cada execução (evitando que o usuário precise remapear livros conhecidos).
   3. **Refatoração Global**: As funções `obter_offset_pdf`, `get_pdfs_tocs`, `process_roteiro`, `gerar_pdfs` e `extrair_texto_paginas` foram atualizadas para receber e consultar o dicionário `offsets_dict` carregado de `offsets.json`, em vez de `OFFSETS_MANUAIS`.
+
+## 2026-08-31 — Correção da Curadoria de Vídeos Ausente no Orquestrador Híbrido
+- **Arquivos alterados:** `scripts/colab/Orquestrador_Hibrido.ipynb`
+- **Descrição:** Restauração do corpo da função `adicionar_videos` que foi acidentalmente truncada em um commit anterior.
+- **Causa Raiz:** A função `adicionar_videos` no Jupyter Notebook terminava no bloco de verificação da API Key (linhas ~550). Como o restante do código havia sido apagado, a função encerrava ali, retornando o config inalterado ou `None` (se não entrasse no `if`), gerando erro de dicionário vazio/None na Célula 9 de geração de PDF.
+- **Correções Aplicadas:**
+  1. Resgatado o código original do histórico do Git (`git log -p`).
+  2. Repositado o código ausente na função usando um script Python de patch para garantir a formatação correta em JSON exigida pelos arquivos `.ipynb`.
+
+## 2026-08-31 — Refatoração e Correção de Bugs na Célula 6.5 (Otimização Curatorial)
+- **Arquivos alterados:** `scripts/colab/Orquestrador_Hibrido.ipynb`
+- **Descrição:** Refatoração cirúrgica e correção de segurança de tipos (Type Safety) e alinhamento de schema no agente otimizador (Célula 6.5).
+- **Causa Raiz & Correções:**
+  1. **Schema Mismatch (Alucinação Induzida):** O modelo Pydantic exigia a chave `corte_idx`, mas o `SYSTEM_PROMPT_OTIMIZADOR` instruía o LLM a retornar `idx`. Corrigido o prompt e o gerador de resumo (`resumir_config_para_llm`) para usarem de forma padronizada a chave `corte_idx`.
+  2. **Type Safety em Dicionários:** A função `aplicar_operacoes` utilizava iteradores de objetos com chaves que poderiam gerar `KeyError` dependendo do cast do Pydantic no campo `objetivo` (string vs int). Foi injetado `str(obj_id)` e `str(op.objetivo)` para proteger as buscas no dicionário `obj_map`.
+
+## 2026-08-31 — Remoção do Índice da Capa (Orquestrador Híbrido)
+- **Arquivos alterados:** `scripts/colab/Orquestrador_Hibrido.ipynb`
+- **Descrição:** O usuário reportou que o índice não estava funcionando corretamente e pediu sua remoção.
+- **Correções Aplicadas:**
+  1. Comentada a linha `elems.extend(_build_cover_index(cortes, styles))` dentro da função `gerar_capa` para suspender a renderização da tabela de índice na capa dos PDFs, mantendo o cabeçalho e as sugestões de vídeos intactos.
