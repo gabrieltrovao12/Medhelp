@@ -1,5 +1,44 @@
 # Log de Sistema - Medhelp
 
+## 2026-08-31 — Refatoração Anti-Alucinação da Célula 6.5 (Otimizador Curatorial)
+- **Arquivos:** [`Orquestrador_Hibrido.ipynb`](file:///home/vvgfilhos/medhelp/scripts/colab/Orquestrador_Hibrido.ipynb) — Célula 5 (Motor)
+- **Descrição:** Substituição completa do modelo de "echo total" (onde o Gemini reescrevia o JSON inteiro) por um modelo de operações (diff). O Gemini agora retorna apenas uma lista de ações (DELETE/GAP) e o Python aplica cirurgicamente no JSON original.
+- **Problemas resolvidos:**
+  1. Echo total de JSON eliminado — output do modelo cai de ~400 linhas para ~20 linhas.
+  2. Dados intocados (nomes, páginas) nunca passam pelo modelo — zero corrupção silenciosa.
+  3. `response_schema` Pydantic adicionado (`ResultadoOtimizacao`) — JSON garantido pela API.
+  4. Consolidação de cortes contíguos migrada para Python puro — 100% determinístico.
+  5. Pós-validação automática — checa se páginas "apareceram do nada".
+  6. Prompt OCANES com [FOCO]/[MENÇÃO] como ground truth para decisões de corte.
+  7. Persona "Curador Pedagógico Médico Rigoroso" removida — ruído estocástico.
+- **Pipeline novo (4 etapas):**
+  1. Consolidação determinística (Python) → merge de cortes contíguos
+  2. Análise LLM (Gemini) → retorna lista de operações
+  3. Aplicação (Python) → executa DELETE/GAP no JSON original (com type casting seguro)
+  4. Pós-validação (Python) → checa integridade
+- **Refatorações adicionais:**
+  - Código morto/duplicado removido da função `adicionar_videos`.
+  - Type casting robusto (`str()`) implementado em `aplicar_operacoes` para evitar falha silenciosa de keys caso o campo `objetivo` seja parseado como inteiro.
+- **Backup:** `Orquestrador_Hibrido.ipynb.bak`
+
+## 2026-08-31 — Otimização OCANES do Prompt do NotebookLM (Extrator de Evidências)
+- **Arquivos:** Prompt externo (NotebookLM) → alimenta [`Orquestrador_Hibrido.ipynb`](file:///home/vvgfilhos/medhelp/scripts/colab/Orquestrador_Hibrido.ipynb) Célula 4
+- **Descrição:** Refatoração completa do prompt "Sniper" usado no NotebookLM para extrair evidências brutas de livros fatiados. Aplicado framework OCANES com separação rigorosa [O][C][A][N][E][S].
+- **Problemas corrigidos (12):**
+  1. Persona "Sniper" removida — injetava ruído estocástico sem valor funcional.
+  2. Normas e Ações separadas em blocos distintos — evita attention collapse.
+  3. Adicionados 3 exemplos Few-Shot pareados (hit com densidade+tabela, miss, não-contíguas+nomenclatura alternativa).
+  4. Nova etapa de Expansão Sinonímica (Ação 1) — reduz falsos negativos em temas médicos.
+  5. Formato flexível de capítulo — copia nomenclatura real do livro (Cap./Unidade/Módulo) em vez de forçar "Cap.".
+  6. Nova norma N8 (um capítulo por bloco) — evita blocos monolíticos.
+  7. Norma de nome de arquivo (N4) reforçada com exemplos ✅/❌.
+  8. Normas numeradas N1–N10 para referência cruzada e debugging.
+  9. Norma N9: formato explícito para páginas não-contíguas (vírgula) vs contíguas (travessão).
+  10. Classificação de densidade [FOCO]/[MENÇÃO] por seção — alimenta Otimizador Curatorial (Célula 6.5).
+  11. Norma N10: nomenclatura flexível de capítulo copiada do livro real.
+  12. Linha 📊 para tabelas e figuras-chave (gold content para estudo).
+- **Impacto esperado:** Saída mais consistente, parseable e exaustiva, reduzindo correções manuais no JSON gerado pela Célula 6.
+
 ## 2026-08-21 — Erro HTTP 503 (Rejeição da Cloud) na Geração de Resumos
 - **Arquivos:** `automacao-transcricoes/Config.js`, `automacao-transcricoes/GeminiClient.js`
 - **Descrição:** O pipeline de transcrições falhava sistematicamente com `[HTTP 503] Rejeição da Cloud` ao processar resumos, ativando o loop de Exponential Backoff sem sucesso.
