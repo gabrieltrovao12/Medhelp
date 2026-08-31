@@ -207,3 +207,12 @@
 - **Descrição:** O usuário reportou que o índice não estava funcionando corretamente e pediu sua remoção.
 - **Correções Aplicadas:**
   1. Comentada a linha `elems.extend(_build_cover_index(cortes, styles))` dentro da função `gerar_capa` para suspender a renderização da tabela de índice na capa dos PDFs, mantendo o cabeçalho e as sugestões de vídeos intactos.
+
+## 2026-08-31 — Correção de Falha Crítica de Parsing (Célula 6)
+- **Arquivos alterados:** `scripts/colab/Orquestrador_Hibrido.ipynb`
+- **Descrição:** O usuário reportou erro de validação JSON (`Expecting value: line 34 column 21`) durante a conversão do roteiro do NotebookLM.
+- **Causa Raiz & Correções:**
+  1. **Ausência de Structured Outputs:** O prompt `SYSTEM_PROMPT_CONVERSAO` gerava JSON de forma livre e tentava limpar blocos Markdown via Expressões Regulares, falhando diante de erros sintáticos do LLM (como vírgulas extras).
+  2. **Refatoração com Pydantic:** Foram introduzidas as classes `ObjetivoJSON` e `CorteJSON` no notebook.
+  3. A função `converter_notebooklm_para_json` passou a utilizar `response_schema=list[ObjetivoJSON]` na chamada `call_gemini`, garantindo a validação estrita do JSON nativa da API.
+  4. **Adaptabilidade do Offset:** Como o Structured Outputs não suporta tipagens complexas (`list[int] | str`) para o campo `paginas` (que ocasionalmente recebia `"VERIFICAR_OFFSET"`), o esquema foi remodelado para utilizar a flag boleana `precisa_verificar_offset: bool` e o processamento pós-API foi ajustado para restabelecer a string `"VERIFICAR_OFFSET"` quando necessário.
