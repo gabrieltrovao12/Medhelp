@@ -1,6 +1,12 @@
 # Tarefas do Projeto - Medhelp
 
-## FASE ATUAL: Padronização e Correção dos Filtros por Categoria (TFC, LHM, Conferência, Lacuna Zero)
+## FASE ATUAL: Atualização de Caminhos no Orquestrador Híbrido e Transcrição (Tutoria / Colab)
+- [x] Atualizar caminhos de `pasta_livros` em `scripts/colab/Orquestrador_Hibrido.ipynb` (`Tutoria - UNDB` e `Tutoria - CEUMA`).
+- [x] Atualizar caminho de saída em `scripts/colab/Transcribe.ipynb` (`Transcricoes_Medicina - UNDB`).
+- [x] Validar sintaxe e integridade JSON dos notebooks após as alterações.
+- [x] Submeter commit e push para o GitHub com Guardião de Versão.
+
+## FASE ANTERIOR: Padronização e Correção dos Filtros por Categoria (TFC, LHM, Conferência, Lacuna Zero)
 
 - [x] Atualizar especificação e roteamento de categorias em `research.md`.
 - [x] Atualizar `limparNomeArquivo` em `automacao-transcricoes/Main.js`.

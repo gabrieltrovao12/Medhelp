@@ -1,5 +1,18 @@
 # Log de Sistema - Medhelp
 
+## 2026-09-05 — Atualização de Pastas de Tutoria e Transcrição (Colab)
+- **Arquivos:** 
+  - [`Orquestrador_Hibrido.ipynb`](file:///home/vvgfilhos/medhelp/scripts/colab/Orquestrador_Hibrido.ipynb) — Célula 7 (Configurações da Turma)
+  - [`Transcribe.ipynb`](file:///home/vvgfilhos/medhelp/scripts/colab/Transcribe.ipynb) — Célula 4 (Configuração de Pastas do Drive)
+- **Descrição:** Atualizados os caminhos de diretórios no Google Drive para tutoria e transcrições médicas.
+- **Modificações Aplicadas:**
+  - `Orquestrador_Hibrido.ipynb` (ROUTER):
+    - `UNDB.pasta_livros`: `/content/drive/MyDrive/Logística - UNDB/Livros - UNDB` → `/content/drive/MyDrive/Logística - UNDB/Tutoria - UNDB`
+    - `CEUMA.pasta_livros`: `/content/drive/MyDrive/Logística - CEUMA/Livros - CEUMA` → `/content/drive/MyDrive/Logística - CEUMA/Tutoria - CEUMA`
+  - `Transcribe.ipynb`:
+    - `PASTA_SAIDA_DRIVE`: `/content/drive/MyDrive/Logística - UNDB/Transcrições - UNDB/Resumos_Prontos - UNDB` → `/content/drive/MyDrive/Logística - UNDB/Transcrições - UNDB/Transcricoes_Medicina - UNDB`
+- **Validação:** Verificada a integridade sintática e estrutura JSON dos notebooks sem corromper a formatação original.
+
 ## 2026-08-31 — Refatoração Anti-Alucinação da Célula 6.5 (Otimizador Curatorial)
 - **Arquivos:** [`Orquestrador_Hibrido.ipynb`](file:///home/vvgfilhos/medhelp/scripts/colab/Orquestrador_Hibrido.ipynb) — Célula 5 (Motor)
 - **Descrição:** Substituição completa do modelo de "echo total" (onde o Gemini reescrevia o JSON inteiro) por um modelo de operações (diff). O Gemini agora retorna apenas uma lista de ações (DELETE/GAP) e o Python aplica cirurgicamente no JSON original.
