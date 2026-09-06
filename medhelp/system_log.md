@@ -1,5 +1,14 @@
 # Log de Sistema - Medhelp
 
+## 2026-09-05 — Suporte aos Diretórios CEUMA no Gerador de PDF Premium
+- **Arquivos:** [`colab_gerador_pdf_premium.ipynb`](file:///home/vvgfilhos/medhelp/scripts/colab/pdf-premium/colab_gerador_pdf_premium.ipynb) — Célula 3 (Configurações e Diretórios)
+- **Descrição:** Adicionada resolução explícita de pastas para a faculdade CEUMA (`Resumos_Prontos - CEUMA`, `PDFs_Premium - CEUMA`, `Arquivados - CEUMA`), substituindo a lógica ternária prévia restrita à UNDB por estrutura condicional completa (`UNDB` / `CEUMA` / Fallback).
+- **Modificações Aplicadas:**
+  - `if FACULDADE == 'UNDB'`: direciona para sufixos `- UNDB`.
+  - `elif FACULDADE == 'CEUMA'`: direciona para sufixos `- CEUMA`.
+  - `else`: mantém pastas padrão sem sufixo institucional.
+- **Validação:** Parsing AST de todas as células de código do notebook bem-sucedido e integridade JSON preservada.
+
 ## 2026-09-05 — Atualização de Pastas de Tutoria e Transcrição (Colab)
 - **Arquivos:** 
   - [`Orquestrador_Hibrido.ipynb`](file:///home/vvgfilhos/medhelp/scripts/colab/Orquestrador_Hibrido.ipynb) — Célula 7 (Configurações da Turma)
