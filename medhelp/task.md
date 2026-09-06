@@ -1,6 +1,10 @@
 # Tarefas do Projeto - Medhelp
 
-## FASE ATUAL: Atualização de Caminhos no Orquestrador Híbrido e Transcrição (Tutoria / Colab)
+## FASE ATUAL: Suporte a Diretórios CEUMA no Gerador de PDF Premium
+- [x] Atualizar `RESUMOS_DIR`, `PDFS_DIR` e `ARQUIVO_DIR` em `scripts/colab/pdf-premium/colab_gerador_pdf_premium.ipynb` para suportar CEUMA (`Resumos_Prontos - CEUMA`, `PDFs_Premium - CEUMA`, `Arquivados - CEUMA`).
+- [x] Validar sintaxe e integridade JSON do notebook após a alteração.
+
+## FASE ANTERIOR: Atualização de Caminhos no Orquestrador Híbrido e Transcrição (Tutoria / Colab)
 - [x] Atualizar caminhos de `pasta_livros` em `scripts/colab/Orquestrador_Hibrido.ipynb` (`Tutoria - UNDB` e `Tutoria - CEUMA`).
 - [x] Atualizar caminho de saída em `scripts/colab/Transcribe.ipynb` (`Transcricoes_Medicina - UNDB`).
 - [x] Validar sintaxe e integridade JSON dos notebooks após as alterações.
