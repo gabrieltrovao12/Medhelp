@@ -544,6 +544,7 @@ CAPA → SUBCAPA (Pergunta 01, texto completo) → Slides de Conteúdo → SUBCA
    b. Decompose the question into implicit sub-topics.
    c. Select the appropriate **Slide Archetype** (Tipo A–J) for each sub-topic and generate content slides.
    d. Ensure **exhaustive coverage**: every aspect mentioned in the question must be answered.
+   e. **CRITICAL — Density Limit**: Each slide must have max 2 H2 sections, max 4 bullets per H2, max 8 bullets total. Tables max 6 data rows. If exceeded, SPLIT into multiple slides (e.g., "Etiologias (1/2)", "Etiologias (2/2)"). NEVER compress content to fit.
 5. Number all slides sequentially (1, 2, 3...).
 6. Output the complete Markdown, preserving the **Arquitetura Visual** and **Hierarquia Tipográfica** exactly. Only adapt the **Conteúdo Textual (Semântico)**.
 

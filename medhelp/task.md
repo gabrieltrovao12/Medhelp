@@ -1,6 +1,18 @@
 # Tarefas do Projeto - Medhelp
 
-## FASE ATUAL: Suporte a Diretórios CEUMA no Gerador de PDF Premium
+## FASE ATUAL: Publicação dos Flashcards da Cognitiva 02 no Portal Medhelp
+- [x] Adicionar link dos Flashcards da Cognitiva 02 no bloco Flashcards de `~/index.html`.
+- [x] Validar estrutura HTML, atributos de acessibilidade e integração com `analytics.js`.
+- [x] Registrar alteração em `system_log.md` e validar persistência no repositório.
+
+## FASE ANTERIOR: Engenharia de Prompts OCANES V3 para Flashcards do NotebookLM
+- [x] Diagnóstico da falha de renderização no NotebookLM (geração de LaTeX `$ > 3 \text{ cm} $` e aglutinação de linhas).
+- [x] Reversão da abordagem de CAIXA ALTA conforme solicitação expressa do usuário (retorno à capitalização natural).
+- [x] Refatoração do prompt no padrão estrito OCANES ([O], [C], [A], [N], [E], [S]).
+- [x] Teste de laboratório e simulação com os casos reais de vias biliares.
+- [x] Atualização da skill `publicar-flashcards-notebooklm/SKILL.md` e artefatos de documentação.
+
+## FASE ANTERIOR: Suporte a Diretórios CEUMA no Gerador de PDF Premium
 - [x] Atualizar `RESUMOS_DIR`, `PDFS_DIR` e `ARQUIVO_DIR` em `scripts/colab/pdf-premium/colab_gerador_pdf_premium.ipynb` para suportar CEUMA (`Resumos_Prontos - CEUMA`, `PDFs_Premium - CEUMA`, `Arquivados - CEUMA`).
 - [x] Validar sintaxe e integridade JSON do notebook após a alteração.
 
