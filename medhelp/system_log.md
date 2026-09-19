@@ -1,5 +1,27 @@
 # Log de Sistema - Medhelp
 
+## 2026-09-19 — Adição dos Flashcards Cognitiva 02 no Portal Medhelp
+- **Arquivo:** [`index.html`](file:///home/vvgfilhos/index.html) — Seção 4 (Flashcards)
+- **Descrição:** Inclusão do link interativo do Google NotebookLM para os flashcards de revisão da prova Cognitiva 02 (`Cognitiva 02 (Prova)`).
+- **Link configurado:** `https://notebook.google.com/notebook/8a6518b8-1b99-4443-8597-c0e42dd69605/artifact/e342842d-1a87-445d-9a7f-4607826dd7cb?utm_source=nlm_web_share&utm_medium=google_oo&utm_campaign=art_share_1&utm_content=&utm_smc=nlm_web_share_google_oo_art_share_1_`
+- **Validação de UX/Design:**
+  - Segue a identidade visual e tokens CSS de `styles.css` (`.sub-item`, `.sub-marcador`, `.sub-nome`, `.sub-seta`).
+  - Posicionado sequencialmente após `Cognitiva 01 (Prova)`.
+  - Rastreamento analítico habilitado via `analytics.js` com o evento GA4 `click_sub_item` (categoria pai: `Flashcards`, nome do item: `Cognitiva 02 (Prova)`).
+
+## 2026-09-19 — Correção de Formatação dos Flashcards no NotebookLM (Cartões Didáticos)
+- **Arquivo:** [`SKILL.md`](file:///home/vvgfilhos/medhelp/.agents/skills/publicar-flashcards-notebooklm/SKILL.md) — Seção 4 (Prompt Anti-Alucinação)
+- **Descrição do problema:** O verso dos cartões didáticos do NotebookLM renderizava todo o conteúdo numa única linha com marcação Markdown crua visível (asteriscos `**`, travessões `—`).
+- **Causa raiz:** O campo de verso dos cartões didáticos do NotebookLM é **plain text**, não Markdown. O prompt antigo instruía "manter formatação e estrutura de listas" sem explicitar que a marcação Markdown deveria ser removida e cada item colocado em linha separada.
+- **V1 (falhou):** Prompt sem seção `[E] Exemplos`. Instrução de quebra de linha genérica. Sem regra anti-LaTeX/anti-crase. Resultado: itens continuaram na mesma linha + LaTeX (`$`, `\text{}`) apareceu.
+- **V2 (rejeitado):** Introduziu CAIXA ALTA nos termos e numeração, mas o NotebookLM ignorou numeração e continuou emitindo LaTeX (`$ > 3 \text{ cm} $`) e fundindo itens. O usuário rejeitou a caixa alta ("isso é ruim, deixe como tava").
+- **V3 (definitivo OCANES):**
+  - **Reversão Estética:** Eliminada a conversão para CAIXA ALTA; mantida a capitalização natural do texto original.
+  - **Anti-LaTeX Cirúrgico:** Injetada regra mandante em `[A] Ações` para unidades/comparadores e guardrail rígido em `[N] Normas` com pares de substituição determinísticos (`> 3 cm` em vez de `$ > 3 \text{ cm} $`).
+  - **Formato Vertical em Hífen:** Substituída a numeração por marcadores `- ` com quebra de linha física, espelhando a sintaxe original dos `.md` de flashcards.
+  - **Few-Shot OCANES Rigoroso:** Inclusão direta dos dois casos reais de falha apresentados pelo usuário como contra-exemplos proibidos explícitos.
+- **Impacto:** Otimização semântica direta nas Instruções Personalizadas dos Cartões Didáticos do NotebookLM. Pipeline local de arquivos preservado.
+
 ## 2026-09-05 — Suporte aos Diretórios CEUMA no Gerador de PDF Premium
 - **Arquivos:** [`colab_gerador_pdf_premium.ipynb`](file:///home/vvgfilhos/medhelp/scripts/colab/pdf-premium/colab_gerador_pdf_premium.ipynb) — Célula 3 (Configurações e Diretórios)
 - **Descrição:** Adicionada resolução explícita de pastas para a faculdade CEUMA (`Resumos_Prontos - CEUMA`, `PDFs_Premium - CEUMA`, `Arquivados - CEUMA`), substituindo a lógica ternária prévia restrita à UNDB por estrutura condicional completa (`UNDB` / `CEUMA` / Fallback).

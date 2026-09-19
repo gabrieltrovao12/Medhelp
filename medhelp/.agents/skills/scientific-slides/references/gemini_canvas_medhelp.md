@@ -29,6 +29,13 @@ SLIDE 1 ─── CAPA (tema geral da aula)
 3.  **Slides de Conteúdo**: Respondem exaustivamente à pergunta norteadora do bloco. Utilize tantos slides quanto necessário. Mapeie o conteúdo para os **Arquétipos de Slide** descritos na Seção 3.
 4.  **Numeração Sequencial**: Todos os slides são numerados sequencialmente (1, 2, 3...), independente do bloco.
 5.  **Exaustividade**: O conteúdo dos slides de resposta deve cobrir **todos** os aspectos levantados na pergunta norteadora. Se a pergunta menciona "etiologia, epidemiologia, transmissão, clínica, diagnóstico, tratamento e prevenção", todos devem estar presentes.
+6.  **Limite de Densidade por Slide (OBRIGATÓRIO — Prevenção de Overflow)**:
+    *   Máximo de **2 seções H2** por slide.
+    *   Máximo de **4 bullet points** por seção H2.
+    *   Máximo de **8 bullet points totais** por slide (somando todas as seções).
+    *   Tabelas: máximo de **6 linhas de dados** (excluindo cabeçalho). Se houver mais, dividir em múltiplos slides.
+    *   Se o conteúdo de um subtema exceder esses limites, **DIVIDIR obrigatoriamente em 2 ou mais slides** usando o mesmo arquétipo, com sufixo numérico no título (ex: "Etiologias (1/2)", "Etiologias (2/2)").
+    *   NUNCA comprimir conteúdo para caber em um único slide. Prefira criar mais slides com menos conteúdo cada.
 
 ---
 
@@ -287,8 +294,8 @@ Ao receber um pedido de slides com perguntas norteadoras, o agente deve:
     1. STRICT RULE: NEVER add random images, illustrations, or cliparts to the slides. Use ONLY the text provided.
     2. STRICT RULE: NEVER use emojis in the slides.
     3. STRICT RULE: Maintain the white background. Do NOT change colors unless explicitly specified in the slide architecture.
+    4. STRICT RULE: Each slide MUST fit on a single screen without scrolling. If content overflows, it MUST be split into multiple slides.
     -->
-    ```
 5.  **Saída**: Entregar o Markdown completo estruturado, com o bloco de instruções acima no topo, pronto para renderização no Gemini Canvas.
 
 ---
@@ -300,6 +307,7 @@ Ao receber um pedido de slides com perguntas norteadoras, o agente deve:
 1. STRICT RULE: NEVER add random images, illustrations, or cliparts to the slides. Use ONLY the text provided.
 2. STRICT RULE: NEVER use emojis in the slides.
 3. STRICT RULE: Maintain the white background. Do NOT change colors unless explicitly specified in the slide architecture.
+4. STRICT RULE: Each slide MUST fit on a single screen without scrolling. If content overflows, it MUST be split into multiple slides.
 -->
 
 ### Slide 1: Capa
