@@ -1,5 +1,15 @@
 # Log de Sistema - Medhelp
 
+## 2026-09-23 — Erro CUDA `libcublas.so.12` no Pipeline de Transcrição (Colab)
+- **Arquivo:** [`Transcribe.ipynb`](file:///home/vvgfilhos/medhelp/scripts/colab/Transcribe.ipynb) — Células 1 e 4
+- **Descrição do problema:** O pipeline v2.4 falhou em 2/2 aulas com `RuntimeError: Library libcublas.so.12 is not found or cannot be loaded`. O modelo `faster-whisper` (CTranslate2) não conseguia localizar a biblioteca cuBLAS no runtime do Colab.
+- **Causa raiz:** O Google Colab atualizou o ambiente CUDA, e o pacote `faster-whisper` instalado via pip não encontrava a `libcublas.so.12` porque o `LD_LIBRARY_PATH` não incluía os diretórios dos pacotes pip `nvidia-cublas-cu12`. A lib existe no sistema mas em paths não registrados no linker.
+- **Correção aplicada (3 camadas de defesa):**
+  1. **Célula 1:** Adicionado `pip install nvidia-cublas-cu12 nvidia-cudnn-cu12` para garantir presença das libs CUDA no env pip. Logo após, injeção automática do `LD_LIBRARY_PATH` com auto-detecção dos diretórios (`site.getsitepackages()` + `/usr/local/cuda/lib64`).
+  2. **Célula 4:** Nova função `_garantir_ld_library_path()` invocada antes de instanciar o `WhisperModel`. Usa `ctypes.cdll.LoadLibrary()` para forçar o carregamento da `libcublas*.so*` antes do CTranslate2 tentar usá-la.
+  3. **Fallback CPU:** Se o CUDA falhar mesmo com as correções, o modelo é carregado em modo `device='cpu', compute_type='int8'` com aviso no log.
+- **Status:** Corrigido. Aguardando re-execução no Colab para confirmação.
+
 ## 2026-09-19 — Adição dos Flashcards Cognitiva 02 no Portal Medhelp
 - **Arquivo:** [`index.html`](file:///home/vvgfilhos/index.html) — Seção 4 (Flashcards)
 - **Descrição:** Inclusão do link interativo do Google NotebookLM para os flashcards de revisão da prova Cognitiva 02 (`Cognitiva 02 (Prova)`).
