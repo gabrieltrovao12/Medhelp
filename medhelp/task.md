@@ -1,6 +1,64 @@
 # Tarefas do Projeto - Medhelp
 
-## FASE ATUAL: Publicação dos Flashcards da Cognitiva 02 no Portal Medhelp
+## FASE ATUAL: Crivo do Google Analytics & Dashboard Looker Studio (Item 15) - Concluído & Validado
+- [x] Brainstorming iterativo e validação do Understanding Lock com o usuário (concluído em `research.md`).
+- [x] Escolha da Abordagem 1: Padronização Universal no JS + Dashboard no Looker Studio.
+- [x] Refatorar [`analytics.js`](file:///home/vvgfilhos/medhelp/analytics.js) com:
+  - [x] Envio via `transport: 'beacon'` para blindar links externos do Drive contra perdas de requisição.
+  - [x] Parâmetros canônicos do GA4 (`item_name`, `item_category`, `link_url`, `content_type`).
+  - [x] Preservação de parâmetros legados (`nome_item`, `categoria_pai`, `url_destino`) para retrocompatibilidade.
+  - [x] Detecção de intenção para itens placeholder (`click_item_em_breve`).
+  - [x] Console logger elegante para depuração em tempo real no F12.
+- [x] Fornecer guia prático passo a passo para:
+  - [x] Cadastro das Dimensões Personalizadas no painel do GA4 (60 segundos).
+  - [x] Conexão e criação do Dashboard no Google Looker Studio com ranking de materiais e padrões de horário.
+- [x] Validação sintática do script (`node -c`) e registro detalhado em `system_log.md`.
+
+## FASE ANTERIOR: Ajeitar o Portal (index.html) — Novo Módulo, Lacuna Zero, TBL e Conferências (Item 12) - Concluído & Validado
+- [x] Especificação e arquitetura documentadas em `research.md`.
+- [x] Backup de segurança do `~/index.html`, `~/styles.css` e `~/analytics.js`.
+- [x] Atualização do Módulo Principal:
+  - [x] Substituir "Manifestações Abdominais - Tutoria" por "Febre, Inflamação e Infecção - Tutoria".
+  - [x] Inserir links de Problema 01 a 04 no Drive.
+- [x] Refinamento Solicitado pelo Usuário: Bloco "Outros":
+  - [x] Consolidar Lacuna Zero, Conferências e TBL como subtópicos do card/bloco **"Outros"**.
+  - [x] Garantir que o cabeçalho "Outros" **não seja clicável** (`cursor: default;`), sendo apenas os subtópicos clicáveis.
+  - [x] Ajustar o card de Tutoria para conter Problemas 01 a 04.
+  - [x] Atualizar filtros e responsividade.
+- [x] Otimização de Localização dos Arquivos:
+  - [x] Centralizar/sincronizar os arquivos do site dentro de `medhelp/` e manter link/espelhamento com `~/` para eliminar barreiras de permissão do IDE.
+- [x] Validação visual e registro em `system_log.md`.
+
+## FASE ANTERIOR: Subcapa / Seção de Abertura com Índice de Subtópicos por Objetivo (Item 11) - Concluído & Validado
+- [x] Análise técnica comparativa: Orquestrador Híbrido vs. Prompt do NotebookLM (Concluída em `research.md`).
+- [x] Alinhamento com o usuário: Escolha por Integração na Capa (Página 1) como Dashboard de Estudo.
+- [x] Implementação no Orquestrador Híbrido:
+  - [x] Atualização do schema `ObjetivoJSON` com `subtopicos: list[str] | None = None`.
+  - [x] Enriquecimento do prompt OCANES da Célula 6 para síntese determinística de 3 a 5 subtópicos curtos baseados na pergunta norteadora.
+  - [x] Implementação do componente visual de checklist no ReportLab (`_build_study_checklist`) na Célula 5.
+  - [x] Inclusão da seção na renderização da Capa (`gerar_capa`) e no preview do console da Célula 7.
+- [x] Teste de laboratório com dados reais de objetivos médicos (ex: H. pylori) e validação de 1 página A4 no ReportLab.
+- [x] Revisão e Refatoração Crítica (/refactor): sanitização de prompt, escape XML e blindagem de layout.
+- [x] Registro em `system_log.md`.
+
+## FASE ANTERIOR: Extrator de Sumário Digital para NotebookLM (Concluído & Validado)
+- [x] Pesquisa técnica na web sobre limitações do parser de PDF do NotebookLM (descarta `/Outlines`).
+- [x] Brainstorming iterativo e validação do Understanding Lock com o usuário.
+- [x] Definição de arquitetura: extração de Capítulos H1 e Seções-Mãe H2 em `.md` via PyMuPDF.
+- [x] Criação do script `extrair_sumario_digital.py` em `scripts/python/` com suporte a arquivo único e lote.
+- [x] Execução e validação na pasta real do usuário (`~/Downloads/Livros - Sumário Digital`).
+- [x] Refatoração e blindagem final do Prompt OCANES (v5) com proteção de nome de fonte PDF (N5) e prioridade de sumário.
+- [x] Validação em produção pelo usuário: extração de Objetivos 1 e 2 do Abbas 9ª Ed. com 100% de paridade manual e sem fragmentação.
+- [x] Registro final em `system_log.md`.
+
+## FASE ANTERIOR: Engenharia de Prompts (NotebookLM) — Roteiro de Evidências v5 (Sem Offset & Curadoria Top-Down)
+- [x] Diagnóstico comparativo entre roteiro manual do usuário e extração automática do NotebookLM.
+- [x] Especificação e arquitetura da simplificação sem offset em `research.md`.
+- [x] Eliminação completa da lógica de offset a pedido do usuário (sem esforço matemático manual).
+- [x] Refatoração do Prompt OCANES (v5) com Busca Curatorial Top-Down e Consolidação de Seções-Mãe.
+- [x] Registro técnico no `system_log.md` e entrega do prompt simplificado para cópia no Obsidian.
+
+## FASE ANTERIOR: Publicação dos Flashcards da Cognitiva 02 no Portal Medhelp
 - [x] Adicionar link dos Flashcards da Cognitiva 02 no bloco Flashcards de `~/index.html`.
 - [x] Validar estrutura HTML, atributos de acessibilidade e integração com `analytics.js`.
 - [x] Registrar alteração em `system_log.md` e validar persistência no repositório.
@@ -11,97 +69,3 @@
 - [x] Refatoração do prompt no padrão estrito OCANES ([O], [C], [A], [N], [E], [S]).
 - [x] Teste de laboratório e simulação com os casos reais de vias biliares.
 - [x] Atualização da skill `publicar-flashcards-notebooklm/SKILL.md` e artefatos de documentação.
-
-## FASE ANTERIOR: Suporte a Diretórios CEUMA no Gerador de PDF Premium
-- [x] Atualizar `RESUMOS_DIR`, `PDFS_DIR` e `ARQUIVO_DIR` em `scripts/colab/pdf-premium/colab_gerador_pdf_premium.ipynb` para suportar CEUMA (`Resumos_Prontos - CEUMA`, `PDFs_Premium - CEUMA`, `Arquivados - CEUMA`).
-- [x] Validar sintaxe e integridade JSON do notebook após a alteração.
-
-## FASE ANTERIOR: Atualização de Caminhos no Orquestrador Híbrido e Transcrição (Tutoria / Colab)
-- [x] Atualizar caminhos de `pasta_livros` em `scripts/colab/Orquestrador_Hibrido.ipynb` (`Tutoria - UNDB` e `Tutoria - CEUMA`).
-- [x] Atualizar caminho de saída em `scripts/colab/Transcribe.ipynb` (`Transcricoes_Medicina - UNDB`).
-- [x] Validar sintaxe e integridade JSON dos notebooks após as alterações.
-- [x] Submeter commit e push para o GitHub com Guardião de Versão.
-
-## FASE ANTERIOR: Padronização e Correção dos Filtros por Categoria (TFC, LHM, Conferência, Lacuna Zero)
-
-- [x] Atualizar especificação e roteamento de categorias em `research.md`.
-- [x] Atualizar `limparNomeArquivo` em `automacao-transcricoes/Main.js`.
-- [x] Atualizar regex de busca em `automacao-transcricoes/YouTubeCurator.js`.
-- [x] Corrigir `detectarCategoria` e `gerarNomeFlashcardLimpo` em `medhelp-flashcards/NamingUtils.js`.
-- [x] Ajustar `PASTAS_SAIDA_CATEGORIAS` e `DISCIPLINAS` em `medhelp-flashcards/Config.js`.
-- [x] Executar simulações unitárias dos casos de borda e validar estabilidade dos nomes.
-
-## FASE ANTERIOR: Atualização da Inteligência de Arquiteto (Deep Research)
-
-- [x] Refatorar a skill `medhelp-developer-core` para injetar o padrão de Web Coding (Next.js/React).
-- [x] Injetar padrão Daisy-Chain Quota-Buster para o Google Apps Script na skill mestre.
-- [x] Descartar regras de banco relacional e segurança RLS a pedido do usuário.
-
-## FASE ATUAL: Pipeline Ambulatório SOAP (Apps Script + Gemini API)
-
-- [x] Criar projeto `scripts/apps-script/ambulatorio-soap/`
-  - [x] `appsscript.json` — Manifesto do projeto
-  - [x] `Code.js` — Código consolidado completo (Config, Prompt, API Client, Main, Logger)
-- [x] Usuário: Informar ID da pasta do Google Drive para salvar os `.md`
-- [x] Usuário: Configurar `GEMINI_API_KEY` nas Propriedades do Script do formulário
-- [x] Usuário: Vincular trigger `onFormSubmit` no Editor de Script
-- [x] Teste laboratorial com dados sintéticos no celular
-
-## FASE ANTERIOR: Correções do Orquestrador Automático de Tutoria (PBL)
-
-- [x] Alteração 1: Redesenhar layout da capa em ReportLab (`create_cover_page`) com cálculo de Y dinâmico.
-- [x] Alteração 2: Implementar filtro estrito de idioma PT-BR (Prompt + Backend) no Curador de Vídeos.
-- [x] Alteração 3: Adicionar trava defensiva `pagina_final > pagina_inicial` em Python e regra no prompt `process_roteiro`.
-- [x] Alteração 4: Implementar reconciliação defensiva `reconciliar_e_calcular_limites_corte` (Self-Healing) e prompt OCANES para alinhamento estrito de Páginas Físicas do PDF vs Impressas.
-- [x] Alteração 5: Remover subtítulos (`secao`) do Índice da Capa e alinhar números de páginas à direita em tabela elegante ReportLab no `Orquestrador_Hibrido.ipynb`.
-- [x] Regenerar `Orquestrador_Automatico.ipynb` e `Orquestrador_Hibrido.ipynb` testando compilação e execução.
-
-## FASE ANTERIOR: Subagente Curador do YouTube (POC Local)
-
-- [x] Documentar o escopo do Curador no `research.md`.
-- [x] Atualizar `teste_youtube_curator.py` para usar requests e a API Real do YouTube.
-- [x] Testar a execução do script laboratorial localmente.
-- [x] Mapear integração final para o orquestrador (Apps Script - automacao-transcricoes).
-- [x] Módulo GeminiClient: Adicionar suporte a JSON Estruturado.
-- [x] Módulo YouTubeCurator: Implementar buscas na API e curadoria com OCANES.
-- [x] Módulo Main: Orquestrar a injeção do rodapé no Resumo gerado.
-
-## FASE ANTERIOR: Resolução de Bugs Críticos de Automação
-
-- [x] Corrigir modelo Gemini inexistente (`gemini-3.5-flash` para `gemini-2.5-flash`) em `medhelp-flashcards/Config.js`.
-- [x] Integrar acionamento de Webhook no Colab (`Transcribe.ipynb`) ao final da Célula 4.
-- [x] Criar rotina de inicialização de Triggers (`Setup.js`) para automatizar os Flashcards.
-
-## FASE ANTERIOR: Refatoração Profissional - Automação de Transcrições (VLAEG)
-
-- [x] Dividir `Code.js` em múltiplos módulos funcionais (`Config.js`, `Prompt.js`, `GeminiClient.js`, `DriveManager.js`, `Main.js`).
-- [x] Aplicar padrões de JSDoc, Logging Avançado e tratamento de bordas (Exponential Backoff e Pausa Preditiva).
-- [x] Configurar `.clasp.json` (mantido o existente do usuário).
-- [x] Excluir o antigo monolito `Code.js`.
-- [x] O usuário fará o push final e revisão via `clasp push`.
-- [x] **[NOVO]** Abandono e deleção oficial da pasta `pre-transcricao/`. O setup "Célula 3" agora será feito manualmente pelo usuário no Colab.
-- [x] **[NOVO]** Remoção completa da integração do Gemini (Priming Automático) do `Transcribe.ipynb` e migração de `openai-whisper` para `faster-whisper` (CTranslate2) na Célula 4, garantindo otimização de velocidade e memória sem perda de qualidade.
-
-## FASE ATUAL: Integração do Vigia Local (Antigravity SDK) - [CANCELADA]
-
-- [x] Definir regras de negócio (pasta de entrada, roteamento de cadernos e auth) com o usuário.
-- [x] Cancelamento: Usuário percebeu que a automação em background (Vigia) não atende a necessidade de velocidade do fluxo de tutoria.
-
-## FASE ATUAL: Orquestrador Acadêmico com Subagentes (SDK)
-
-- [x] Criar `scripts/orquestrador_academico.py` com schemas Pydantic e lógica de subagentes.
-- [x] Criar ou atualizar `requirements.txt` com `google-antigravity`.
-- [x] Refatorar a skill `criar-flashcards/SKILL.md` para acionar o orquestrador localmente.
-- [x] Refatorar a skill `elaborar-questoes-prova/SKILL.md` para acionar o orquestrador localmente.
-- [ ] Realizar teste laboratorial do script (a ser feito pelo usuário ao demandar a skill).
-
-## FASE ATUAL: Estrutura e Organização do Repositório
-
-- [x] Migrar pasta de projetos pessoais para `~/medhelp/pessoal` (fora da sincronização problemática do Overgrive e agora sob versionamento direto no GitHub do projeto).
-
-## FASE ANTERIOR: Unificação do Sistema de Flashcards no Apps Script (VLAEG)
-
-- [x] Desenhar a arquitetura de unificação (Monolito Modular).
-- [x] Criar os arquivos utilitários base: `Config.js`, `DriveUtils.js`, `NamingUtils.js`, `GeminiAPI.js`.
-- [x] Criar os gatilhos independentes: `Trigger_Resumos.js` e `Trigger_Tutoria.js`.
-- [ ] Revisão, testes de sintaxe e submissão dos novos scripts pelo painel web do Apps Script (Ação do Usuário).

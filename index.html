@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Portal de Materiais de Apoio Medhelp — Módulo Febre, Inflamação e Infecção. Acesse materiais de Tutoria, Lacuna Zero, Conferências, TBL, Habilidades Médicas e TFC.">
+<meta name="theme-color" content="#556B2F">
 <title>Portal Medhelp - Materiais de Apoio</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;1,500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
@@ -17,60 +19,84 @@
 
   <h1 class="portal-titulo">2026.2 - Material de apoio Medhelp</h1>
   
+  <div class="modulo-badge">
+    <span class="modulo-badge-dot"></span>
+    <span class="modulo-badge-texto">Módulo Atual: <strong>Febre, Inflamação e Infecção</strong></span>
+  </div>
+
   <p class="portal-instrucoes">
     Clique na disciplina para acessar a pasta correspondente no Google Drive. Cada módulo contém mapas mentais, resumos de aulas/conferências, roteiro dos objetivos de tutoria e sugestões de vídeos no YouTube.
   </p>
 
+  <!-- Barra de Filtros / Navegação por Categoria -->
+  <div class="filtros-container" role="tablist" aria-label="Filtrar materiais por categoria">
+    <button type="button" id="filtro-todos" class="filtro-btn ativo" data-filtro="todos" role="tab" aria-selected="true">Todos</button>
+    <button type="button" id="filtro-tutoria" class="filtro-btn" data-filtro="tutoria" role="tab" aria-selected="false">📚 Tutoria</button>
+    <button type="button" id="filtro-outros" class="filtro-btn" data-filtro="outros" role="tab" aria-selected="false">🗂️ Outros (Lacuna, Conf, TBL)</button>
+    <button type="button" id="filtro-habilidades" class="filtro-btn" data-filtro="habilidades" role="tab" aria-selected="false">🩺 Habilidades &amp; TFC</button>
+    <button type="button" id="filtro-flashcards" class="filtro-btn" data-filtro="flashcards" role="tab" aria-selected="false">🔄 Flashcards</button>
+  </div>
+
   <div class="grid-pastas">
 
     <!-- 1. TUTORIA -->
-    <div class="pasta-bloco">
-      <a href="https://drive.google.com/drive/u/1/folders/1Qd-eMzLSvVJ1L9MS8Q1wGmNnUvBmf2WD" target="_blank" class="pasta-header" aria-label="Acessar pasta principal de Tutoria">
+    <div class="pasta-bloco" data-categoria="tutoria">
+      <a href="https://drive.google.com/drive/u/0/folders/1Hz6afomNtSoPz4HSfW6fxAfOlxX7il48" target="_blank" class="pasta-header" aria-label="Acessar pasta de Tutoria">
         <span class="pasta-icone">📚</span>
-        <span class="pasta-nome">Manifestações Abdominais - Tutoria</span>
+        <span class="pasta-nome">Febre, Inflamação e Infecção - Tutoria</span>
         <span class="pasta-seta">→</span>
       </a>
       <div class="subpastas-lista">
-        <a href="https://drive.google.com/drive/u/1/folders/1I2cdbYPJZooQW3O-1IOCYB5rUymIT6ON" target="_blank" class="sub-item">
-          <span class="sub-marcador"></span>
-          <span class="sub-nome">Lacuna Zero</span>
-          <span class="sub-seta">→</span>
-        </a>
-        <a href="https://drive.google.com/drive/u/1/folders/1Na55xnAmbizZo3M51Dt7qJFsyJVDdNGW" target="_blank" class="sub-item">
+        <a href="https://drive.google.com/drive/u/0/folders/1Hz6afomNtSoPz4HSfW6fxAfOlxX7il48" target="_blank" class="sub-item">
           <span class="sub-marcador"></span>
           <span class="sub-nome">Problema 01</span>
           <span class="sub-seta">→</span>
         </a>
-        <a href="https://drive.google.com/drive/u/1/folders/1kFrVlGF3TP6dlwYs8bpQILHJ6NSw8dUE" target="_blank" class="sub-item">
+        <a href="https://drive.google.com/drive/u/0/folders/1MyoeIp8nXvgLfeRl3Nlcnd8c5klWyTqt" target="_blank" class="sub-item">
           <span class="sub-marcador"></span>
           <span class="sub-nome">Problema 02</span>
           <span class="sub-seta">→</span>
         </a>
-        <a href="https://drive.google.com/drive/u/1/folders/1CLvijVbHfqNqFaWdpiD0vmO7gyjnySzc" target="_blank" class="sub-item">
+        <a href="https://drive.google.com/drive/u/0/folders/1G4MUt6VBw49SMgV3M2qDJOBXEvshg46P" target="_blank" class="sub-item">
           <span class="sub-marcador"></span>
           <span class="sub-nome">Problema 03</span>
           <span class="sub-seta">→</span>
         </a>
-        <a href="https://drive.google.com/drive/u/1/folders/1j-GlcrtwjGjYgaqySQ4RH6L5bUWzBuhc" target="_blank" class="sub-item">
+        <a href="https://drive.google.com/drive/u/0/folders/1CDonVmWOz0YB5pfsKdFz-aIWun7GqlRZ" target="_blank" class="sub-item">
           <span class="sub-marcador"></span>
           <span class="sub-nome">Problema 04</span>
-          <span class="sub-seta">→</span>
-        </a>
-        <a href="https://drive.google.com/drive/u/0/folders/1jAa-4jyiaW12yCIaDHPvTicZv0bOHvjn" target="_blank" class="sub-item">
-          <span class="sub-marcador"></span>
-          <span class="sub-nome">Problema 05</span>
-          <span class="sub-seta">→</span>
-        </a>
-        <a href="https://drive.google.com/drive/u/0/folders/1q3RB-1gUZoCFvxLhM0eg_NiXSjnqxMXP" target="_blank" class="sub-item">
-          <span class="sub-marcador"></span>
-          <span class="sub-nome">Problema 06</span>
           <span class="sub-seta">→</span>
         </a>
       </div>
     </div>
 
-    <!-- 2. HABILIDADES MÉDICAS -->
-    <div class="pasta-bloco">
+    <!-- 2. OUTROS (LACUNA ZERO, CONFERÊNCIAS, TBL) - CABEÇALHO NÃO CLICÁVEL -->
+    <div class="pasta-bloco bloco-outros" data-categoria="outros">
+      <div class="pasta-header header-estatico" style="cursor: default;">
+        <span class="pasta-icone">🗂️</span>
+        <span class="pasta-nome">Outros</span>
+      </div>
+      <div class="subpastas-lista">
+        <a href="https://drive.google.com/drive/u/0/folders/12ZfSkcVjI3fmtViUeesWdIJtRfbEYFFP" target="_blank" class="sub-item item-destaque" aria-label="Acessar pasta de Lacuna Zero no Drive">
+          <span class="sub-marcador destaque"></span>
+          <span class="sub-nome">Lacuna Zero <span class="badge-tag">Nivelamento</span></span>
+          <span class="sub-seta">→</span>
+        </a>
+        <a href="https://drive.google.com/drive/u/0/folders/1biDGwPJ_efPUeG72ltTvQk7J9bXGa4WW" target="_blank" class="sub-item" aria-label="Acessar pasta de Conferências no Drive">
+          <span class="sub-marcador destaque"></span>
+          <span class="sub-nome">Conferências <span class="badge-tag">Gravações &amp; Slides</span></span>
+          <span class="sub-seta">→</span>
+        </a>
+        <div class="sub-item sub-item-placeholder" aria-label="Materiais de TBL em breve">
+          <span class="sub-marcador"></span>
+          <span class="sub-nome">TBL — Team-Based Learning</span>
+          <span class="badge-status">Em breve</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. HABILIDADES MÉDICAS -->
+    <div class="pasta-bloco" data-categoria="habilidades">
       <a href="https://drive.google.com/drive/u/1/folders/1ODVau9hF6KDBduocEMdebzpuFm0Y7ah5" target="_blank" class="pasta-header" aria-label="Acessar pasta principal de Habilidades Médicas">
         <span class="pasta-icone">🩺</span>
         <span class="pasta-nome">Habilidades Médicas</span>
@@ -90,8 +116,8 @@
       </div>
     </div>
 
-    <!-- 3. TFC -->
-    <div class="pasta-bloco">
+    <!-- 4. TFC -->
+    <div class="pasta-bloco" data-categoria="habilidades">
       <a href="https://drive.google.com/drive/u/1/folders/13STTVplklklH6uatjbZ1P4QhR4ZUcnC5" target="_blank" class="pasta-header" aria-label="Acessar pasta principal de TFC">
         <span class="pasta-icone">🔬</span>
         <span class="pasta-nome">TFC</span>
@@ -110,33 +136,24 @@
         </a>
       </div>
     </div>
-    <!-- 4. FLASHCARDS -->
-    <div class="pasta-bloco" style="border-top-color: var(--texto);">
+
+    <!-- 5. FLASHCARDS -->
+    <div class="pasta-bloco" data-categoria="flashcards" style="border-top-color: var(--verde-musgo);">
       <div class="pasta-header" style="cursor: default;">
         <span class="pasta-icone">🔄</span>
         <span class="pasta-nome">Flashcards</span>
       </div>
       <div class="subpastas-lista">
-        <a href="https://notebook.google.com/notebook/f1146e63-cb69-4ebb-9599-29799225cb29/artifact/090294c0-d61f-4215-aa4a-c51f3184a1c6?utm_source=nlm_web_share&utm_medium=google_oo&utm_campaign=art_share_1&utm_content=&utm_smc=nlm_web_share_google_oo_art_share_1_" target="_blank" class="sub-item">
+        <div class="sub-item sub-item-placeholder">
           <span class="sub-marcador"></span>
-          <span class="sub-nome">Cognitiva 01 (Prova)</span>
-          <span class="sub-seta">→</span>
-        </a>
-        <a href="https://notebook.google.com/notebook/8a6518b8-1b99-4443-8597-c0e42dd69605/artifact/e342842d-1a87-445d-9a7f-4607826dd7cb?utm_source=nlm_web_share&utm_medium=google_oo&utm_campaign=art_share_1&utm_content=&utm_smc=nlm_web_share_google_oo_art_share_1_" target="_blank" class="sub-item">
+          <span class="sub-nome">Decks do Módulo Febre, Inflamação e Infecção</span>
+          <span class="badge-status">Em elaboração</span>
+        </div>
+        <div class="sub-item sub-item-placeholder">
           <span class="sub-marcador"></span>
-          <span class="sub-nome">Cognitiva 02 (Prova)</span>
-          <span class="sub-seta">→</span>
-        </a>
-        <a href="https://notebook.google.com/notebook/03f9c586-3d1c-476c-9a31-d2745815a591/artifact/4dd574cd-652d-40a6-b974-132b39507216?utm_source=nlm_web_share&utm_medium=google_oo&utm_campaign=art_share_1&utm_content=&utm_smc=nlm_web_share_google_oo_art_share_1_" target="_blank" class="sub-item">
-          <span class="sub-marcador"></span>
-          <span class="sub-nome">TFC Cirúrgico</span>
-          <span class="sub-seta">→</span>
-        </a>
-        <a href="https://notebook.google.com/notebook/94a75ea1-9c8b-4016-9031-95839e084a9c/artifact/1e7844c9-c7f7-460e-88aa-5c0856a2110b?utm_source=nlm_web_share&utm_medium=google_oo&utm_campaign=art_share_1&utm_content=&utm_smc=nlm_web_share_google_oo_art_share_1_" target="_blank" class="sub-item">
-          <span class="sub-marcador"></span>
-          <span class="sub-nome">TFC Clínico</span>
-          <span class="sub-seta">→</span>
-        </a>
+          <span class="sub-nome">Revisões Cognitivas Espaçadas</span>
+          <span class="badge-status">Aguarde</span>
+        </div>
       </div>
     </div>
 
@@ -147,6 +164,36 @@
   </footer>
 
 </div>
+
+<!-- Script de Filtragem e Interatividade -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const botoes = document.querySelectorAll('.filtro-btn');
+    const blocos = document.querySelectorAll('.pasta-bloco');
+
+    botoes.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const filtro = this.getAttribute('data-filtro');
+
+        botoes.forEach(b => {
+          b.classList.remove('ativo');
+          b.setAttribute('aria-selected', 'false');
+        });
+        this.classList.add('ativo');
+        this.setAttribute('aria-selected', 'true');
+
+        blocos.forEach(function(bloco) {
+          const categoria = bloco.getAttribute('data-categoria');
+          if (filtro === 'todos' || categoria === filtro) {
+            bloco.style.display = 'flex';
+          } else {
+            bloco.style.display = 'none';
+          }
+        });
+      });
+    });
+  });
+</script>
 
 </body>
 </html>
