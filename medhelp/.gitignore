@@ -2,3 +2,7 @@
 .venv/
 node_modules/
 config/gcp-oauth.keys.json
+scratch/
+index.html
+styles.css
+analytics.js

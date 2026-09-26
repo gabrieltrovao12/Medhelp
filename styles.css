@@ -32,16 +32,76 @@
     display: inline-block;
   }
 
+  /* Badge do Módulo Ativo */
+  .modulo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(85, 107, 47, 0.08);
+    border: 1px solid rgba(85, 107, 47, 0.2);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    color: var(--verde-musgo);
+    margin: 0 0 18px 0;
+    font-weight: 400;
+  }
+
+  .modulo-badge-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--verde-musgo);
+    box-shadow: 0 0 0 2px rgba(85, 107, 47, 0.25);
+    display: inline-block;
+  }
+
   .portal-instrucoes {
     font-size: 0.95rem;
     color: var(--texto-leve);
     line-height: 1.6;
-    margin: 0 0 35px 0;
+    margin: 0 0 24px 0;
     max-width: 750px;
     font-weight: 300;
   }
 
-  /* Grid das 3 pastas principais */
+  /* Barra de Navegação / Filtros por Categoria */
+  .filtros-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 30px 0;
+  }
+
+  .filtro-btn {
+    appearance: none;
+    border: 1px solid var(--borda);
+    background: var(--card-bg);
+    color: var(--texto-leve);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  }
+
+  .filtro-btn:hover {
+    color: var(--verde-musgo);
+    border-color: var(--verde-claro);
+    background: rgba(163, 177, 138, 0.1);
+  }
+
+  .filtro-btn.ativo {
+    background: var(--verde-musgo);
+    color: #ffffff;
+    border-color: var(--verde-musgo);
+    box-shadow: 0 4px 12px rgba(85, 107, 47, 0.25);
+  }
+
+  /* Grid das pastas principais */
   .grid-pastas {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -161,6 +221,11 @@
     background-color: var(--verde-musgo);
   }
 
+  .sub-marcador.destaque {
+    background-color: var(--verde-musgo);
+    box-shadow: 0 0 0 2px rgba(85, 107, 47, 0.25);
+  }
+
   .sub-nome {
     flex-grow: 1;
     font-weight: 400;
@@ -177,6 +242,52 @@
   .sub-item:hover .sub-seta {
     opacity: 1;
     transform: translateX(0);
+  }
+
+  /* Tags e Badges de status */
+  .badge-tag {
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: rgba(85, 107, 47, 0.12);
+    color: var(--verde-musgo);
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 8px;
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .badge-status {
+    font-size: 0.75rem;
+    font-weight: 500;
+    background: #f1f3f5;
+    color: var(--texto-leve);
+    border: 1px solid #e2e8f0;
+    padding: 3px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+
+  /* Placeholder de itens sem link */
+  .sub-item-placeholder {
+    cursor: default;
+    background: rgba(248, 249, 250, 0.5);
+  }
+
+  .sub-item-placeholder:hover {
+    background: rgba(248, 249, 250, 0.8);
+    color: var(--texto-leve);
+  }
+
+  .sub-item-placeholder:hover .sub-nome {
+    text-decoration: none;
+  }
+
+  .sub-item-placeholder:hover .sub-marcador {
+    transform: none;
+    background-color: var(--verde-claro);
   }
 
   .portal-footer {
@@ -204,10 +315,23 @@
       font-size: 1.4rem;
       margin-bottom: 8px;
     }
+    .modulo-badge {
+      font-size: 0.8rem;
+      padding: 4px 10px;
+      margin-bottom: 12px;
+    }
     .portal-instrucoes {
       margin-bottom: 15px;
       font-size: 0.85rem;
       line-height: 1.4;
+    }
+    .filtros-container {
+      margin-bottom: 18px;
+      gap: 6px;
+    }
+    .filtro-btn {
+      padding: 6px 12px;
+      font-size: 0.8rem;
     }
     .grid-pastas {
       grid-template-columns: 1fr;

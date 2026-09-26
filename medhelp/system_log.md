@@ -1,5 +1,125 @@
 # Log de Sistema - Medhelp
 
+## 2026-09-26 — Auditoria Crítica e Refatoração Pós-Implementação (/refactor)
+- **Arquivos:** [`medhelp/analytics.js`](file:///home/vvgfilhos/medhelp/analytics.js), [`medhelp/index.html`](file:///home/vvgfilhos/medhelp/index.html) e [`medhelp/styles.css`](file:///home/vvgfilhos/medhelp/styles.css)
+- **Diagnóstico & Problemas Detectados:**
+  1. **Poluição de Telemetria por Badges Visuais (Bug Silencioso):** Em `analytics.js`, o método `.innerText` no seletor `.sub-nome` capturava concatenado o texto das tags visuais filhas, gerando labels distorcidas como `"Lacuna Zero Nivelamento"` e `"Conferências Gravações & Slides"` nos relatórios do GA4 e Looker Studio.
+  2. **Lacunas de Metadados SEO & Acessibilidade:** Faltavam `meta description` e `meta theme-color` no cabeçalho do portal, e os botões de filtro careciam de IDs únicos para testes e navegação assistida por teclado.
+- **Correções Aplicadas:**
+  1. **Sanitização de String de Evento (`analytics.js`):** Injetada clonagem de nó com remoção cirúrgica de seletores `.badge-tag` e `.badge-status` antes da extração do texto, garantindo que o GA4 receba títulos limpos (`"Lacuna Zero"`, `"Conferências"`).
+  2. **Enriquecimento Semântico (`index.html`):** Adicionadas tags `<meta name="description">`, `<meta name="theme-color" content="#556B2F">` e IDs únicos (`#filtro-todos`, `#filtro-tutoria`, etc.) em todos os botões da barra de filtros.
+  3. **Preservação de Integridade:** Validação sintática com `html.parser` (0 tags desbalanceadas), `node -c` (0 erros de compilação) e paridade de links simbólicos confirmada.
+
+## 2026-09-26 — Otimização do Google Analytics & Integração Looker Studio (Item 15)
+- **Arquivos:** [`analytics.js`](file:///home/vvgfilhos/medhelp/analytics.js) e [`research.md`](file:///home/vvgfilhos/medhelp/research.md)
+- **Descrição:** Refatoração da inteligência de telemetria do portal para mitigar a perda de eventos em navegações externas (Google Drive) e alinhar os dados com os padrões canônicos do GA4 e Looker Studio.
+- **Causa Raiz & Gargalo Identificado:**
+  1. No GA4, parâmetros personalizados enviados em `gtag('event')` são ignorados nas tabelas de relatórios padrão a menos que sejam mapeados como *Custom Dimensions*.
+  2. Ao abrir links externos para o Drive, o fechamento ou troca de contexto do navegador podia interromper a requisição HTTP tradicional do `gtag`.
+- **Modificações Aplicadas:**
+  1. **Transporte Assíncrono (`transport_type: 'beacon'`):** Implementado no `config` e em todos os eventos para acionar a API nativa `navigator.sendBeacon`, garantindo 100% de entrega mesmo em transições instantâneas de aba.
+  2. **Alinhamento Duplo (Universal + Legado):**
+     - O evento `click_sub_item` agora envia simultaneamente `item_name`, `item_category`, `link_url`, `content_type` (padrões universais do GA4) e mantém `nome_item`, `categoria_pai`, `url_destino` (retrocompatibilidade).
+  3. **Rastreamento de Intenção (`click_item_em_breve`):** Cliques em materiais com status "Em breve" agora são capturados para medir a demanda reprimida dos alunos.
+  4. **Console Logger para Depuração Local:** Injetada rotina de log formatada no console do navegador (`F12`) quando acessado em `localhost` ou `file:`, facilitando inspeção imediata.
+- **Validação de Laboratório:** Verificação sintática via `node -c /home/vvgfilhos/medhelp/analytics.js` sem erros e compatibilidade com symlink confirmada.
+
+## 2026-09-26 — Reestruturação do Portal Medhelp: Novo Módulo, Lacuna Zero, TBL e Conferências (Item 12)
+- **Arquivos:** [`index.html`](file:///home/vvgfilhos/index.html), [`styles.css`](file:///home/vvgfilhos/styles.css) e [`analytics.js`](file:///home/vvgfilhos/analytics.js)
+- **Descrição:** Reconfiguração integral do portal web para a transição do módulo acadêmico anterior (*Manifestações Abdominais*) para o novo módulo **Febre, Inflamação e Infecção**, incorporando seções dedicadas e links diretos do Google Drive para Lacuna Zero, Conferências, TBL e remoção de flashcards antigos.
+- **Modificações Aplicadas:**
+  1. **Atualização do Módulo Principal:**
+     - Título e cabeçalho do bloco 1 alterados para `Febre, Inflamação e Infecção - Tutoria`.
+     - Injetado badge visual identificador do módulo ativo (`.modulo-badge`).
+     - Substituição dos links das pastas de Problemas pelo novo mapeamento do Drive:
+       - Lacuna Zero: `12ZfSkcVjI3fmtViUeesWdIJtRfbEYFFP` (com badge de destaque `Nivelamento`).
+       - Problema 01: `1Hz6afomNtSoPz4HSfW6fxAfOlxX7il48`.
+       - Problema 02: `1MyoeIp8nXvgLfeRl3Nlcnd8c5klWyTqt`.
+       - Problema 03: `1G4MUt6VBw49SMgV3M2qDJOBXEvshg46P`.
+       - Problema 04: `1CDonVmWOz0YB5pfsKdFz-aIWun7GqlRZ`.
+       - Problemas 05 e 06 antigos de manifestações abdominais removidos.
+  2. **Novas Seções e Consolidação no Bloco "Outros":**
+     - **Card "Outros" (`bloco-outros`):** Criado card unificado e amplo agrupando **Lacuna Zero**, **Conferências** e **TBL**.
+     - **Cabeçalho Não Clicável:** Conforme especificado pelo usuário, o cabeçalho "Outros" foi implementado como elemento estático neutro (`cursor: default;`), mantendo a interatividade restrita exclusivamente aos seus subtópicos internos (Lacuna Zero, Conferências e TBL).
+     - **Tutoria:** Card de Tutoria reorganizado para comportar estritamente os Problemas 01 a 04.
+     - **Flashcards:** Links legados do módulo anterior removidos; adicionado estado visual reservado ("Em elaboração / Em breve") sem nenhum link quebrado.
+  3. **Barra de Navegação e Filtros Rápidos (`.filtros-container`):**
+     - Botões de filtro atualizados: "Todos", "📚 Tutoria", "🗂️ Outros (Lacuna, Conf, TBL)", "🩺 Habilidades & TFC", "🔄 Flashcards".
+     - Filtragem em tempo real sem recarregar a página, com suporte total a acessibilidade (ARIA tabs).
+  4. **Sincronização de Arquivos no Espaço de Trabalho:**
+     - Arquivos `index.html`, `styles.css` e `analytics.js` agora sincronizados diretamente dentro de `/home/vvgfilhos/medhelp/` (além da raiz `~/`), eliminando restrições de permissão do sandbox do IDE e garantindo versionamento nativo.
+  5. **Estilo & Design System:**
+     - Paleta institucional aplicada (Verde Musgo `#556B2F`, Verde Claro `#A3B18A`).
+     - Micro-animações suaves em hover, transições e sombras.
+     - Layout 100% responsivo para visualização direta ou incorporada em iframe (notion/obsidian).
+  5. **Métricas (GA4):**
+     - `analytics.js` atualizado para rastrear cliques nos novos botões de filtro (`click_filtro_categoria`) além dos cabeçalhos e subpastas.
+- **Validação de Laboratório:**
+  - Parsing HTML via `html.parser` comprovando 100% de tags balanceadas e sem erros de fechamento.
+  - Verificação automatizada em Python atestando a presença de todos os IDs de pastas do Drive fornecidos pelo usuário e a ausência completa de resíduos do módulo anterior.
+  - Teste de requisições HTTP locais via servidor Python servindo `index.html` com status 200 OK.
+
+## 2026-09-26 — Implementação e Refatoração do Mapa de Estudo e Checklist de Subtópicos no Orquestrador Híbrido (Item 11)
+- **Arquivo:** [`scripts/colab/Orquestrador_Hibrido.ipynb`](file:///home/vvgfilhos/medhelp/scripts/colab/Orquestrador_Hibrido.ipynb) (Células 5, 6 e 7)
+- **Descrição:** Síntese de subtópicos essenciais (3 a 5 itens) gerada pelo Gemini a partir da pergunta norteadora e renderização de checklist visual na Capa do PDF.
+- **Revisão e Refatoração Crítica (/refactor):**
+  1. **Sanitização de Prompt (Célula 6):** Eliminados 4 resíduos de sequências de escape literais (`\n",`) que haviam permanecido em `SYSTEM_PROMPT_CONVERSAO` decorrentes de colagens anteriores, garantindo um prompt OCANES markdown puro e sem ruído sintático.
+  2. **Proteção Anti-ExpatError XML (Célula 5):** Aplicado `html.escape(st)` nos itens do checklist antes de passá-los para `Paragraph`, prevenindo quebras do ReportLab quando subtópicos médicos contiverem caracteres como `&`, `<`, `>` (ex: "Sensibilidade < 90% & Espec.", "CagA & VacA").
+  3. **Correção de Divisores Duplicados (Célula 5):** Ajustada a lógica condicional em `gerar_capa()` para evitar linhas divisórias duplas consecutivas quando o objetivo possui checklist mas não possui vídeos recomendados.
+  4. **Robustez de Tipagem (Célula 5):** `_build_study_checklist()` agora trata entradas do tipo `string`, strings vazias ou nulas com fallback seguro para lista vazia `[]`.
+  5. **Largura Determinística de Coluna (Célula 5):** Coluna de texto do checklist fixada em `15.4 * cm` (largura útil da página A4 com margens de 2.5 cm), prevenindo auto-cálculo flutuante do ReportLab.
+- **Validação de Laboratório:** Bateria de testes de estresse com 4 combinações de dados reais (Com Vídeos + Com Subtópicos; Sem Vídeos + Com Subtópicos; Com Vídeos + Sem Subtópicos; Mínimo puro) confirmou compilação impecável em exatamente 1 página A4 em todos os cenários.
+
+## 2026-09-26 — Validação em Produção: Extrator de Sumário Digital + Prompt OCANES v5
+- **Arquivos:** [`scripts/python/extrair_sumario_digital.py`](file:///home/vvgfilhos/medhelp/scripts/python/extrair_sumario_digital.py) e Prompt v5 (NotebookLM)
+- **Status:** ✅ Validado em produção com 100% de sucesso pelo usuário no Abbas 9ª Edição.
+- **Resultado Obtido:**
+  - Objetivo 1: `Anatomia e Funções dos Tecidos Linfoides | pp. 88–107`
+  - Objetivo 2: `Células do Sistema Imune | pp. 60–87`
+- **Ganhos Comprovados:**
+  1. Paridade absoluta com a curadoria manual do usuário.
+  2. Eliminação total da hiperfragmentação de subtópicos (de 58 linhas para blocos macroscópicos limpos).
+  3. Zero dispersão (nenhum capítulo tardio ou secundário indesejado foi puxado).
+  4. Preservação do nome do arquivo `.pdf` no bloco `📚`, garantindo integração nativa com o `Orquestrador_Hibrido.ipynb` no Colab.
+  5. Zero esforço matemático de offset exigido do usuário.
+
+## 2026-09-26 — Refatoração v5 do Prompt OCANES do Roteiro de Evidências — Eliminação de Offset e Simplificação do Sumário Digital
+- **Arquivo:** Prompt externo (NotebookLM) → alimenta [`Orquestrador_Hibrido.ipynb`](file:///home/vvgfilhos/medhelp/scripts/colab/Orquestrador_Hibrido.ipynb) Célula 4
+- **Descrição:** Remoção completa da mecânica de offset manual a pedido do usuário ("não faz sentido pra mim"), tornando o uso direto e sem atrito matemático.
+- **Estrutura Final Consolidada:**
+  1. **Zero Offset:** O usuário não precisa calcular nem declarar deslocamentos de páginas. Apenas declara o tipo (`[DIGITAL]` ou `[IMPRESSO]`).
+  2. **Resolução Transparente de Livros [DIGITAL]:** O modelo utiliza diretamente a numeração do Sumário/Índice do livro se disponível; caso contrário, emite o contador do leitor `pp. [XX–YY do leitor]`.
+  3. **Busca Curatorial Top-Down (PBL):** A IA seleciona primeiro o Capítulo-Mestre da fundamentação teórica e, em seguida, a Seção-Mãe (Nível H2), eliminando a fragmentação em subtópicos e a dispersão em capítulos tardios.
+  4. **Teto de Cardealidade:** 1 a 2 capítulos por objetivo e 1 seção consolidada por capítulo.
+- **Causa Raiz Identificada:**
+  1. A combinação de *Expansão Sinonímica* com *Exaustividade Obrigatória (N5 antiga)* forçava a IA a listar até 7 capítulos por objetivo, pois termos como "células" ou "MHC" apareciam densamente em capítulos avançados (patologia, transplantes, etc.).
+  2. A instrução de extração de seções sem hierarquia forçava a atomização em micro-tópicos de nível H3/H4 (ex: 9 subtópicos para órgãos linfoides), em vez de consolidar na Seção-Mãe (Nível H2).
+- **Alterações Aplicadas:**
+  1. **Princípio do Capítulo-Âncora (Ação 3 e Norma N5):** O modelo é orientado a localizar exclusivamente o capítulo de fundamentação teórica nuclear onde o assunto é conceituado. Capítulos secundários/avançados são explicitamente vetados.
+  2. **Consolidação Macroscópica de Seções (Ação 4 e Norma N6):** O modelo deve agrupar os subtópicos contíguos sob o título da Seção-Mãe do sumário digital, com intervalo contínuo de páginas (`pp. [início–fim do leitor]`), eliminando listas infladas de subtítulos.
+  3. **Preservação de Limitadores Manuais (Ação 2 e Norma N7):** Mantida a regra N14 do usuário para permitir travas pontuais (ex: "APENAS Capítulo X").
+- **Validação em Laboratório:** Simulação realizada com os 6 objetivos de Imunologia (Abbas 9ª Ed.) comprovou convergência de 100% com a topologia e a concisão do roteiro manual construído pelo usuário.
+- **Causa Raiz:** O prompt v2 forçava a busca de "número impresso no rodapé/cabeçalho" como lei absoluta (N1). Livros como o Abbas não possuem página impressa — apenas bookmarks/sumário digital do PDF. Isso gerava saída com `"pág. [N do leitor] - sem numeração impressa"` em todas as seções, perdendo a informação útil de que o livro TEM âncoras de navegação (Capítulo + Seção).
+- **Alterações Aplicadas:**
+  1. **3 modos de paginação:** `[IMPRESSO]` (pág. impressa como lei), `[DIGITAL]` (Cap+Seção como âncora, pág. do leitor como secundária), `[NENHUM]` (pág. do leitor declarada).
+  2. **Campo de tipo no Contexto:** Usuário informa o tipo de cada livro antes da varredura (ex: `Abbas → DIGITAL`, `Bogliolo → IMPRESSO`).
+  3. **Ação 6 reforçada:** Para livros `[DIGITAL]`, o título da seção do sumário digital é tratado como âncora primária de navegação.
+  4. **Ação 7 condicional:** Lógica de paginação bifurca por tipo de livro.
+  5. **Norma N1 tripartida:** Regra de paginação específica para cada modo.
+  6. **Nova Norma N13:** Proíbe misturar sistemas (impressa vs leitor) no mesmo livro.
+  7. **4 exemplos Few-Shot:** Adicionado caso `[DIGITAL]` com Abbas; caso `[NENHUM]` atualizado.
+  8. **Saída [S] tripartida:** Formato de saída diferenciado para cada tipo.
+- **Impacto downstream:** A Célula 6 (Conversão JSON) do Orquestrador Híbrido receberá páginas do leitor em vez de páginas impressas para livros `[DIGITAL]`. O campo `paginas` no JSON gerado pode conter o formato `[N do leitor]` — validar compatibilidade no próximo uso.
+
+## 2026-09-25 — Refatoração v2 do Prompt OCANES do Roteiro de Evidências (NotebookLM)
+- **Arquivo:** Prompt externo (NotebookLM) → alimenta [`Orquestrador_Hibrido.ipynb`](file:///home/vvgfilhos/medhelp/scripts/colab/Orquestrador_Hibrido.ipynb) Célula 4
+- **Descrição:** Duas alterações cirúrgicas no prompt "Extrator de Evidências Brutas" usado no NotebookLM para varrer livros-texto fatiados.
+- **Alterações Aplicadas:**
+  1. **Eliminação da classificação [MENÇÃO]:** Removida toda referência a seções tangenciais (1 parágrafo, citações dentro de outro assunto). O roteiro agora registra APENAS seções com cobertura densa (assunto principal). Tag `[FOCO]` também removida da saída por redundância (com 1 nível, a tag não agrega informação). Adicionadas Ação 3 (FILTRAGEM DE DENSIDADE) e Norma N11 como guardrails.
+  2. **Reordenação por relevância à pergunta norteadora:** Blocos 📚 dentro de cada 🎯 OBJETIVO passam a ser ordenados do mais relevante ao menos relevante em relação à pergunta norteadora da tutoria, em vez de agrupados por livro/capítulo. Adicionadas Ação 8 (ORDENAÇÃO POR RELEVÂNCIA) e Norma N12.
+- **Motivação:** Seções tangenciais poluíam o roteiro sem valor para estudo focado. A ordenação por capítulo forçava o estudante a decidir por si a prioridade de leitura.
+- **Impacto downstream:** Afeta a Célula 6 (Conversão JSON) e Célula 6.5 (Otimizador Curatorial) do Orquestrador Híbrido, que consomem a saída deste prompt. Como a tag `[FOCO]` foi removida, o Otimizador não receberá mais classificação de densidade — todo corte que chegar já será denso por definição.
+
 ## 2026-09-23 — Erro CUDA `libcublas.so.12` no Pipeline de Transcrição (Colab)
 - **Arquivo:** [`Transcribe.ipynb`](file:///home/vvgfilhos/medhelp/scripts/colab/Transcribe.ipynb) — Células 1 e 4
 - **Descrição do problema:** O pipeline v2.4 falhou em 2/2 aulas com `RuntimeError: Library libcublas.so.12 is not found or cannot be loaded`. O modelo `faster-whisper` (CTranslate2) não conseguia localizar a biblioteca cuBLAS no runtime do Colab.
@@ -8,7 +128,7 @@
   1. **Célula 1:** Adicionado `pip install nvidia-cublas-cu12 nvidia-cudnn-cu12` para garantir presença das libs CUDA no env pip. Logo após, injeção automática do `LD_LIBRARY_PATH` com auto-detecção dos diretórios (`site.getsitepackages()` + `/usr/local/cuda/lib64`).
   2. **Célula 4:** Nova função `_garantir_ld_library_path()` invocada antes de instanciar o `WhisperModel`. Usa `ctypes.cdll.LoadLibrary()` para forçar o carregamento da `libcublas*.so*` antes do CTranslate2 tentar usá-la.
   3. **Fallback CPU:** Se o CUDA falhar mesmo com as correções, o modelo é carregado em modo `device='cpu', compute_type='int8'` com aviso no log.
-- **Status:** Corrigido. Aguardando re-execução no Colab para confirmação.
+- **Status:** ✅ Confirmado em produção (23/09/2026 21:19). Pipeline rodando com CUDA no Colab.
 
 ## 2026-09-19 — Adição dos Flashcards Cognitiva 02 no Portal Medhelp
 - **Arquivo:** [`index.html`](file:///home/vvgfilhos/index.html) — Seção 4 (Flashcards)

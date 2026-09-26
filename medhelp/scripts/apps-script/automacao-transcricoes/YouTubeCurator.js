@@ -4,6 +4,8 @@
  */
 
 const YouTubeCurator = {
+  // Set global para manter os IDs de vídeos já selecionados na execução atual e evitar repetições (intra e inter-objetivos)
+  videosUtilizadosNaSessao: new Set(),
   
   /**
    * Função principal que orquestra a busca e curadoria.
@@ -26,6 +28,10 @@ const YouTubeCurator = {
       
       if (curadoria && curadoria.video_escolhido_id && curadoria.video_escolhido_id !== "NENHUM") {
         console.log(`[YouTubeCurator] Vídeo curado com sucesso: ${curadoria.titulo_formatado}`);
+        
+        // Registrar o vídeo como utilizado para evitar repetições futuras
+        this.videosUtilizadosNaSessao.add(curadoria.video_escolhido_id);
+
         const url = `https://www.youtube.com/watch?v=${curadoria.video_escolhido_id}`;
         return `> 🎥 **Aula Sugerida:** [${curadoria.titulo_formatado}](${url})`;
       } else if (curadoria && curadoria.video_escolhido_id === "NENHUM") {
@@ -96,6 +102,12 @@ const YouTubeCurator = {
         const snippet = item.snippet || {};
         const contentDetails = item.contentDetails || {};
         const duracaoSegundos = this.parseIsoDuration(contentDetails.duration || "");
+
+        // Filtro de Deduplicação: Evitar vídeos já selecionados na sessão atual
+        if (this.videosUtilizadosNaSessao.has(item.id)) {
+          console.log(`[YouTubeCurator] Descartando vídeo já utilizado na sessão (${item.id}): "${snippet.title}"`);
+          continue;
+        }
 
         // Filtro de Duração Mínima: Apenas vídeos com 10 minutos (600s) ou mais
         if (duracaoSegundos < 600) {
