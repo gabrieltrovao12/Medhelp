@@ -132,3 +132,24 @@
    - Dimensão: Dia da semana e Hora do dia.
    - Métrica: Sessões ativas.
    - Objetivo: Revelar as "vésperas de estudo" para planejar publicações de materiais no momento de maior pico.
+
+---
+
+## 8. Especificação de Limpeza Visual e Ativação do TBL (Portal index.html)
+
+### 8.1 Diagnóstico das Demandas do Usuário
+1. **Poluição Visual no Bloco "Outros":**
+   - As tags "Nivelamento" (em Lacuna Zero) e "Gravações & Slides" (em Conferências) foram solicitadas para remoção para conferir um visual mais sóbrio, limpo e direto aos itens.
+2. **Ativação da Pasta de TBL:**
+   - Substituição do nome longo "TBL — Team-Based Learning" por simplesmente "TBL".
+   - Conversão do placeholder inativo (`.sub-item-placeholder` com badge "Em breve") em link de navegação ativo apontando para a pasta oficial do Drive: `https://drive.google.com/drive/u/0/folders/1RE5uK-9Y9qGf73gmerAhBCY6T2egSzPD`.
+3. **Harmonização dos Badges de Flashcards:**
+   - Unificação dos status "Em elaboração" e "Aguarde" em um único padrão textual e visual: **"Em breve"**.
+
+### 8.2 Aplicação do Ciclo V.L.A.E.G.
+- **Visão (V):** Inputs definidos (URL do Drive de TBL, exclusão de badges de texto secundários em Lacuna e Conferências, unificação para "Em breve" em Flashcards).
+- **Link (L):** Validação da URL da pasta TBL e confirmação de disparo automático do evento `click_sub_item` no `analytics.js`.
+- **Arquitetura (A):** Modificação no `index.html`, mantendo marcação semântica e acessibilidade (`aria-label`).
+- **Estilo (E):** Manutenção da tipografia serifada/sem-serifa equilibrada e setas indicativas de link ativo (`.sub-seta`) nos itens do card "Outros".
+- **Gatilho (G):** Validação do HTML e registro em `system_log.md`.
+
