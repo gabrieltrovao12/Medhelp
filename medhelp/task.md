@@ -1,6 +1,14 @@
 # Tarefas do Projeto - Medhelp
 
-## FASE ATUAL: Crivo do Google Analytics & Dashboard Looker Studio (Item 15) - Concluído & Validado
+## FASE ATUAL: Limpeza Visual e Ativação do TBL no Portal (index.html) - Concluído & Validado
+- [x] Remover tag "Nivelamento" de Lacuna Zero no card "Outros".
+- [x] Remover tag "Gravações & Slides" de Conferências no card "Outros".
+- [x] Converter "TBL — Team-Based Learning" para apenas "TBL" e ativar link do Drive (`1RE5uK-9Y9qGf73gmerAhBCY6T2egSzPD`).
+- [x] Padronizar badges da seção Flashcards ("Em elaboração" e "Aguarde") para "Em breve".
+- [x] Validar renderização e integridade do HTML.
+- [x] Registrar correções e testes em `system_log.md`.
+
+## FASE ANTERIOR: Crivo do Google Analytics & Dashboard Looker Studio (Item 15) - Concluído & Validado
 - [x] Brainstorming iterativo e validação do Understanding Lock com o usuário (concluído em `research.md`).
 - [x] Escolha da Abordagem 1: Padronização Universal no JS + Dashboard no Looker Studio.
 - [x] Refatorar [`analytics.js`](file:///home/vvgfilhos/medhelp/analytics.js) com:

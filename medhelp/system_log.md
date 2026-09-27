@@ -390,3 +390,13 @@
   2. **Refatoração com Pydantic:** Foram introduzidas as classes `ObjetivoJSON` e `CorteJSON` no notebook.
   3. A função `converter_notebooklm_para_json` passou a utilizar `response_schema=list[ObjetivoJSON]` na chamada `call_gemini`, garantindo a validação estrita do JSON nativa da API.
   4. **Adaptabilidade do Offset:** Como o Structured Outputs não suporta tipagens complexas (`list[int] | str`) para o campo `paginas` (que ocasionalmente recebia `"VERIFICAR_OFFSET"`), o esquema foi remodelado para utilizar a flag boleana `precisa_verificar_offset: bool` e o processamento pós-API foi ajustado para restabelecer a string `"VERIFICAR_OFFSET"` quando necessário.
+
+## 2026-09-26 — Limpeza Visual e Ativação do TBL no Portal (index.html)
+- **Arquivos alterados:** `index.html` (e espelho `~/medhelp/index.html`)
+- **Descrição:** Limpeza de poluição visual em badges secundários de subtópicos, padronização dos status em Flashcards e ativação do link oficial do Google Drive para TBL.
+- **Detalhamento das Modificações:**
+  1. **Remoção de Tags Secundárias:** Eliminadas as tags `<span class="badge-tag">Nivelamento</span>` de **Lacuna Zero** e `<span class="badge-tag">Gravações &amp; Slides</span>` de **Conferências**, conferindo uma visualização mais limpa e sóbria.
+  2. **Ativação da Pasta de TBL:** O subtópico "TBL — Team-Based Learning" foi renomeado para "TBL" e convertido de placeholder inativo para link navegável ativo (`<a href="https://drive.google.com/drive/u/0/folders/1RE5uK-9Y9qGf73gmerAhBCY6T2egSzPD" target="_blank" class="sub-item">...</a>`), com seta indicativa (`.sub-seta`) e rastreamento automático de cliques via `analytics.js`.
+  3. **Padronização em Flashcards:** Os badges "Em elaboração" e "Aguarde" foram uniformizados para `<span class="badge-status">Em breve</span>`.
+- **Validação:** Testes sintáticos automatizados em Node.js confirmaram a ausência das palavras removidas e integridade da árvore HTML.
+
