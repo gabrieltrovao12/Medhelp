@@ -153,3 +153,9 @@
 - **Estilo (E):** Manutenção da tipografia serifada/sem-serifa equilibrada e setas indicativas de link ativo (`.sub-seta`) nos itens do card "Outros".
 - **Gatilho (G):** Validação do HTML e registro em `system_log.md`.
 
+### 8.3 Atualização da Pasta-Mãe do Módulo de Tutoria (Febre, Inflamação e Infecção)
+- **Diagnóstico:** O cabeçalho do card de Tutoria (`.pasta-header`) estava utilizando provisoriamente o ID do Problema 01 (`1Hz6afomNtSoPz4HSfW6fxAfOlxX7il48`).
+- **Resolução:** Substituição pelo link oficial da pasta-mãe do módulo fornecido pelo usuário: `https://drive.google.com/drive/u/0/folders/1vKNhlHaeWpFFtXXKLxuubL9P3Cy1_sm4`.
+- **Integridade dos Subitens:** Os links de Problema 01 a 04 permanecem inalterados.
+
+

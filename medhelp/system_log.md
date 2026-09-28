@@ -400,3 +400,12 @@
   3. **Padronização em Flashcards:** Os badges "Em elaboração" e "Aguarde" foram uniformizados para `<span class="badge-status">Em breve</span>`.
 - **Validação:** Testes sintáticos automatizados em Node.js confirmaram a ausência das palavras removidas e integridade da árvore HTML.
 
+## 2026-09-27 — Atualização da Pasta-Mãe do Módulo Tutoria (Febre, Inflamação e Infecção)
+- **Arquivos alterados:** `index.html` (e espelho `~/medhelp/index.html`)
+- **Descrição:** Vinculação da pasta oficial do módulo de Febre, Inflamação e Infecção no cabeçalho do card de Tutoria.
+- **Detalhamento das Modificações:**
+  1. O atributo `href` do elemento `.pasta-header` do card Tutoria foi atualizado de `1Hz6afomNtSoPz4HSfW6fxAfOlxX7il48` (ID provisório do Problema 01) para a pasta-mãe oficial fornecida pelo usuário: `https://drive.google.com/drive/u/0/folders/1vKNhlHaeWpFFtXXKLxuubL9P3Cy1_sm4`.
+  2. Todos os links internos das subpastas (Problema 01 a 04) foram mantidos preservados.
+- **Validação:** Verificação via script e inspeção visual confirmando que a navegação do card principal agora acessa a pasta macro do módulo.
+
+

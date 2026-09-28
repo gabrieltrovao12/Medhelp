@@ -1,6 +1,11 @@
 # Tarefas do Projeto - Medhelp
 
-## FASE ATUAL: Limpeza Visual e Ativação do TBL no Portal (index.html) - Concluído & Validado
+## FASE ATUAL: Atualização da Pasta-Mãe de Tutoria (Febre, Inflamação e Infecção) - Concluído & Validado
+- [x] Atualizar o link `.pasta-header` do card Tutoria em `index.html` para `1vKNhlHaeWpFFtXXKLxuubL9P3Cy1_sm4`.
+- [x] Validar integridade dos links de Problema 01 a 04.
+- [x] Registrar alteração em `system_log.md`.
+
+## FASE ANTERIOR: Limpeza Visual e Ativação do TBL no Portal (index.html) - Concluído & Validado
 - [x] Remover tag "Nivelamento" de Lacuna Zero no card "Outros".
 - [x] Remover tag "Gravações & Slides" de Conferências no card "Outros".
 - [x] Converter "TBL — Team-Based Learning" para apenas "TBL" e ativar link do Drive (`1RE5uK-9Y9qGf73gmerAhBCY6T2egSzPD`).
