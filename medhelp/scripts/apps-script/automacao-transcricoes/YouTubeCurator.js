@@ -172,7 +172,7 @@ Retorne estritamente neste formato JSON:
     const userPrompt = `Tema da Aula/Objetivo: ${tema}\n\nAvalie e escolha a melhor opção entre os vídeos abaixo:\n${resultadosTxt}`;
     
     console.log(`[YouTubeCurator] Avaliando opções via LLM (Gemini)...`);
-    return chamarGeminiJSON(userPrompt, apiKeyGemini, systemPrompt);
+    return chamarGemini(userPrompt, apiKeyGemini, systemPrompt, { formato: 'json', temperatura: 0.0 });
   }
 
 };

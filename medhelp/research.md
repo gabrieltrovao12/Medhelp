@@ -1,5 +1,40 @@
 # Roteiro de Evidências (NotebookLM) — Especificação e Solução de Sumário Digital
 
+## 0. Diagnóstico Crítico: Quebra do PyAV 19.0.0 no faster-whisper (`Transcribe.ipynb`)
+- **Incidente:** O pipeline de transcrição médica no Google Colab falhou subitamente para todo o lote com:
+  `TypeError: open() got an unexpected keyword argument 'metadata_errors'`
+- **Causa Raiz Investigada:**
+  - O pacote `PyAV` (`av`) publicou a versão major **19.0.0** no PyPI em 29/09/2026 às 17:46:33 UTC (horas antes da execução do usuário).
+  - No PyAV 19.0.0, os argumentos `metadata_errors` e `metadata_encoding` foram **removidos** de `av.open()` (o tratamento agora é forçado como UTF-8 com `surrogateescape`).
+  - O `faster-whisper` (v1.2.1) tem como dependência declarada `av>=11` (sem teto superior). Ao executar `!pip install faster-whisper`, o pip baixou a versão mais recente (`av==19.0.0`).
+  - No arquivo `faster_whisper/audio.py`, a função de decodificação chama:
+    `with av.open(input_file, mode="r", metadata_errors="ignore") as container:`
+  - Como `metadata_errors` não é mais aceito pelo PyAV 19, a chamada quebra imediatamente ao carregar qualquer áudio na VRAM/CPU.
+- **Estratégia de Correção (Dupla Camada - Defesa em Profundidade):**
+  1. **Camada 1 (Instalação / Dependências - Célula 1):**
+     Fixar `"av<19"` na instalação via pip (`!pip install faster-whisper "av<19" ...`), garantindo compatibilidade nativa em novas instâncias do Colab.
+  2. **Camada 2 (Hotfix / Monkeypatch em Runtime - Célula 4):**
+     Injetar um wrapper transparente em `av.open` que descarta `metadata_errors` e `metadata_encoding` caso existam antes de repassar para o PyAV real:
+     ```python
+     try:
+         import av
+         _orig_av_open = av.open
+         def _safe_av_open(*args, **kwargs):
+             kwargs.pop('metadata_errors', None)
+             kwargs.pop('metadata_encoding', None)
+             return _orig_av_open(*args, **kwargs)
+         av.open = _safe_av_open
+     except Exception:
+         pass
+     ```
+     *Benefício imediato:* Usuários com sessões ativas do Colab que já possuem `av==19.0.0` em memória não precisam reiniciar o runtime nem reinstalar pacotes — o script se autocorrige em tempo de execução (*Self-Healing*).
+  3. **Correção do Guardião de Versão (Célula 0):**
+     Restauração de indentação e variáveis na Célula 0 para checagem sem falhas sintáticas com GitHub.
+  4. **Atualização do Banner e Metadados:**
+     Versão do pipeline elevada para **v2.5 (CUDA + OCR + PyAV-Fix)**.
+
+---
+
 ## 1. Problema Diagnosticado e Refinamento
 1. **Dispersão por Exaustividade Cega (Over-Retrieval):** Corrigido pelo *Princípio do Capítulo-Âncora*, forçando o modelo a focar no capítulo conceitual de base (máximo 1 a 2 blocos por objetivo) e eliminando a busca por retalhos dispersos no livro.
 2. **Hiper-Fragmentação de Seções:** Corrigido pela *Consolidação Macroscópica de Seções (Nível H2)*, onde subtópicos contíguos são fundidos sob o título da Seção-Mãe em um único intervalo de páginas.
@@ -157,5 +192,29 @@
 - **Diagnóstico:** O cabeçalho do card de Tutoria (`.pasta-header`) estava utilizando provisoriamente o ID do Problema 01 (`1Hz6afomNtSoPz4HSfW6fxAfOlxX7il48`).
 - **Resolução:** Substituição pelo link oficial da pasta-mãe do módulo fornecido pelo usuário: `https://drive.google.com/drive/u/0/folders/1vKNhlHaeWpFFtXXKLxuubL9P3Cy1_sm4`.
 - **Integridade dos Subitens:** Os links de Problema 01 a 04 permanecem inalterados.
+
+---
+
+## 9. Extrator de Sumário Digital: Resiliência contra Marcadores Achatados e PDFs sem Bookmarks (Junqueira & Carneiro)
+
+### 9.1 Diagnóstico de Casos de Borda (Edge Cases)
+1. **Bookmarks Achatados (Flattened TOC):**
+   - Em livros convertidos de ePub para PDF por ferramentas como o Calibre (ex: `Histologia Básica_parte1.pdf`), todos os nós do índice são salvos como Nível 1 (`item[0] == 1`).
+   - O extrator padrão transformava 138 tópicos em cabeçalhos `## 📚`, quebrando a macro-hierarquia requerida pelo NotebookLM.
+   - **Solução:** Algoritmo de desachatamento inteligente. Quando mais de 80% dos marcadores forem Nível 1 e houver títulos numerados (`^\d{1,2}\s+[A-ZÀ-Ú]`), o script promove apenas os capítulos numerados a `lvl = 1` e rebaixa todas as seções internas contíguas para `lvl = 2` (`- 📂 **...**`), descartando preliminares e homenagens pré-capítulo 1.
+
+2. **PDFs sem Árvore de Bookmarks (`doc.get_toc() == []`):**
+   - Arquivos como `Histologia Básica_parte2.pdf` sofreram perda dos metadados de outline durante o split ou conversão.
+   - **Solução:** Fallback heurístico visual (`extrair_sumario_sem_bookmarks`).
+     - Detecta páginas de capa do capítulo (página com 0 texto e $\ge 1$ imagem) seguidas de página de índice (`Introdução`, `Bibliografia`).
+     - Identifica a numeração do capítulo por legendas de figuras (`FIGURA XX.1`) e vincula aos títulos canônicos do livro.
+     - Mapeia o **Atlas de Histologia** ao final do volume (pp. 674–916), dividindo as pranchas em tecidos fundamentais e sistemas orgânicos.
+
+### 9.2 Interface CLI e Resolução de Caminhos
+- Se o usuário estiver no diretório `~/Downloads/histologia/`, a sintaxe para invocar o extrator é:
+  ```bash
+  python3 /home/vvgfilhos/medhelp/scripts/python/extrair_sumario_digital.py .
+  ```
+- O script processa automaticamente arquivo único ou lote, gerando o arquivo `[Nome] - Sumario_Digital.md` no mesmo diretório de cada PDF.
 
 

@@ -2,12 +2,17 @@
 # -*- coding: utf-8 -*-
 """
 Medhelp — Extrator de Sumário Digital (Bookmarks) para NotebookLM
-Gera um arquivo Markdown macroscópico (.md) com Capítulos e Seções-Mãe com intervalos de páginas calculados.
+Gera arquivos Markdown (.md) macroscópicos com Partes, Capítulos e Seções com intervalos de páginas calculados.
+Suporta:
+1. Livros padrão de 2 níveis (Capítulos e Seções — Abbas, Robbins, Junqueira);
+2. Tratados e livros estruturados em Partes/Unidades (Harrison, Guyton);
+3. Detecção e reestruturação genérica de índices com marcadores achatados (Flattened TOC).
 """
 
 import sys
 import os
 import argparse
+import re
 import fitz  # PyMuPDF
 
 
@@ -37,47 +42,66 @@ def extrair_sumario_pdf(caminho_pdf: str, output_path: str = None) -> str:
         print(f"⚠️ Aviso: '{nome_arquivo}' não possui bookmarks/sumário digital embutido.")
         return ""
 
-    # Detectar hierarquia: identificar qual nível representa Capítulos e qual representa Seções
-    import re
-    contagem_niveis = {}
-    for item in toc:
-        lvl = item[0]
-        contagem_niveis[lvl] = contagem_niveis.get(lvl, 0) + 1
+    if not output_path:
+        diretorio = os.path.dirname(caminho_pdf) or "."
+        output_path = os.path.join(diretorio, f"{nome_base} - Sumario_Digital.md")
 
     lvl1_titulos = [item[1].strip() for item in toc if item[0] == 1]
     
-    # Se nível 1 tiver poucos itens (<= 8) e contiver 'Parte'/'Unidade', então Lvl 1 = Partes, Lvl 2 = Capítulos
-    tem_partes = (
-        len(lvl1_titulos) <= 8 and
-        any(re.match(r"^(parte|part|unidade|m[oó]dulo)\s+([0-9]+|[ivxlcdm]+)\b", t, re.IGNORECASE) for t in lvl1_titulos)
+    # 1. Detectar tratados com Partes/Unidades (Nível 1 = Parte, Nível 2 = Seção, Nível 3 = Capítulo)
+    tem_partes = any(
+        re.match(r"^(parte|part|unidade|m[oó]dulo)\s+([0-9]+|[ivxlcdm]+)\b", t, re.IGNORECASE)
+        for t in lvl1_titulos
     )
-    
-    nivel_capitulo = 2 if tem_partes else 1
-    nivel_secao = 3 if tem_partes else 2
+    tem_lvl3 = any(item[0] == 3 for item in toc)
 
-    # Filtrar apenas os itens de interesse (Capítulos e Seções-Mãe)
-    # Ignorar páginas preliminares triviais se estiverem soltas
-    preliminares_ignorar = {"capa", "rosto", "créditos", "nota", "dedicatória", "revisão técnica e tradução"}
+    # 2. Detectar se os marcadores vieram achatados (ex: >80% nível 1, mas contendo capítulos numerados)
+    lvl1_count = sum(1 for item in toc if item[0] == 1)
+    is_flattened = (lvl1_count / max(1, len(toc))) > 0.8
+    capitulos_numerados = [
+        item for item in toc
+        if re.match(r"^(\d{1,2}|capítulo\s+\d+)\b", item[1].strip(), re.IGNORECASE)
+    ]
+    is_flattened_numbered = is_flattened and len(capitulos_numerados) >= 3
+
+    preliminares_ignorar = {
+        "capa", "rosto", "página de rosto", "folha de rosto", "frontispício", 
+        "créditos", "nota", "dedicatória", "dedicação", "revisão técnica", 
+        "revisão científica e tradução", "revisão técnica e tradução",
+        "organizadores", "organizadores das edições anteriores", "autores", 
+        "colaboradores", "prefácio", "agradecimentos", "material suplementar", 
+        "sumário", "sumário de vídeos e áudios", "gen"
+    }
 
     itens_filtrados = []
-    for item in toc:
-        lvl, title, page = item[0], normalizar_espacos(item[1]), item[2]
-        if title.lower() in preliminares_ignorar:
-            continue
-        if lvl == nivel_capitulo:
-            itens_filtrados.append({
-                "lvl": lvl,
-                "title": title,
-                "page": page,
-                "is_cap": True
-            })
-        elif lvl == nivel_secao:
-            itens_filtrados.append({
-                "lvl": lvl,
-                "title": title,
-                "page": page,
-                "is_cap": False
-            })
+
+    if is_flattened_numbered:
+        in_chapter = False
+        for item in toc:
+            lvl, title, page = item[0], normalizar_espacos(item[1]), item[2]
+            if title.lower() in preliminares_ignorar or re.search(r"\(\d{4}[–-]\d{4}\)", title):
+                continue
+            is_cap = bool(re.match(r"^(\d{1,2}|capítulo\s+\d+)\b", title, re.IGNORECASE))
+            if is_cap:
+                in_chapter = True
+                itens_filtrados.append({"lvl": 1, "title": title, "page": page})
+            elif in_chapter:
+                itens_filtrados.append({"lvl": 2, "title": title, "page": page})
+    else:
+        for item in toc:
+            lvl, title, page = item[0], normalizar_espacos(item[1]), item[2]
+            if title.lower() in preliminares_ignorar or re.search(r"\(\d{4}[–-]\d{4}\)", title):
+                continue
+            
+            if tem_partes and tem_lvl3:
+                if lvl in (1, 2, 3):
+                    itens_filtrados.append({"lvl": lvl, "title": title, "page": page})
+            elif tem_partes and not tem_lvl3:
+                if lvl in (1, 2):
+                    itens_filtrados.append({"lvl": lvl, "title": title, "page": page})
+            else:
+                if lvl in (1, 2):
+                    itens_filtrados.append({"lvl": lvl, "title": title, "page": page})
 
     if not itens_filtrados:
         print(f"⚠️ Nenhum capítulo/seção identificado na hierarquia de '{nome_arquivo}'.")
@@ -86,7 +110,6 @@ def extrair_sumario_pdf(caminho_pdf: str, output_path: str = None) -> str:
     # Calcular intervalos de páginas (início e fim)
     for i in range(len(itens_filtrados)):
         atual = itens_filtrados[i]
-        # Próximo item com página maior
         prox_pagina = total_paginas
         for j in range(i + 1, len(itens_filtrados)):
             if itens_filtrados[j]["page"] > atual["page"]:
@@ -94,7 +117,18 @@ def extrair_sumario_pdf(caminho_pdf: str, output_path: str = None) -> str:
                 break
         atual["end_page"] = max(atual["page"], prox_pagina)
 
-    # Construir Markdown Macroscópico
+    # Para livros padrão de 2 níveis (ou achatados), o nível 1 (Capítulo) deve cobrir todo o capítulo até o próximo
+    if not (tem_partes and tem_lvl3):
+        for i in range(len(itens_filtrados)):
+            if itens_filtrados[i]["lvl"] == 1:
+                cap_end = total_paginas
+                for j in range(i + 1, len(itens_filtrados)):
+                    if itens_filtrados[j]["lvl"] == 1:
+                        cap_end = itens_filtrados[j]["page"] - 1
+                        break
+                itens_filtrados[i]["end_page"] = cap_end
+
+    # Construir Markdown Estruturado
     linhas_md = [
         f"# Sumário Estruturado — {nome_base}",
         f"**Documento:** `{nome_arquivo}` | **Total de Páginas:** {total_paginas}",
@@ -106,24 +140,32 @@ def extrair_sumario_pdf(caminho_pdf: str, output_path: str = None) -> str:
         ""
     ]
 
-    cap_atual = None
     for item in itens_filtrados:
         p_inicio = item["page"]
         p_fim = item["end_page"]
         pag_str = f"pp. {p_inicio}–{p_fim}" if p_inicio != p_fim else f"pág. {p_inicio}"
+        title = item["title"]
+        lvl = item["lvl"]
 
-        if item["is_cap"]:
-            cap_atual = item["title"]
-            linhas_md.append(f"\n## 📚 {cap_atual} | 📄 {pag_str}")
+        if tem_partes and tem_lvl3:
+            if lvl == 1:
+                linhas_md.append(f"\n## 📚 {title} | 📄 {pag_str}")
+            elif lvl == 2:
+                if any(w in title.lower() for w in ("seção", "secao")):
+                    linhas_md.append(f"\n### {title} | 📄 {pag_str}")
+                elif "capítulo" in title.lower() or "capitulo" in title.lower():
+                    linhas_md.append(f"\n## 📚 {title} | 📄 {pag_str}")
+                else:
+                    linhas_md.append(f"- 📂 **{title}** | 📄 {pag_str}")
+            elif lvl == 3:
+                linhas_md.append(f"- 📂 **{title}** | 📄 {pag_str}")
         else:
-            linhas_md.append(f"- 📂 **{item['title']}** | 📄 {pag_str}")
+            if lvl == 1:
+                linhas_md.append(f"\n## 📚 {title} | 📄 {pag_str}")
+            elif lvl == 2:
+                linhas_md.append(f"- 📂 **{title}** | 📄 {pag_str}")
 
     conteudo_final = "\n".join(linhas_md) + "\n"
-
-    # Salvar arquivo
-    if not output_path:
-        diretorio = os.path.dirname(caminho_pdf) or "."
-        output_path = os.path.join(diretorio, f"{nome_base} - Sumario_Digital.md")
 
     try:
         with open(output_path, "w", encoding="utf-8") as f:
@@ -156,7 +198,7 @@ def main():
         if not pdfs:
             print(f"⚠️ Nenhum PDF encontrado na pasta: {caminho}")
             return
-        print(f"📂 Processando {len(pdfs)} arquivos PDF...")
+        print(f"📂 Processando {len(pdfs)} arquivo(s) PDF...")
         for pdf in sorted(pdfs):
             extrair_sumario_pdf(pdf)
     else:

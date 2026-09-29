@@ -1,5 +1,59 @@
 # Log de Sistema - Medhelp
 
+## 2026-09-29 — Pipeline Colab: Hotfix PyAV 19.0.0 (`metadata_errors`) & Blindagem de Versão
+- **Arquivos:** [`scripts/colab/Transcribe.ipynb`](file:///home/vvgfilhos/medhelp/scripts/colab/Transcribe.ipynb), [`research.md`](file:///home/vvgfilhos/medhelp/research.md) e [`task.md`](file:///home/vvgfilhos/medhelp/task.md)
+- **Incidente Observado em Produção:**
+  - O pipeline de transcrição médica no Google Colab falhou para todas as 5 aulas do lote com a seguinte exceção:
+    `TypeError: open() got an unexpected keyword argument 'metadata_errors'`
+- **Causa Raiz Identificada:**
+  1. A biblioteca PyAV (`av`) lançou a versão **19.0.0** no PyPI em 29/09/2026 às 17:46:33 UTC (poucas horas antes da execução).
+  2. No PyAV 19.0.0, os argumentos `metadata_errors` e `metadata_encoding` foram **removidos** de `av.open()` (o comportamento agora força UTF-8 com `surrogateescape`).
+  3. O `faster-whisper` (1.2.1) declara dependência como `av>=11` (sem teto superior). Assim, `pip install faster-whisper` instalou a versão recém-lançada `av==19.0.0`.
+  4. Na decodificação interna de áudio (`faster_whisper/audio.py`), a biblioteca executa `av.open(input_file, mode="r", metadata_errors="ignore")`, disparando a exceção fatal.
+- **Correções Aplicadas (Protocolo de Defesa em Dupla Camada):**
+  1. **Camada 1 — Instalação (Célula 1):**
+     - Fixado `"av<19"` no comando pip (`!pip install faster-whisper "av<19" nvidia-cublas-cu12 nvidia-cudnn-cu12 -q`).
+     - Atualizado banner de confirmação para `v2.5 PyAV-Fix + CUDA`.
+  2. **Camada 2 — Hotfix Self-Healing em Runtime (Célula 4):**
+     - Implementado monkeypatch defensivo transparente em `av.open` no topo da Célula 4 e dentro de `transcrever_audio`.
+     - Caso `metadata_errors` ou `metadata_encoding` sejam passados ao abrir o contêiner de áudio, eles são descartados via `kwargs.pop()` antes de delegar para o `av.open` original.
+     - **Vantagem Imediata:** Permite que o usuário re-execute a Célula 4 imediatamente na mesma sessão do Colab sem precisar reiniciar o ambiente ou re-instalar pacotes.
+  3. **Correção de Sintaxe no Guardião de Versão (Célula 0):**
+     - Corrigida duplicata e erro de indentação em `VERSAO_LOCAL` que quebrava o guardião de versão.
+     - Timestamp atualizado para `2026-09-29T23:55:00Z`.
+  4. **Filtro de Ruído no Log:**
+     - Adicionado supressor de avisos anônimos do Hugging Face Hub (`logging.getLogger("huggingface_hub.utils._http").setLevel(logging.ERROR)`).
+  5. **Atualização de Banner:**
+     - Pipeline atualizado para `v2.5 (CUDA + OCR + PyAV-Fix + Duração)`.
+- **Validação de Laboratório:**
+  - Todas as células de código validadas com sucesso via `ast.parse` (0 erros sintáticos).
+  - Teste unitário de monkeypatch simulado com chamadas idênticas ao `faster-whisper` validado com sucesso.
+
+## 2026-09-28 — Extrator de Sumário Digital: Arquitetura 100% Genérica & Binário CLI Global
+- **Arquivos:** [`scripts/python/extrair_sumario_digital.py`](file:///home/vvgfilhos/medhelp/scripts/python/extrair_sumario_digital.py), `~/.local/bin/extrair_sumario_digital` e [`Histologia - Junqueira - Sumario_Digital.md`](file:///home/vvgfilhos/Downloads/histologia/Histologia%20-%20Junqueira%20-%20Sumario_Digital.md)
+- **Refatoração Anti-Acoplamento (Zero Hardcoded):**
+  - Removido qualquer resíduo de tabelas ou dicionários específicos de livros (ex: `nomes_capitulos_junqueira` e `subtopics_ch14` em linhas 14-64).
+  - O script foi 100% restaurado para operar de forma agnóstica e genérica com base na árvore de bookmarks de qualquer PDF médico (Robbins, Abbas, Guyton, Harrison, Junqueira, etc.).
+- **Ativação CLI Global:**
+  - Criado link simbólico executável em `~/.local/bin/extrair_sumario_digital` apontando para o script Python no repositório.
+  - Como `~/.local/bin` já está no `$PATH`, o comando pode ser invocado de **qualquer pasta** no terminal simplesmente digitando:
+    `extrair_sumario_digital .` ou `extrair_sumario_digital /caminho/da/pasta`.
+- **Validação em Produção no Volume Completo:**
+  - Processado `~/Downloads/histologia/Histologia - Junqueira.pdf` (1.832 páginas, 238 tópicos originais).
+  - Saída: `Histologia - Junqueira - Sumario_Digital.md` (12.7 KB, 228 tópicos macroscópicos filtrados com todos os 23 Capítulos e Atlas de Histologia perfeitamente hierarquizados).
+
+## 2026-09-28 — Extrator de Sumário Digital: Suporte a Tratados Médicos Multicamadas (Harrison 21ª Ed.)
+- **Arquivos:** [`scripts/python/extrair_sumario_digital.py`](file:///home/vvgfilhos/medhelp/scripts/python/extrair_sumario_digital.py) e [`Harrison Medicina Interna 21ed - Sumario_Digital.md`](file:///home/vvgfilhos/Downloads/Livros%20-%20Sum%C3%A1rio%20Digital/Harrison%20Medicina%20Interna%2021ed%20-%20Sumario_Digital.md)
+- **Desafio Arquitetural:** O Harrison Medicina Interna possui estrutura hierárquica em 3 níveis (Nível 1 = 22 Partes, Nível 2 = Seções temáticas, Nível 3 = 480+ Capítulos clínicos). O filtro anterior de 2 níveis descartaria os capítulos clínicos (como Lúpus, Infarto, Febre, etc.).
+- **Solução Implementada:**
+  - Detecção dinâmica de livros estruturados em Partes (`PARTE [0-9]+` ou `UNIDADE [0-9]+`) com nível 3 ativo.
+  - Formatação inteligente:
+    - Level 1: `## 📚 PARTE X | ...`
+    - Level 2: `### Seção Y | ...` (ou `- 📂 **Capítulo**` se for direto)
+    - Level 3: `- 📂 **Capítulo Clínico** | 📄 pp. início–fim`
+- **Execução Real:** Processado `/home/vvgfilhos/Downloads/Harrison Medicina Interna 21ed.pdf` (7.827 páginas, 601 tópicos) em 1 segundo.
+- **Saída:** Gerado `/home/vvgfilhos/Downloads/Livros - Sumário Digital/Harrison Medicina Interna 21ed - Sumario_Digital.md` (45 KB), contendo todas as 22 Partes e centenas de capítulos clínicos mapeados com precisão cirúrgica de páginas.
+
 ## 2026-09-26 — Auditoria Crítica e Refatoração Pós-Implementação (/refactor)
 - **Arquivos:** [`medhelp/analytics.js`](file:///home/vvgfilhos/medhelp/analytics.js), [`medhelp/index.html`](file:///home/vvgfilhos/medhelp/index.html) e [`medhelp/styles.css`](file:///home/vvgfilhos/medhelp/styles.css)
 - **Diagnóstico & Problemas Detectados:**

@@ -33,7 +33,7 @@ Este protocolo define as regras não negociáveis de formatação e tom de voz p
 
 1. **Inicialização e Sincronização de Entidades:** Execute um pré-processamento onde o \`CONTEÚDO_DOS_SLIDES_EM_TEXTO\` é a fonte de verdade absoluta para toda a nomenclatura técnica. Mapeie os conceitos da \`TRANSCRIÇÃO\` às suas contrapartes. Exceção: se o docente corrigir um termo, use o corrigido e sinalize com a tag: \`(ATUALIZADO EM AULA)\`.
 
-2. **Foco Principal da Aula:** Realize uma varredura na transcrição para extrair os focos absolutos de cobrança. Preencha a Tabela de Foco Principal listando apenas o "Conceito-Chave" pareado à justificativa exata (evidência) de como o professor enfatizou sua importância na prova.
+2. **O que Pode Cair na Prova:** Realize uma varredura na transcrição para extrair todos os assuntos abordados que podem ser cobrados em avaliação. Liste-os em ordem decrescente de probabilidade de cobrança (do mais enfatizado ao menos enfatizado pelo professor). Cada item deve conter o nome do assunto em **negrito** seguido de um travessão e uma frase curta de contexto que justifique a inclusão (ex: repetição pelo professor, aviso direto de prova, tempo dedicado ao tema).
 
 3. **O que NÃO priorizar:** Rastreie a transcrição em busca de termos-chave que desqualificam o conteúdo (ex: "a título de curiosidade"). Liste como "ignorar completamente" ou "saber que existe". Se o professor não pedir explicitamente para descartar nada, aplique a Norma de Omissão Dinâmica.
 
@@ -57,11 +57,11 @@ Apresentar a saída exclusivamente no formato Markdown abaixo, sem qualquer text
 
 ---
 
-## 1. Foco Principal da Aula
+## 1. O que Pode Cair na Prova
 
-| Conceito-Chave | Como o professor enfatizou (Evidência) |
-| :--- | :--- |
-| [Conceito 1] | [Paráfrase objetiva da evidência] |
+- **[Assunto 1]** — [frase curta de contexto sobre a ênfase do professor]
+- **[Assunto 2]** — [frase curta de contexto]
+- **[Assunto 3]** — [frase curta de contexto]
 
 ## 2. O que NÃO priorizar
 - [Tópico 1] — *ignorar completamente* — *Motivo: [paráfrase]*

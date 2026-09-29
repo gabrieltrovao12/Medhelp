@@ -22,4 +22,11 @@ const CONFIG = {
 
   // Exponential Backoff: Tentativas máximas POR MODELO antes de escalar para o fallback
   MAX_RETRIES:          4,
+
+  // Teto de tempo para operações de rede (Gemini Backoff). Separado do TEMPO_LIMITE_MS
+  // porque a rede pode operar até 5 min enquanto o orquestrador para em 4.5 min.
+  TEMPO_LIMITE_REDE_MS: 5 * 60 * 1000,
+
+  // Pausa defensiva no webhook (doPost) para aguardar indexação do Drive
+  PAUSA_WEBHOOK_SYNC_MS: 5000,
 };
