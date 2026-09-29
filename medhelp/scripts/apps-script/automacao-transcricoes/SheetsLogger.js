@@ -38,13 +38,8 @@ const SheetsLogger = {
       const data  = Utilities.formatDate(agora, Session.getScriptTimeZone(), 'dd/MM/yyyy');
       const hora  = Utilities.formatDate(agora, Session.getScriptTimeZone(), 'HH:mm:ss');
       
-      // Função simples para calcular ISO Week
-      const d = new Date(Date.UTC(agora.getFullYear(), agora.getMonth(), agora.getDate()));
-      const dayNum = d.getUTCDay() || 7;
-      d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-      const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
-      const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1)/7);
-      const semanaStr = `${d.getUTCFullYear()}-W${weekNo.toString().padStart(2, '0')}`;
+      // Calcula semana ISO (ex: "2026-W39")
+      const semanaStr = calcularSemanaISO(agora);
 
       sheet.appendRow([
         data,
@@ -63,3 +58,17 @@ const SheetsLogger = {
     }
   }
 };
+
+/**
+ * Calcula a semana ISO 8601 de uma data (ex: "2026-W39").
+ * @param {Date} data
+ * @returns {string}
+ */
+function calcularSemanaISO(data) {
+  const d = new Date(Date.UTC(data.getFullYear(), data.getMonth(), data.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  return `${d.getUTCFullYear()}-W${weekNo.toString().padStart(2, '0')}`;
+}

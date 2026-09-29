@@ -1,6 +1,21 @@
 # Tarefas do Projeto - Medhelp
 
-## FASE ATUAL: Atualização da Pasta-Mãe de Tutoria (Febre, Inflamação e Infecção) - Concluído & Validado
+## FASE ATUAL: Refatoração & Correção PyAV 19.0.0 (`Transcribe.ipynb`) - Concluído & Validado
+- [x] Implementar blindagem de dependências na Célula 1 (`"av<19"`).
+- [x] Implementar Hotfix de Self-Healing em tempo de execução na Célula 4 para descartar `metadata_errors` em `av.open`.
+- [x] Corrigir sintaxe e indentação do Guardião de Versão na Célula 0.
+- [x] Atualizar banner do pipeline para v2.5 (CUDA + OCR + PyAV-Fix).
+- [x] Validar sintaxe Python de todas as células do notebook via AST.
+- [x] Registrar correções no `system_log.md`.
+
+## FASE ANTERIOR: Extrator de Sumário Digital — Arquitetura 100% Genérica & CLI Global
+- [x] Eliminar qualquer lógica hardcoded ou nomes de livros específicos em `scripts/python/extrair_sumario_digital.py`.
+- [x] Preservar motor genérico para livros de 2 níveis (Abbas, Robbins, Junqueira completo) e tratados de 3 níveis (Harrison, Guyton).
+- [x] Criar binário executável global `~/.local/bin/extrair_sumario_digital` no `$PATH` do usuário.
+- [x] Processar `Histologia - Junqueira.pdf` (1.832 páginas, 228 tópicos) gerando `Histologia - Junqueira - Sumario_Digital.md`.
+- [x] Registrar no `system_log.md` e atualizar `research.md`.
+
+## FASE ANTERIOR: Atualização da Pasta-Mãe de Tutoria (Febre, Inflamação e Infecção) - Concluído & Validado
 - [x] Atualizar o link `.pasta-header` do card Tutoria em `index.html` para `1vKNhlHaeWpFFtXXKLxuubL9P3Cy1_sm4`.
 - [x] Validar integridade dos links de Problema 01 a 04.
 - [x] Registrar alteração em `system_log.md`.

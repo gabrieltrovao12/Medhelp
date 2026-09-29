@@ -22,7 +22,7 @@
  */
 function fetchGeminiWithResilience(url, payload, fallbackIndex) {
   const startTime = Date.now();
-  const MAX_EXECUTION_TIME_MS = 300000; // Limite de 5 min (GAS mata em 6 min)
+  const MAX_EXECUTION_TIME_MS = CONFIG.TEMPO_LIMITE_REDE_MS || 300000;
   const BASE_DELAY_MS = 1000;
   const CAP_DELAY_MS = 60000;
   const maxRetries = CONFIG.MAX_RETRIES || 4;
@@ -122,58 +122,59 @@ function fetchGeminiWithResilience(url, payload, fallbackIndex) {
 }
 
 /**
- * Envia o texto para o Gemini e retorna o resumo gerado.
+ * Monta o prompt de usuário padrão para transcrições (usado pelo Main.js).
+ *
+ * @param {string} texto       - Conteúdo bruto do arquivo de transcrição
+ * @param {string} nomeArquivo - Nome do arquivo (sem extensão)
+ * @returns {string} Prompt formatado
  */
-function chamarGeminiAPI(texto, nomeArquivo, apiKey, systemInstruction) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${CONFIG.MODELO_GEMINI}:generateContent?key=${apiKey}`;
-
+function construirPromptTranscricao(texto, nomeArquivo) {
   const dataHoje = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'dd/MM/yyyy');
-  const promptUsuario = `**NOME DO ARQUIVO:** ${nomeArquivo}\n**DATA:** ${dataHoje}\n\n**ARQUIVO BRUTO PARA PROCESSAMENTO:**\n\n${texto}`;
-
-  const payload = {
-    system_instruction: { parts: [{ text: systemInstruction }] },
-    contents: [{ parts: [{ text: promptUsuario }] }],
-    generationConfig: { temperature: 0.2 }
-  };
-
-  try {
-    const json = fetchGeminiWithResilience(url, payload);
-    const candidate = json.candidates && json.candidates[0];
-    
-    if (!candidate || !candidate.content || !candidate.content.parts || candidate.content.parts.length === 0) {
-      console.error(`[ERRO] A API retornou candidato inválido ou vazio.`);
-      return null;
-    }
-    return candidate.content.parts[0].text;
-  } catch (e) {
-    console.error(`[ERRO] Falha ao processar ${nomeArquivo}: ${e.message}`);
-    return null;
-  }
+  return `**NOME DO ARQUIVO:** ${nomeArquivo}\n**DATA:** ${dataHoje}\n\n**ARQUIVO BRUTO PARA PROCESSAMENTO:**\n\n${texto}`;
 }
 
 /**
- * Envia o texto para o Gemini e retorna um objeto JSON parseado.
+ * Interface unificada para chamadas ao Gemini — retorna texto bruto ou JSON parseado.
+ *
+ * @param {string} promptUsuario    - Prompt do usuário já montado
+ * @param {string} apiKey           - Chave da API Gemini
+ * @param {string} systemInstruction - System instruction (OCANES)
+ * @param {Object} [opts]           - Opções opcionais
+ * @param {'text'|'json'} [opts.formato='text'] - 'text' retorna string, 'json' retorna objeto
+ * @param {number} [opts.temperatura=0.2]       - Temperatura do LLM
+ * @returns {string|Object|null} Resultado ou null em caso de falha
  */
-function chamarGeminiJSON(promptUsuario, apiKey, systemInstruction) {
+function chamarGemini(promptUsuario, apiKey, systemInstruction, opts) {
+  opts = opts || {};
+  const formato    = opts.formato || 'text';
+  const temperatura = opts.temperatura !== undefined ? opts.temperatura : 0.2;
+
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${CONFIG.MODELO_GEMINI}:generateContent?key=${apiKey}`;
+
+  const generationConfig = { temperature: temperatura };
+  if (formato === 'json') {
+    generationConfig.response_mime_type = 'application/json';
+  }
 
   const payload = {
     system_instruction: { parts: [{ text: systemInstruction }] },
     contents: [{ parts: [{ text: promptUsuario }] }],
-    generationConfig: { temperature: 0.0, response_mime_type: "application/json" }
+    generationConfig: generationConfig
   };
 
   try {
     const json = fetchGeminiWithResilience(url, payload);
     const candidate = json.candidates && json.candidates[0];
-    
+
     if (!candidate || !candidate.content || !candidate.content.parts || candidate.content.parts.length === 0) {
-      console.error(`[ERRO JSON] Candidato inválido.`);
+      console.error('[ERRO] Candidato inválido ou vazio.');
       return null;
     }
-    return JSON.parse(candidate.content.parts[0].text);
+
+    const textoResultado = candidate.content.parts[0].text;
+    return formato === 'json' ? JSON.parse(textoResultado) : textoResultado;
   } catch (e) {
-    console.error(`[ERRO JSON] Falha ao processar: ${e.message}`);
+    console.error(`[ERRO] Falha na chamada Gemini: ${e.message}`);
     return null;
   }
 }
@@ -195,7 +196,8 @@ Slide 1 - Hipertensão Portal: Aumento da pressão no sistema venoso portal (>10
 Consequências: ascite, varizes esofágicas, esplenomegalia.`;
 
   console.log('[TESTE] Enviando prompt de diagnóstico...');
-  const resultado = chamarGeminiAPI(textoTeste, 'TESTE_DIAGNOSTICO', apiKey, SYSTEM_INSTRUCTION_TEORIA);
+  const promptTeste = construirPromptTranscricao(textoTeste, 'TESTE_DIAGNOSTICO');
+  const resultado = chamarGemini(promptTeste, apiKey, SYSTEM_INSTRUCTION_TEORIA);
 
   if (resultado) {
     console.log('[TESTE] Conexão bem-sucedida. Resposta truncada:');

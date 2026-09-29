@@ -48,7 +48,8 @@ function processarNovasTranscricoes() {
       }
 
       const arquivo = listaArquivos[i];
-      const resultado = processarArquivoIndividual(arquivo, apiKey, apiKeyYoutube, tempoInicio, turmaConfig, turmaId);
+      const contexto = { apiKey, apiKeyYoutube, tempoInicio, turmaConfig, turmaId };
+      const resultado = processarArquivoIndividual(arquivo, contexto);
 
       if (resultado === true)        processados++;
       else if (resultado === null)   quarentena++;  // arquivo mal nomeado
@@ -78,14 +79,16 @@ function processarNovasTranscricoes() {
  * Processa um único arquivo de transcrição.
  *
  * @param {GoogleAppsScript.Drive.File} arquivo
- * @param {string} apiKey
- * @param {string} apiKeyYoutube
- * @param {number} tempoInicio
- * @param {Object} turmaConfig - Config da turma (vem do TurmaRouter)
- * @param {string} turmaId    - Sigla da turma ('UNDB' | 'CEUMA')
+ * @param {Object} contexto
+ * @param {string} contexto.apiKey
+ * @param {string} contexto.apiKeyYoutube
+ * @param {number} contexto.tempoInicio
+ * @param {Object} contexto.turmaConfig - Config da turma (vem do TurmaRouter)
+ * @param {string} contexto.turmaId    - Sigla da turma ('UNDB' | 'CEUMA')
  * @returns {true|false|null} true=sucesso, false=falha real, null=arquivo em quarentena (mal nomeado)
  */
-function processarArquivoIndividual(arquivo, apiKey, apiKeyYoutube, tempoInicio, turmaConfig, turmaId) {
+function processarArquivoIndividual(arquivo, contexto) {
+  const { apiKey, apiKeyYoutube, tempoInicio, turmaConfig, turmaId } = contexto;
   const nomeOriginal = arquivo.getName().replace(/\.txt$/i, '');
   const pastaOrigemId = arquivo.getParents().hasNext() ? arquivo.getParents().next().getId() : null;
 
@@ -111,7 +114,8 @@ function processarArquivoIndividual(arquivo, apiKey, apiKeyYoutube, tempoInicio,
 
   const ehPratica = /osce|prática|pratica/i.test(nomeOriginal);
   const promptAplicado = ehPratica ? SYSTEM_INSTRUCTION_OSCE : SYSTEM_INSTRUCTION_TEORIA;
-  const resumoGerado = chamarGeminiAPI(textoBruto, nomeOriginal, apiKey, promptAplicado);
+  const promptUsuario = construirPromptTranscricao(textoBruto, nomeOriginal);
+  const resumoGerado = chamarGemini(promptUsuario, apiKey, promptAplicado);
 
   if (!resumoGerado) {
     console.error(`[FALHA][${turmaId}] API não retornou texto válido para "${nomeOriginal}". ` +
@@ -237,8 +241,8 @@ Resumos prontos em: Drive → Resumos_Prontos/`;
  * @returns {TextOutput} Resposta em formato JSON
  */
 function doPost(e) {
-  console.log("[WEBHOOK] Acionador recebido. Aguardando 5s para sincronização e indexação do Google Drive...");
-  Utilities.sleep(5000); // Pausa defensiva: evita race condition onde o Colab salva o arquivo no Drive e chama o Webhook no mesmo milissegundo antes da API indexar
+  console.log("[WEBHOOK] Acionador recebido. Aguardando sincronização do Google Drive...");
+  Utilities.sleep(CONFIG.PAUSA_WEBHOOK_SYNC_MS);
   
   try {
     processarNovasTranscricoes();
