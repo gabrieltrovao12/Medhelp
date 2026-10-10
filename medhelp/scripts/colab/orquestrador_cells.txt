@@ -243,7 +243,7 @@ logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 logging.getLogger('pypdf').setLevel(logging.ERROR)
 
 AUTORIA = f'© Conteúdo Autoral  •  {MONITOR_NOME}'
-GEMINI_FALLBACK_MODELS = ['gemini-3.5-flash-lite', 'gemini-3.6-flash', 'gemini-2.5-flash', 'gemini-3.5-flash']
+GEMINI_FALLBACK_MODELS = ['gemini-3.5-flash-lite', 'gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-3.8-flash']
 
 # ── Gemini API com Exponential Backoff ──────────────────────
 async def call_gemini(client, contents, system_instruction, max_retries=4, response_schema=None):

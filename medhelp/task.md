@@ -1,6 +1,47 @@
 # Tarefas do Projeto - Medhelp
 
-## FASE ATUAL: Refatoração & Correção PyAV 19.0.0 (`Transcribe.ipynb`) - Concluído & Validado
+## FASE ATUAL: Refatoração Cirúrgica do Orquestrador Híbrido — Resolução Determinística de Offsets e Livros Digitais Multi-Partes (Concluído & Validado)
+- [x] Especificar arquitetura de desacoplamento: LLM extrai páginas brutas e Python resolve offsets e limites físicos.
+- [x] Refatorar Célula 3 (`_pedir_offset`): melhorar UX/instruções para livros digitais de volume único vs livros fatiados em partes (`_parte1`, `_parte2`, `_parte3`).
+- [x] Refatorar Célula 5 (Motor):
+  - [x] Implementar `resolver_arquivo_pdf` para pareamento resiliente de nomes de arquivos.
+  - [x] Implementar `aplicar_offsets_deterministicos` com proteção self-healing contra offsets duplicados e suporte a múltiplos volumes.
+  - [x] Aprimorar `validar_config` com relatórios ricos e alertas acionáveis.
+- [x] Refatorar Célula 6 (`converter_notebooklm_para_json`):
+  - [x] Atualizar `SYSTEM_PROMPT_CONVERSAO` removendo exigência de contas aritméticas pelo Gemini.
+  - [x] Encadear pipeline pós-LLM com resolução determinística de arquivos e offsets + consolidação contígua.
+- [x] Validação laboratorial:
+  - [x] Validar sintaxe AST de todas as células do notebook.
+  - [x] Executar simulação de teste com cenários de borda (livro digital parte 2 com offset negativo, páginas já físicas no leitor, livro com offset positivo).
+- [x] Alinhamento estrito dos modelos Gemini da geração 3.x (`gemini-3.5-flash-lite`, `gemini-3.6-flash`, `gemini-3.5-flash`, `gemini-3.8-flash`) e expurgo definitivo de modelos legados (2.5, 2.0, 1.5).
+- [x] Registrar histórico no `system_log.md`.
+
+
+## FASE ANTERIOR: Curadoria & Fusão de Objetivos de Tutoria — Meningites (Orquestrador Híbrido) - Concluído
+- [x] Mapear os 5 objetivos e identificar sobreposições de páginas e eixos conceituais (Protocolo pp. 8–25 e Harrison Cap. 138).
+- [x] Transcrever e processar o áudio com as instruções de fusão do usuário (sub-objetivos tutoriais e modelo do Orquestrador).
+- [x] Formatar a fusão primária (Objetivos 3 e 4) e alternativa (Objetivos 2, 3 e 4) no padrão estrito de input da Célula 4.
+- [x] Validar offset do Protocolo (+1) e Harrison (0 - Digital).
+- [x] Documentar no `research.md` e registrar no `system_log.md`.
+
+## FASE ANTERIOR: Extrator de Sumário Digital — Microbiologia Tortora 12ª ed. (Concluído & Validado)
+- [x] Refinar `preliminares_ignorar` em `scripts/python/extrair_sumario_digital.py` para ignorar seções pré-textuais editoriais (`iniciais`, `ficha catalográfica`, `ficha técnica`, `sobre os autores`, `sumário detalhado`).
+- [x] Executar a extração no arquivo `Microbiologia Tortora 12. ed.pdf` em `~/Downloads/Livros - Sumário Digital/`.
+- [x] Validar o arquivo gerado `Microbiologia Tortora 12. ed - Sumario_Digital.md` (42 tópicos, 5 partes, 28 capítulos + apêndices, páginas 23 a 962).
+- [x] Registrar a execução e validação no `system_log.md` e `research.md`.
+
+## FASE ANTERIOR: Refatoração do Orquestrador Híbrido (Célula 6.5 & Offsets Digitais) - Concluído & Validado
+- [x] Diagnóstico da falha de offsets para Livros Digitais (`VERIFICAR_OFFSET`) e descompasso da Célula 6.5.
+- [x] Brainstorming iterativo e alinhamento de decisões com o usuário (`medhelp-brainstorming`).
+- [x] Confirmação do Understanding Lock (Decisões 1 a 4 aprovadas).
+- [x] Refatorar Célula 5 (`CorteJSON`, `ObjetivoJSON`, `validar_config`, normalização NFC).
+- [x] Refatorar Célula 6 (`SYSTEM_PROMPT_CONVERSAO` enxuto, remoção de fusão/offsets alucinados, consolidação determinística integrada).
+- [x] Remover Célula 6.5 (Células 16 e 17 de Markdown e Código do subagente obsoleto).
+- [x] Validar sintaxe AST de todas as células do `Orquestrador_Hibrido.ipynb`.
+- [x] Teste laboratorial com o caso real do usuário (Objetivo 01 de PAC).
+- [x] Registrar correções no `system_log.md`.
+
+## FASE ANTERIOR: Refatoração & Correção PyAV 19.0.0 (`Transcribe.ipynb`) - Concluído & Validado
 - [x] Implementar blindagem de dependências na Célula 1 (`"av<19"`).
 - [x] Implementar Hotfix de Self-Healing em tempo de execução na Célula 4 para descartar `metadata_errors` em `av.open`.
 - [x] Corrigir sintaxe e indentação do Guardião de Versão na Célula 0.

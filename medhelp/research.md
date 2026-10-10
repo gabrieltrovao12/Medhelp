@@ -217,4 +217,143 @@
   ```
 - O script processa automaticamente arquivo único ou lote, gerando o arquivo `[Nome] - Sumario_Digital.md` no mesmo diretório de cada PDF.
 
+---
 
+## 10. Diagnóstico Crítico: Erro de Offsets em Livros Digitais (`VERIFICAR_OFFSET`) & Redundância da Célula 6.5
+
+### 10.1 Causa Raiz do Erro `"paginas": "VERIFICAR_OFFSET"` em Livros Digitais
+1. **Natureza dos Livros Digitais vs Impressos:**
+   - Livros extraídos via `extrair_sumario_digital.py` (ou livros ePub/PDF digitais puros como `Histologia Básica_parte2.pdf` e `Robbins - Patologia_parte2.pdf`) têm suas páginas no `Sumario_Digital.md` extraídas diretamente de `doc.get_toc()`.
+   - No PyMuPDF, o campo `page` é **1-based físico do arquivo PDF** (contador do leitor). Logo, o offset é **ZERO** (`offset = 0`), pois a página já é a coordenada exata no arquivo.
+2. **O Roteiro do NotebookLM:**
+   - O NotebookLM v5 emite: `📂 [Seção] | 📄 pp. [XX–YY do leitor]` ou `📄 pp. XX–YY`.
+3. **O Conflito na Célula 6 (`SYSTEM_PROMPT_CONVERSAO`):**
+   - O prompt da Célula 6 instrui: *"Localize o arquivo e o offset na tabela do contexto... Some o offset a CADA número... Se o texto indicar 'VERIFICAR', defina precisa_verificar_offset como true... Se o resultado for <= 0, precisa_verificar_offset = true"*.
+   - Se o livro digital não foi mapeado na Célula 3 (porque o usuário não tem página impressa para digitar no prompt interativo), ele **não existe na `{tabela_offsets}`**.
+   - Diante de um arquivo sem offset mapeado ou com menção `do leitor` / `VERIFICAR`, o Gemini na Célula 6 aciona a flag de segurança `precisa_verificar_offset = True`, convertida em `paginas = "VERIFICAR_OFFSET"` e travando o pipeline na Célula 7 (`validar_config`).
+   - Adicionalmente, detectou-se inconsistência de normalização Unicode NFD (`Histologia Básica` com `\u0301`) vs NFC (`Histologia Básica` com `\u00e1`).
+
+### 10.2 Diagnóstico da Célula 6.5 (Otimização Curatorial Automática)
+1. **Obsoleto por Mudança de Montante:**
+   - O subagente de 6.5 foi desenhado quando o NotebookLM gerava tags `[FOCO]` e `[MENÇÃO]`. Em 25/09/2026, essas tags foram completamente eliminadas do NotebookLM porque o próprio NotebookLM já faz busca curatorial top-down enxuta.
+   - O prompt da 6.5 ainda busca `[MENÇÃO]` para deletar, ficando disfuncional em produção.
+2. **Redundância com Célula 6:**
+   - A Célula 6 já analisa fusão de objetivos complementares e sobreposição de páginas.
+   - A única parte operacional útil de 6.5 é `consolidar_cortes_contiguos(config)` (fusão matemática determinística em Python de páginas adjacentes do mesmo capítulo).
+3. **Solução Arquitetural:**
+   - Incorporar a consolidação determinística diretamente ao final da Célula 6.
+   - Eliminar ou aposentar a Célula 6.5 como etapa separada de LLM, poupando tokens, eliminando latência e acabando com a instabilidade.
+
+### 10.3 Decision Log (Brainstorming Validado)
+- **Decisão 1 (Célula 6.5):** Eliminar a Célula 6.5 como chamada de LLM separada. A consolidação determinística de páginas contíguas (`consolidar_cortes_contiguos`) é migrada para a Célula 6, rodando de forma pura e instantânea em Python antes de salvar o `config.json`.
+- **Decisão 2 (Eliminação do VERIFICAR_OFFSET):** Manter a soma de offset no prompt do Gemini, mas remover completamente o campo `precisa_verificar_offset` e a emissão de `VERIFICAR_OFFSET`. O Gemini retorna sempre `paginas: list[int]` já convertidas. Para livros digitais ou com offset 0, as páginas originais são mantidas sem alteração.
+- **Decisão 3 (Remoção da Fusão entre Objetivos):** Eliminar a regra e o campo de fusão entre objetivos diferentes do prompt da Célula 6 (`SYSTEM_PROMPT_CONVERSAO`). Cada objetivo da tutoria mantém seu próprio PDF exclusivo.
+- **Decisão 4 (Normalização Unicode):** Adicionar `unicodedata.normalize('NFC', ...)` nos nomes de arquivo em Python e na geração da tabela de offsets para blindar contra discrepâncias de acentuação (NFD vs NFC).
+
+### 10.4 Plano de Refatoração no `Orquestrador_Hibrido.ipynb`
+1. **Célula 5 (Motor):**
+   - Atualizar `CorteJSON` (remover `precisa_verificar_offset: bool`).
+   - Atualizar `ObjetivoJSON` (remover `fusao: list[str] | None`).
+   - Normalizar strings com `unicodedata.normalize('NFC', ...)` nas funções utilitárias.
+   - Atualizar `validar_config` para remover guard de `VERIFICAR_OFFSET`.
+2. **Célula 6 (Conversão JSON + Consolidação):**
+   - Refatorar `SYSTEM_PROMPT_CONVERSAO`: eliminar regras de fusão entre objetivos, eliminar regras de `VERIFICAR_OFFSET`, simplificar normas e instruir aplicação direta do offset.
+   - Atualizar `gerar_tabela_offsets`: normalizar nomes com NFC.
+   - Integrar chamada a `consolidar_cortes_contiguos(config)` logo após receber a resposta do Gemini.
+   - Salvar o `config.json` já consolidado.
+3. **Células 16 e 17 (Célula 6.5):**
+   - Remover as células 16 (markdown) e 17 (código do otimizador LLM) da estrutura do notebook JSON.
+
+---
+
+## 11. Extração de Sumário Digital: Microbiologia Tortora 12ª ed.
+
+### 11.1 Estrutura do Livro
+- **Arquivo:** `Microbiologia Tortora 12. ed.pdf` (962 páginas, 168 MB).
+- **Hierarquia no PDF:**
+  - Nível 1: Partes I a V + preliminares (`Iniciais`) e pós-textuais (`Finais`).
+  - Nível 2: Capítulos 1 a 28 (distribuídos nas 5 partes) + Apêndices A a E, Glossário e Índice Remissivo.
+- **Filtro de Ruído Pré-Textual:**
+  - Inclusão de termos editoriais comuns em `preliminares_ignorar`: `"iniciais"`, `"ficha catalográfica"`, `"ficha técnica"`, `"sobre os autores"`, `"sumário detalhado"`.
+  - Permite que o mapa de evidências inicie exatamente no conteúdo pedagógico útil da obra (`Parte I - Fundamentos de microbiologia`, pág. 23).
+- **Arquivo Gerado:**
+  - `Microbiologia Tortora 12. ed - Sumario_Digital.md` gerado na pasta do usuário com 42 tópicos indexados e páginas físicas exatas (1-based), 100% pronto para subida como fonte no NotebookLM.
+
+---
+
+## 12. Curadoria e Fusão de Objetivos de Tutoria: Meningites (Orquestrador Híbrido)
+
+### 12.1 Diagnóstico do Roteiro Bruto do NotebookLM
+- **Fontes Citadas:**
+  1. `Harrisson Medicina interna_recortado_4.pdf` [DIGITAL → Offset 0]:
+     - Cap. 137: Encefalite viral (pp. 2098–2110).
+     - Cap. 138: Meningite bacteriana (pp. 2111–2122) e viral (pp. 2122–2125).
+  2. `PROTOCOLO DE FLUXOS E ROTINAS DAS MENINGITES 2022 (1).pdf` [IMPRESSO → Offset +1]:
+     - Seção 1: pp. 4–5 (Introdução e Manifestações Clínicas).
+     - Seção 3: pp. 5–7 (Definição de Caso Suspeito e Investigação Diagnóstica).
+     - Seção 3: pp. 8–25 (Padrões de Alteração Liquórica e Exames do LCR / Diagnóstico Diferencial).
+     - Seção 3: pp. 6–29 (Notificação, Investigação, Quimioprofilaxia e Medidas de Controle).
+- **Problema de Redundância e Duplicação Identificado:**
+  - O **Objetivo 3** (LCR) e o **Objetivo 4** (Diferencial Meningite vs. Encefalite) citavam **rigorosamente o mesmo intervalo do Protocolo (`pp. 8–25`)** e o mesmo miolo de Meningite Bacteriana do Harrison (`pp. 2111–2122`).
+  - Sem fusão, seriam gerados dois cadernos contendo as mesmas 18 páginas do Protocolo impressas em duplicidade, fragmentando a análise laboratorial e sindrômica.
+
+### 12.2 Diretriz do Usuário (Transcrição do Áudio)
+- *"Faça a fusão de objetivos que têm a mesma coisa... porque os objetivos que têm as mesmas páginas não faz sentido deixar separados, mas claro que sub-objetivos tutoriais. Vamos seguir o modelo do Orquestrador Híbrido, deixando os títulos certinho, todos presentes, mas com o objetivo fundido."*
+
+### 12.3 Estratégia de Fusão e Preservação de Sub-objetivos
+1. **Fusão Primária (Recomendada - Objetivos 3 e 4):**
+   - **Novo Objetivo 03:** *Análise Liquórica e Diagnóstico Diferencial das Infecções do SNC (Meningite vs. Encefalite)*.
+   - Preserva no corpo da pergunta norteadora:
+     - `• Sub-objetivo Tutorial 3: Qual é a importância da análise do líquido cefalorraquidiano (LCR)...?`
+     - `• Sub-objetivo Tutorial 4: Como diferenciar meningite, encefalite e meningoencefalite...?`
+   - Consolidação de Cortes:
+     - Harrison Cap. 137: Encefalite viral (pp. 2098–2110).
+     - Harrison Cap. 138: Meningite bacteriana e viral (pp. 2111–2125).
+     - Protocolo Seção 3: Diagnóstico Diferencial e Padrões de LCR (pp. 8–25).
+2. **Opção Alternativa (Eixo Diagnóstico Completo - Objetivos 2, 3 e 4):**
+   - Agrupa Investigação Clínica/PL (pp. 5–7) + LCR/Diferencial (pp. 8–25), totalizando pp. 5–25 do Protocolo em um único caderno diagnóstico amplo.
+
+---
+
+## 13. Refatoração Cirúrgica do Orquestrador Híbrido: Resolução Determinística de Offsets e Livros Digitais Multi-Partes
+
+### 13.1 Diagnóstico das Falhas e Relato do Usuário
+- **Sintoma Observado:** Durante a execução de tutoria no Google Colab, cortes de livros travam sistematicamente na Célula 7 com mensagens de erro como `página X inválida (≤ 0). Verifique o offset.` ou páginas excedendo o total físico do arquivo, mesmo após o usuário fornecer o offset correto na Célula 3.
+- **Ponto Crítico (Livros Digitais Fatiados em Partes):** Livros digitais com marcadores extraídos (`Sumario_Digital.md`) frequentemente ultrapassam o limite de tamanho e são divididos pelo usuário em 2 ou 3 arquivos (`_parte1.pdf`, `_parte2.pdf`, `_parte3.pdf`). Nesses casos, o roteiro do NotebookLM cita páginas contínuas da obra completa (ex: pp. 480–495), enquanto a Parte 2 inicia fisicamente na página 1 do leitor, exigindo offset negativo (ex: `1 - 451 = -450`).
+- **Atrito Manual:** Diante da falha do orquestrador em aplicar o offset ou de retornar páginas erradas, o usuário era obrigado a abrir e editar o `config.json` manualmente a cada tutoria.
+
+### 13.2 Causas-Raiz Identificadas
+1. **Delegação Indevida de Aritmética para LLM:**
+   - A Célula 6 injetava `{tabela_offsets}` no prompt e exigia que o Gemini calculasse a soma das páginas uma a uma. Modelos generativos são propensos a erros estocásticos em operações com números negativos e listas longas.
+2. **Instrução Ambígua no Prompt OCANES:**
+   - O prompt continha a regra: `"(se o offset for 0 ou o livro for digital, mantenha os números originais sem alteração)"`.
+   - Diante de livros digitais divididos em partes (que possuem offset não-nulo para casar a Parte 2 ou 3), o Gemini interpretava a menção a "livro digital" como ordem expressa para ignorar o offset e retornar os números brutos, estourando o limite de páginas da Parte 2.
+3. **Instrução Indutora a Erro na Célula 3:**
+   - A interface interativa exibia: `"(💡 Se o livro for DIGITAL ou já estiver com páginas do leitor, digite 0)"`. O usuário era induzido a digitar 0 para volumes fatiados de livros digitais, congelando o descompasso de páginas.
+4. **Falta de Pipeline Pós-Processador Determinístico em Python:**
+   - O Python lia a resposta do Gemini e gravava o JSON direto no disco, sem reconciliar os nomes dos arquivos com o diretório real e sem recalcular/validar matematicamente as páginas contra o `offsets.json`.
+
+### 13.3 Arquitetura de Refatoração (V.L.A.E.G. & /refactor)
+1. **Célula 3 (Mapeamento Interativo com UX Robusta):**
+   - Diferenciar claramente no prompt interativo:
+     - *Livro Digital de Volume Único*: onde página do leitor é igual à página citada -> offset `0`.
+     - *Livro Impresso ou Digital Fatiado em Partes (`_parte2`, `_parte3`)*: offset calculado como `pg_leitor - pg_impressa`.
+   - Exibir confirmação matemática imediata na tela: `Impresso X + offset Y = Leitor Z`.
+2. **Célula 5 (Motor Determinístico de Resolução):**
+   - `resolver_arquivo_pdf(arquivo_citado, pasta_livros)`: Resolve variações de nomes via NFC, case-insensitive, extensão `.pdf` ausente e `get_close_matches`.
+   - `aplicar_offsets_deterministicos(config, pasta_livros, offsets_dict)`:
+     - Aplica matematicamente `pg + offset` em Python puro.
+     - **Proteção Self-Healing para Páginas Já Ajustadas**: Se `pg` já for uma página válida do leitor (`1 <= pg <= total_paginas`) e `pg + offset` resultar em valor inválido (`<= 0` ou `> total`), o motor detecta que o roteiro já continha páginas do leitor e não aplica offset duplicado.
+     - **Roteamento Inteligente de Partes**: Se uma página citada pertencer a outra parte de um livro fatiado (ex: citou `parte1` para a página 650, mas a `parte1` tem 450 páginas e a `parte2` cobre 451..916), o motor re-associa o corte à parte correta.
+   - Refinar `validar_config` com mensagens ricas, diagnósticos precisos e eliminação de falhas silenciosas.
+3. **Célula 6 (Conversão com Responsabilidades Isoladas):**
+   - `SYSTEM_PROMPT_CONVERSAO`: O Gemini extrai estritamente o intervalo citado no roteiro como inteiros brutos (Chain of Thought sem matemática de offsets).
+   - Pipeline Python após retorno da API:
+     `config = aplicar_offsets_deterministicos(config, PASTA_LIVROS, OFFSETS)`
+     `config = consolidar_cortes_contiguos(config)`
+     Salva o `config.json` já 100% validado fisicamente.
+4. **Alinhamento Estrito de Modelos Gemini 3.x (Zero Regressão para 2.x):**
+   - Eliminação definitiva de qualquer fallback para modelos legados/obsoletos (`gemini-2.5-flash`, `gemini-2.0-flash`, `gemini-1.5-flash`).
+   - Fixação da cadeia oficial de modelos da geração 3.x:
+     `GEMINI_FALLBACK_MODELS = ['gemini-3.5-flash-lite', 'gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-3.8-flash']`.
+   - O tratamento de 404 em tempo de execução agora atua estritamente saltando de forma transparente entre essas variantes da série 3.x caso alguma quota ou endpoint oscile, mantendo altíssima velocidade e zero degradação de capacidade de raciocínio.

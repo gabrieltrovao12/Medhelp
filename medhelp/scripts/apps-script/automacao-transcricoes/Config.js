@@ -12,7 +12,7 @@ const CONFIG = {
 
   // Cadeia de fallback ordenada: ativada sequencialmente quando o modelo anterior
   // retorna 503/429 após esgotar MAX_RETRIES, ou falha com 404.
-  MODELOS_FALLBACK: ['gemini-3.5-flash-lite', 'gemini-3.6-flash', 'gemini-2.5-flash'],
+  MODELOS_FALLBACK: ['gemini-3.5-flash-lite', 'gemini-3.6-flash', 'gemini-3.8-flash'],
 
   // Trava de segurança: GAS mata scripts após 6 min. Usamos 4.5 min.
   TEMPO_LIMITE_MS:      4.5 * 60 * 1000,

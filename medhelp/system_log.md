@@ -1,5 +1,91 @@
 # Log de Sistema - Medhelp
 
+## 2026-10-10 — Refatoração Cirúrgica do Orquestrador Híbrido: Desacoplamento de Offsets e Suporte Multi-Partes
+- **Arquivos:** [`scripts/colab/Orquestrador_Hibrido.ipynb`](file:///home/vvgfilhos/medhelp/scripts/colab/Orquestrador_Hibrido.ipynb), [`research.md`](file:///home/vvgfilhos/medhelp/research.md), [`task.md`](file:///home/vvgfilhos/medhelp/task.md)
+- **Problema Diagnosticado e Motivação:**
+  - O usuário reportou via áudio que livros travavam constantemente na validação da Célula 7 com mensagens de "verificar offset" (`página ≤ 0`) ou páginas além dos limites do PDF, especialmente para **livros digitais fatiados em partes** (`_parte1.pdf`, `_parte2.pdf`, `_parte3.pdf`), forçando a edição manual constante do `config.json`.
+  - **Causa Raiz 1 (Antipattern de Aritmética por LLM):** O prompt da Célula 6 forçava o Gemini a somar offsets a cada página. LLMs frequentemente falham em somas de listas e operações com números negativos.
+  - **Causa Raiz 2 (Cláusula Confusa no Prompt):** A regra `(se o offset for 0 ou o livro for digital, mantenha os números originais sem alteração)` fazia o Gemini ignorar os offsets informados pelo usuário para livros digitais divididos em partes (que necessitam de offset negativo como `-450`).
+  - **Causa Raiz 3 (Dica Incorreta na Célula 3):** O prompt interativo sugeria digitar `0` para qualquer livro digital, induzindo o usuário a não configurar o offset em partes fatiadas posteriores.
+  - **Causa Raiz 4 (Ausência de Pipeline Pós-LLM):** O Python confiava cegamente nas páginas devolvidas pelo LLM em vez de aplicar o `offsets.json` deterministicamente.
+- **Refatorações Aplicadas:**
+  1. **Célula 3 (Mapeamento Interativo Didático):**
+     - Prompt interativo atualizado com distinção clara entre Livro Digital de Volume Único (offset `0`) e Livros Impressos ou Fatiados em Partes (offset = `leitor - impresso`, ex: `-450`).
+     - Detecção automática de sufixos `parte2`, `parte3` exibindo dicas contextuais.
+     - Confirmação visual imediata do cálculo: `Citado X + offset Y = Leitor Z`.
+  2. **Célula 5 (Motor Determinístico de Resolução & Modelos 3.x):**
+     - Alinhamento rigoroso dos modelos para a geração 3.x (`gemini-3.8-flash`, `gemini-3.5-flash-lite`, `gemini-3.6-flash`, `gemini-3.5-flash`), descartando versões legadas 2.x conforme diretriz do usuário.
+     - Adicionada função `resolver_arquivo_pdf(arquivo_citado, pasta_livros)`: matching tolerante a faltas de `.pdf`, case-insensitive, acentuação e fuzzy matching com `get_close_matches`.
+     - Adicionada função `aplicar_offsets_deterministicos(config, pasta_livros, offsets_dict)`:
+       - Cálculo aritmético puro em Python (`pg + offset`).
+       - Auto-cura de páginas já físicas (evita offset duplicado ou negativo caso o roteiro já cite páginas do leitor).
+       - Auto-cura de inversão acidental de sinal (`pg - offset`).
+       - Roteamento inteligente de partes fatiadas (se uma página citada pertencer a outra parte do livro, re-associa o corte).
+     - Adicionada função `recalibrar_config_offsets()`: recalibragem instantânea em Python com custo zero de API.
+     - Limpeza de código morto: remoção de `_build_cover_index` e estilos ReportLab órfãos (`'secao'`, `'pg_right'`, `'livro'`, `'cap'`, `'sec'`).
+     - Blindagem de layout em `gerar_capa` (margens e spacers calibrados para garantir que a capa caiba rigorosamente em 1 página A4).
+     - Refatorada função `validar_config(config, pasta_livros)` com relatórios analíticos ricos e diagnósticos claros.
+  3. **Célula 6 (Conversão Semântica Isolada):**
+     - Refatorado `SYSTEM_PROMPT_CONVERSAO`: o Gemini agora é estritamente um extrator semântico das páginas citadas brutas (`paginas: list[int]`), sem fardo aritmético.
+     - Pós-processamento encadeado em Python aplicando `aplicar_offsets_deterministicos` e `consolidar_cortes_contiguos` antes de salvar `config.json`.
+  4. **Célula 7 (Preview Enriquecido):**
+     - Exibição de vídeos recomendados no preview pré-geração.
+- **Validação de Laboratório:**
+  - Sintaxe de todas as 22 células do notebook validada com sucesso via AST (`ast.parse`).
+  - Suíte de testes (`test_hybrid_orchestrator.py`) executada cobrindo livros divididos em partes com offset negativo, roteiros com páginas físicas pré-ajustadas, livros com offset positivo, livros digitais íntegros e tolerância a erros tipográficos de nomes de arquivos.
+  - 100% dos testes aprovados.
+
+## 2026-10-05 — Curadoria & Fusão de Objetivos de Tutoria: Meningites (Orquestrador Híbrido)
+- **Contexto e Solicitação:**
+  - O usuário submeteu 5 objetivos extraídos do NotebookLM para o tema **Meningites** com as fontes `Harrisson Medicina interna_recortado_4.pdf` [DIGITAL] e `PROTOCOLO DE FLUXOS E ROTINAS DAS MENINGITES 2022 (1).pdf` [IMPRESSO].
+  - Em áudio, solicitou a fusão de objetivos que cobrem a mesma matéria e possuem as mesmas páginas, mantendo os títulos originais da tutoria explicitamente preservados como sub-objetivos tutoriais e respeitando o padrão estrutural do Orquestrador Híbrido.
+- **Diagnóstico das Páginas e Sobreposição:**
+  - `Objetivo 3` (Análise do LCR) e `Objetivo 4` (Diferencial Meningite vs. Encefalite) apresentavam exatamente as mesmas páginas no Protocolo (`pp. 8–25`) e Harrison Cap. 138 (`pp. 2111–2122`). Sem fusão, 18 páginas do Protocolo seriam duplicadas no corte físico.
+  - O offset do Protocolo impresso foi aferido como `+1` (p. 9 impressa = p. 10 do leitor). O Harrison é digital (offset `0`).
+- **Solução Implementada:**
+  - Estruturação do texto pronto para input na Célula 4 com fusão dos Objetivos 3 e 4 sob o título unificado *"Análise Liquórica e Diagnóstico Diferencial nas Infecções do SNC"*, preservando ambas as perguntas norteadoras como sub-objetivos tutoriais.
+  - Oferecida também a variante com agrupamento de todo o eixo diagnóstico (Objetivos 2, 3 e 4 unificando pp. 5–25 do Protocolo).
+
+## 2026-10-05 — Extrator de Sumário Digital: Microbiologia Tortora 12ª ed. & Refinamento de Preliminares
+- **Arquivos:** [`scripts/python/extrair_sumario_digital.py`](file:///home/vvgfilhos/medhelp/scripts/python/extrair_sumario_digital.py), `~/Downloads/Livros - Sumário Digital/Microbiologia Tortora 12. ed - Sumario_Digital.md`, [`task.md`](file:///home/vvgfilhos/medhelp/task.md)
+- **Contexto e Solicitação:**
+  - O usuário solicitou a geração do sumário digital do livro `Microbiologia Tortora 12. ed.pdf` localizado na pasta `~/Downloads/Livros - Sumário Digital`.
+- **Aprimoramento do Script:**
+  - Expandido o conjunto `preliminares_ignorar` para incluir os nós editoriais pré-textuais presentes em livros médicos como o Tortora: `"iniciais"`, `"ficha catalográfica"`, `"ficha técnica"`, `"sobre os autores"` e `"sumário detalhado"`.
+  - Isso eliminou completamente o ruído de páginas de créditos e fichas pré-capítulo 1, iniciando a estrutura limpa diretamente em `Parte I - Fundamentos de microbiologia` (pág. 23).
+- **Validação de Execução:**
+  - Processado `Microbiologia Tortora 12. ed.pdf` (962 páginas, 168 MB).
+  - Gerado com sucesso o arquivo [`Microbiologia Tortora 12. ed - Sumario_Digital.md`](file:///home/vvgfilhos/Downloads/Livros%20-%20Sumário%20Digital/Microbiologia%20Tortora%2012.%20ed%20-%20Sumario_Digital.md) com **42 tópicos estruturados**:
+    - **Parte I - Fundamentos de microbiologia** (pp. 23–285, Capítulos 1 a 9);
+    - **Parte II - Visão geral do mundo microbiano** (pp. 286–410, Capítulos 10 a 13);
+    - **Parte III - Interação entre micróbio e hospedeiro** (pp. 411–600, Capítulos 14 a 20);
+    - **Parte IV - Microrganismos e doenças humanas** (pp. 601–792, Capítulos 21 a 26);
+    - **Parte V - Microbiologia ambiental e aplicada** (pp. 793–832, Capítulos 27 a 28);
+    - **Finais** (pp. 833–962, Respostas, Apêndices A a E, Glossário e Índice).
+  - Intervalos de páginas calculados com precisão matemática física (1-based), pronto para ingestão no NotebookLM.
+
+## 2026-09-29 — Orquestrador Híbrido: Eliminação da Célula 6.5, Resolução de Offsets Digitais e Normalização NFC
+- **Arquivos:** [`scripts/colab/Orquestrador_Hibrido.ipynb`](file:///home/vvgfilhos/medhelp/scripts/colab/Orquestrador_Hibrido.ipynb), [`research.md`](file:///home/vvgfilhos/medhelp/research.md) e [`task.md`](file:///home/vvgfilhos/medhelp/task.md)
+- **Problema Diagnosticado e Motivação:**
+  1. **Falha de Offsets em Livros Digitais:** Cortes de livros como `Histologia Básica_parte2.pdf` e `Robbins - Patologia_parte2.pdf` retornavam com `"paginas": "VERIFICAR_OFFSET"`, travando a validação na Célula 7. Causa: a instrução do prompt forçava o Gemini a acionar a flag de segurança `precisa_verificar_offset = true` diante de menções de leitor ou arquivos com divergência de acentos Unicode (NFD `Básica` com `\u0301` vs NFC `Básica`).
+  2. **Disfunção e Redundância da Célula 6.5:** O subagente de otimização curatorial (`otimizar_config_com_llm`) dependia das tags `[FOCO]` e `[MENÇÃO]` (removidas do NotebookLM em 25/09/2026) e duplicava a fusão e o escopo da Célula 6. Na prática, não funcionava e adicionava latência desnecessária.
+- **Refatorações Aplicadas:**
+  1. **Eliminação Completa da Célula 6.5 como Chamada de LLM:**
+     - Removidas as células 16 (markdown) e 17 (código com requisição ao Gemini) do notebook.
+     - A função determinística `consolidar_cortes_contiguos` (Python puro) foi movida para ser executada diretamente ao final da Célula 6 logo após a resposta do Gemini, rodando em milissegundos e sem chamadas extras de IA.
+     - Removido código morto em Célula 5 (`Operacao`, `ResultadoOtimizacao`, `resumir_config_para_llm`, `aplicar_operacoes`, `pos_validar_otimizacao`, `otimizar_config_com_llm`).
+  2. **Eliminação do Erro `VERIFICAR_OFFSET`:**
+     - Removido o campo `precisa_verificar_offset` da classe `CorteJSON` e do prompt `SYSTEM_PROMPT_CONVERSAO`. O Gemini sempre retorna `paginas: list[int]` já calculadas com o offset aplicado.
+     - Instrução explícita de que livros digitais ou com offset 0 mantêm as páginas do roteiro intactas.
+  3. **Remoção de Fusão Indesejada entre Objetivos Diferentes:**
+     - Eliminada a regra `Análise de Fusão` do prompt da Célula 6 e o campo `fusao` de `ObjetivoJSON`, garantindo que cada objetivo da tutoria gere seu próprio PDF independente.
+  4. **Normalização Universal Unicode NFC:**
+     - Injetado `unicodedata.normalize('NFC', ...)` na Célula 3 (`_carregar_offsets`, `_salvar_offsets`, `mapear_offsets`), na Célula 5 (`validar_config`) e na Célula 6 (`gerar_tabela_offsets` e pós-processamento).
+     - Na Célula 3, adicionado atalho para digitar diretamente `0` no prompt caso o livro seja digital.
+- **Validação de Laboratório:**
+  - Todas as 22 células do notebook validadas com sucesso via `ast.parse` (0 erros de compilação Python).
+  - Simulação de parsing Pydantic executada com o caso real do usuário (Objetivo 01 de PAC) comprovando validação limpa dos cortes de Histologia e Robbins sem `VERIFICAR_OFFSET`.
+
 ## 2026-09-29 — Pipeline Colab: Hotfix PyAV 19.0.0 (`metadata_errors`) & Blindagem de Versão
 - **Arquivos:** [`scripts/colab/Transcribe.ipynb`](file:///home/vvgfilhos/medhelp/scripts/colab/Transcribe.ipynb), [`research.md`](file:///home/vvgfilhos/medhelp/research.md) e [`task.md`](file:///home/vvgfilhos/medhelp/task.md)
 - **Incidente Observado em Produção:**

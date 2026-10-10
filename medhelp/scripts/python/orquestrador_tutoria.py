@@ -396,7 +396,7 @@ async def call_agent_with_fallback(system_prompt, prompt, response_schema, max_r
     if not api_key:
         raise ValueError("GEMINI_API_KEY não foi encontrada no ambiente ou arquivo .env!")
 
-    models = ['gemini-3.5-flash', 'gemini-2.5-flash', 'gemini-1.5-flash']
+    models = ['gemini-3.5-flash-lite', 'gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-3.8-flash']
     
     for tentativa in range(max_retries):
         model_to_use = models[min(tentativa, len(models)-1)]

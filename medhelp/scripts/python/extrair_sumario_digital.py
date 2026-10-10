@@ -70,7 +70,8 @@ def extrair_sumario_pdf(caminho_pdf: str, output_path: str = None) -> str:
         "revisão científica e tradução", "revisão técnica e tradução",
         "organizadores", "organizadores das edições anteriores", "autores", 
         "colaboradores", "prefácio", "agradecimentos", "material suplementar", 
-        "sumário", "sumário de vídeos e áudios", "gen"
+        "sumário", "sumário detalhado", "sumário de vídeos e áudios", "gen",
+        "iniciais", "ficha catalográfica", "ficha técnica", "sobre os autores"
     }
 
     itens_filtrados = []
