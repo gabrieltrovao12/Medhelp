@@ -357,3 +357,33 @@
    - Fixação da cadeia oficial de modelos da geração 3.x:
      `GEMINI_FALLBACK_MODELS = ['gemini-3.5-flash-lite', 'gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-3.8-flash']`.
    - O tratamento de 404 em tempo de execução agora atua estritamente saltando de forma transparente entre essas variantes da série 3.x caso alguma quota ou endpoint oscile, mantendo altíssima velocidade e zero degradação de capacidade de raciocínio.
+
+---
+
+## 14. Especificação: Publicação dos Flashcards de TFC Clínico e TFC Cirúrgico (NotebookLM) no Portal Medhelp (index.html)
+
+### 14.1 Contexto e Objetivos
+O ecossistema Medhelp disponibilizou cadernos interativos oficiais no Google NotebookLM dedicados aos decks de flashcards de revisão espaçada para **TFC Clínico** e **TFC Cirúrgico**:
+- **TFC Clínico (Flashcards):** `https://notebook.google.com/notebook/f0be34ca-65be-4ad4-9412-3e18888c2c5a`
+- **TFC Cirúrgico (Flashcards):** `https://notebook.google.com/notebook/ee774c54-ae58-499d-9b25-a70ed2c76618`
+
+O objetivo é disponibilizar o acesso direto a esses cadernos no portal de materiais Medhelp (`index.html`), publicado no GitHub Pages (`gabrieltrovao12/Medhelp`), integrando-os ao sistema de categorias e rastreamento de engajamento do GA4.
+
+### 14.2 Ciclo V.L.A.E.G.
+1. **Visão (V):**
+   - Mapeamento de entradas: URLs públicas dos dois cadernos NotebookLM.
+   - Mapeamento de saídas: Elementos de ancoragem `<a class="sub-item" target="_blank">` no bloco de Flashcards (`data-categoria="flashcards"`).
+2. **Link (L):**
+   - Validação da integridade das URLs do NotebookLM.
+   - Compatibilidade total com `analytics.js`, que intercepta cliques em `.sub-item` e dispara o evento GA4 `click_sub_item` com `item_category: 'Flashcards'` e `link_url`.
+3. **Arquitetura (A):**
+   - Inclusão dos itens dentro de `.grid-pastas > .pasta-bloco[data-categoria="flashcards"] > .subpastas-lista`.
+   - Preservação dos placeholders para os futuros decks de tutoria do módulo atual (`Decks do Módulo Febre, Inflamação e Infecção`) e revisões cognitivas (`Revisões Cognitivas Espaçadas`).
+   - Acessibilidade: atributos `aria-label` descritivos e tags semânticas.
+4. **Estilo (E):**
+   - Padrão visual elegante utilizando `.sub-marcador.destaque` (verde musgo ativo com halo translúcido) e `.sub-seta` animada com transição de hover.
+   - Tipografia sóbria sem tags espúrias, alinhada à limpeza visual adotada no portal.
+5. **Gatilho (G):**
+   - Validação automatizada da árvore HTML e dos seletores.
+   - Commit semântico no Git e push para `origin main` para acionamento do deploy no GitHub.
+

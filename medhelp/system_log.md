@@ -1,5 +1,21 @@
 # Log de Sistema - Medhelp
 
+## 2026-10-13 — Publicação dos Flashcards de TFC Clínico e TFC Cirúrgico no Portal Medhelp (index.html)
+- **Arquivos:** [`index.html`](file:///home/vvgfilhos/medhelp/index.html) (raiz do repositório / GitHub Pages), [`research.md`](file:///home/vvgfilhos/medhelp/research.md), [`task.md`](file:///home/vvgfilhos/medhelp/task.md)
+- **Descrição da Alteração:**
+  - Inserção dos links interativos do Google NotebookLM para os cadernos oficiais de flashcards de **TFC Clínico** e **TFC Cirúrgico** dentro do bloco `.pasta-bloco[data-categoria="flashcards"]`.
+  - Links configurados:
+    - **TFC Clínico:** `https://notebook.google.com/notebook/f0be34ca-65be-4ad4-9412-3e18888c2c5a`
+    - **TFC Cirúrgico:** `https://notebook.google.com/notebook/ee774c54-ae58-499d-9b25-a70ed2c76618`
+  - Atualização sutil da `meta description` para incluir "Flashcards" no resumo do portal para indexação e compartilhamento.
+- **Conformidade de UX, Design e Analytics (V.L.A.E.G.):**
+  - **Acessibilidade & Semântica:** Adicionados atributos `aria-label="Acessar Flashcards de TFC Clínico no NotebookLM"` e `target="_blank"` com classes consistentes (`.sub-item`, `.sub-marcador.destaque`, `.sub-nome`, `.sub-seta`).
+  - **Preservação de Layout:** Mantidos os placeholders (`.sub-item-placeholder` com badge "Em breve") para os futuros decks de tutoria do módulo e revisões cognitivas espaçadas.
+  - **Rastreamento GA4 Automático:** O script [`analytics.js`](file:///home/vvgfilhos/medhelp/analytics.js) intercepta as tags `.sub-item` ativas e despacha o evento `click_sub_item` com `item_category: 'Flashcards'` e as respectivas URLs via `transport: 'beacon'`.
+- **Validação de Laboratório:**
+  - Validação da árvore sintática HTML com parser formal (0 tags desbalanceadas, integridade 100%).
+  - Validação da integração e sintaxe JS via Node.js.
+
 ## 2026-10-10 — Refatoração Cirúrgica do Orquestrador Híbrido: Desacoplamento de Offsets e Suporte Multi-Partes
 - **Arquivos:** [`scripts/colab/Orquestrador_Hibrido.ipynb`](file:///home/vvgfilhos/medhelp/scripts/colab/Orquestrador_Hibrido.ipynb), [`research.md`](file:///home/vvgfilhos/medhelp/research.md), [`task.md`](file:///home/vvgfilhos/medhelp/task.md)
 - **Problema Diagnosticado e Motivação:**
@@ -548,4 +564,11 @@
   2. Todos os links internos das subpastas (Problema 01 a 04) foram mantidos preservados.
 - **Validação:** Verificação via script e inspeção visual confirmando que a navegação do card principal agora acessa a pasta macro do módulo.
 
-
+## 2026-10-12 — Geração de Slides de Tutoria: Meningites (Gemini Canvas / scientific-slides)
+- **Arquivos gerados/alterados:** `pessoal/geral/slides_tutoria_meningites.md`, `task.md`
+- **Descrição:** Criação da apresentação completa para discussão tutorial de Meningites (Infectologia/Neurologia). Inicialmente estruturada em 35 slides, foi posteriormente refinada e sintetizada a pedido do usuário em **16 slides de alto impacto**.
+- **Conformidade de Arquitetura e Regras de Negócio:**
+  1. **Cabeçalho Obrigatório:** Preservado o bloco de regras do Gemini Canvas (fundo branco, sem emojis, sem imagens aleatórias).
+  2. **Estrutura Macro:** 1 Capa temática + 5 Subcapas (com texto integral das perguntas sem cortes) + 10 Slides de Conteúdo essenciais (2 por pergunta norteadora).
+  3. **Síntese Textual:** Bullets telegráficos de suporte verbal (6 a 10 palavras), tabelas comparativas consolidadas e mnemônico FACIL preservado.
+- **Validação:** Validação visual e estrutural concluída com sucesso.

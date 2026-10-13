@@ -1,6 +1,21 @@
 # Tarefas do Projeto - Medhelp
 
-## FASE ATUAL: Refatoração Cirúrgica do Orquestrador Híbrido — Resolução Determinística de Offsets e Livros Digitais Multi-Partes (Concluído & Validado)
+## FASE ATUAL: Publicação dos Flashcards de TFC Clínico e TFC Cirúrgico no Portal (index.html) - Concluído & Validado
+- [x] Especificação técnica e ciclo V.L.A.E.G. documentados em `research.md`.
+- [x] Integrar os links dos cadernos NotebookLM de TFC Clínico e Cirúrgico no card Flashcards de `index.html`.
+- [x] Validar compatibilidade semântica, acessibilidade (`aria-label`) e eventos no `analytics.js`.
+- [x] Executar testes laboratoriais de integridade da árvore HTML.
+- [x] Registrar histórico analítico de alterações em `system_log.md`.
+- [x] Criar commit semântico e realizar push para `origin main` (GitHub Pages).
+
+## FASE ANTERIOR: Geração de Slides de Tutoria — Meningites (Gemini Canvas / scientific-slides) - Concluído & Validado (Versão Resumida)
+- [x] Mapear as 5 Perguntas Norteadoras da tutoria de Meningites e decompor em subtemas pedagógicos.
+- [x] Aplicar o protocolo estrito do Gemini Canvas (Medhelp) com cabeçalho de renderização e arquétipos Tipo A a J.
+- [x] Cumprir regras de densidade e síntese de alto impacto (16 slides objetivos, máx 2 H2, bullets telegráficos).
+- [x] Gerar arquivo markdown consolidado `pessoal/geral/slides_tutoria_meningites.md` (16 slides essenciais).
+- [x] Apresentar os slides estruturados ao usuário.
+
+## FASE ANTERIOR: Refatoração Cirúrgica do Orquestrador Híbrido — Resolução Determinística de Offsets e Livros Digitais Multi-Partes (Concluído & Validado)
 - [x] Especificar arquitetura de desacoplamento: LLM extrai páginas brutas e Python resolve offsets e limites físicos.
 - [x] Refatorar Célula 3 (`_pedir_offset`): melhorar UX/instruções para livros digitais de volume único vs livros fatiados em partes (`_parte1`, `_parte2`, `_parte3`).
 - [x] Refatorar Célula 5 (Motor):
