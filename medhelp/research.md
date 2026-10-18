@@ -387,3 +387,32 @@ O objetivo é disponibilizar o acesso direto a esses cadernos no portal de mater
    - Validação automatizada da árvore HTML e dos seletores.
    - Commit semântico no Git e push para `origin main` para acionamento do deploy no GitHub.
 
+---
+
+## 15. Especificação: Atualização do Link do Flashcard de TFC Cirúrgico (NotebookLM) no Portal Medhelp (index.html)
+
+### 15.1 Contexto e Objetivos
+O caderno oficial de flashcards de **TFC Cirúrgico** foi atualizado e publicado sob um novo link curto/compartilhado do Google NotebookLM:
+- **Link Anterior:** `https://notebook.google.com/notebook/ee774c54-ae58-499d-9b25-a70ed2c76618`
+- **Novo Link Atualizado:** `https://notebooklm.link.google/Io3b1Z5d4mqf`
+
+O objetivo é substituir deterministicamente a referência no portal `index.html` mantendo estritamente a conformidade visual, semântica e analítica.
+
+### 15.2 Ciclo V.L.A.E.G.
+1. **Visão (V):**
+   - Entrada: `https://notebooklm.link.google/Io3b1Z5d4mqf`.
+   - Saída: Atributo `href` da tag `<a>` de TFC Cirúrgico no bloco de Flashcards (`.pasta-bloco[data-categoria="flashcards"]`) em `index.html`.
+2. **Link (L):**
+   - Validação de integridade do formato de URL `notebooklm.link.google`.
+   - Compatibilidade preservada com `analytics.js` (evento GA4 `click_sub_item`).
+3. **Arquitetura (A):**
+   - Modificação cirúrgica em `index.html` (alvo físico `/home/vvgfilhos/index.html` via symlink).
+   - Preservação intacta de todas as demais categorias, do TFC Clínico e dos placeholders.
+4. **Estilo (E):**
+   - Manutenção de `.sub-marcador.destaque`, `.sub-nome` ("TFC Cirúrgico") e `.sub-seta` ("→").
+5. **Gatilho (G):**
+   - Verificação da árvore HTML via script Python.
+   - Registro do histórico no `system_log.md`.
+   - Commit e push no Git para GitHub Pages.
+
+

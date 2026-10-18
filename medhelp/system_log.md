@@ -1,5 +1,16 @@
 # Log de Sistema - Medhelp
 
+## 2026-10-18 — Atualização do Link do Flashcard de TFC Cirúrgico no Portal Medhelp (index.html)
+- **Arquivos:** [`index.html`](file:///home/vvgfilhos/medhelp/index.html) (raiz do repositório / GitHub Pages), [`research.md`](file:///home/vvgfilhos/medhelp/research.md), [`task.md`](file:///home/vvgfilhos/medhelp/task.md)
+- **Descrição da Alteração:**
+  - Substituição do link do caderno interativo do Google NotebookLM de **TFC Cirúrgico** dentro do bloco `.pasta-bloco[data-categoria="flashcards"]`.
+  - Link anterior: `https://notebook.google.com/notebook/ee774c54-ae58-499d-9b25-a70ed2c76618`
+  - Novo link: `https://notebooklm.link.google/Io3b1Z5d4mqf`
+- **Conformidade V.L.A.E.G. & Analytics:**
+  - Preservados os atributos semânticos (`aria-label="Acessar Flashcards de TFC Cirúrgico no NotebookLM"` e `target="_blank"`), classes estéticas (`.sub-item`, `.sub-marcador.destaque`, `.sub-nome`, `.sub-seta`) e compatibilidade total com o despacho de eventos GA4 via `analytics.js`.
+- **Validação de Laboratório:**
+  - Análise sintática e verificação de integridade da árvore HTML sem erros de fechamento ou tags desbalanceadas (100% íntegro).
+
 ## 2026-10-13 — Publicação dos Flashcards de TFC Clínico e TFC Cirúrgico no Portal Medhelp (index.html)
 - **Arquivos:** [`index.html`](file:///home/vvgfilhos/medhelp/index.html) (raiz do repositório / GitHub Pages), [`research.md`](file:///home/vvgfilhos/medhelp/research.md), [`task.md`](file:///home/vvgfilhos/medhelp/task.md)
 - **Descrição da Alteração:**

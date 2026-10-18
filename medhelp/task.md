@@ -1,6 +1,13 @@
 # Tarefas do Projeto - Medhelp
 
-## FASE ATUAL: Publicação dos Flashcards de TFC Clínico e TFC Cirúrgico no Portal (index.html) - Concluído & Validado
+## FASE ATUAL: Atualização do Link do Flashcard de TFC Cirúrgico no Portal (index.html) - Concluído & Validado
+- [x] Especificação técnica e ciclo V.L.A.E.G. documentados em `research.md`.
+- [x] Atualizar o link do caderno NotebookLM de TFC Cirúrgico para `https://notebooklm.link.google/Io3b1Z5d4mqf` no bloco Flashcards de `index.html`.
+- [x] Validar compatibilidade semântica, integridade do HTML e consistência com `analytics.js`.
+- [x] Registrar histórico analítico de alterações em `system_log.md`.
+- [x] Criar commit semântico e realizar push para `origin main` (GitHub Pages).
+
+## FASE ANTERIOR: Publicação dos Flashcards de TFC Clínico e TFC Cirúrgico no Portal (index.html) - Concluído & Validado
 - [x] Especificação técnica e ciclo V.L.A.E.G. documentados em `research.md`.
 - [x] Integrar os links dos cadernos NotebookLM de TFC Clínico e Cirúrgico no card Flashcards de `index.html`.
 - [x] Validar compatibilidade semântica, acessibilidade (`aria-label`) e eventos no `analytics.js`.
