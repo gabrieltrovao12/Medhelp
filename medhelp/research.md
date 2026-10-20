@@ -415,4 +415,33 @@ O objetivo é substituir deterministicamente a referência no portal `index.html
    - Registro do histórico no `system_log.md`.
    - Commit e push no Git para GitHub Pages.
 
+---
+
+## 16. Especificação: Unificação do Bloco Flashcards com Lacuna Zero (NotebookLM) no Portal Medhelp (index.html)
+
+### 16.1 Contexto e Objetivos
+O usuário determinou a limpeza de todos os links e nomes previamente presentes no bloco de **Flashcards** (`.pasta-bloco[data-categoria="flashcards"]`), unificando o card para exibir exclusivamente os flashcards do caderno **Lacuna Zero**:
+- **Novo Link Exclusivo:** `https://notebooklm.link.google/aOaQN6cI1NYQ`
+- **Nome do Item:** `Lacuna Zero`
+- **Itens Removidos:** TFC Clínico, TFC Cirúrgico e quaisquer outros itens residuais da lista.
+
+### 16.2 Ciclo V.L.A.E.G.
+1. **Visão (V):**
+   - Entrada: URL `https://notebooklm.link.google/aOaQN6cI1NYQ` com o identificador "Lacuna Zero".
+   - Saída: `.subpastas-lista` do bloco Flashcards contendo unicamente a tag de ancoragem para Lacuna Zero.
+2. **Link (L):**
+   - Formato de link verificado: link direto de compartilhamento público do Google NotebookLM.
+   - Compatibilidade total com `analytics.js` (evento GA4 `click_sub_item` com `item_category: 'Flashcards'`).
+3. **Arquitetura (A):**
+   - Modificação em `index.html` (arquivo físico `/home/vvgfilhos/index.html` mapeado via symlink).
+   - Preservação da integridade estrutural das demais categorias e do contêiner `.pasta-bloco[data-categoria="flashcards"]`.
+4. **Estilo (E):**
+   - Manutenção do padrão visual com `.sub-marcador.destaque`, `.sub-nome` ("Lacuna Zero") e `.sub-seta` ("→").
+   - Acessibilidade: `aria-label="Acessar Flashcards de Lacuna Zero no NotebookLM"`.
+5. **Gatilho (G):**
+   - Validação da árvore sintática HTML com parser formal.
+   - Registro analítico em `system_log.md`.
+   - Commit e deploy via push para `origin main`.
+
+
 

@@ -1,5 +1,19 @@
 # Log de Sistema - Medhelp
 
+## 2026-10-20 — Unificação do Bloco Flashcards em Lacuna Zero no Portal Medhelp (index.html)
+- **Arquivos:** [`index.html`](file:///home/vvgfilhos/medhelp/index.html) (raiz do repositório / GitHub Pages), [`research.md`](file:///home/vvgfilhos/medhelp/research.md), [`task.md`](file:///home/vvgfilhos/medhelp/task.md)
+- **Descrição da Alteração:**
+  - Remoção de todos os links, placeholders e nomes do bloco `.pasta-bloco[data-categoria="flashcards"]` (removidos TFC Clínico, TFC Cirúrgico e placeholders de módulos/revisões).
+  - Inserção exclusiva do caderno interativo de flashcards do **Lacuna Zero** via Google NotebookLM:
+    - **Link Exclusivo:** `https://notebooklm.link.google/aOaQN6cI1NYQ`
+    - **Nome do Item:** `Lacuna Zero`
+    - **Acessibilidade:** `aria-label="Acessar Flashcards de Lacuna Zero no NotebookLM"`
+- **Conformidade V.L.A.E.G. & Analytics:**
+  - Mantida padronização visual com `.sub-item`, `.sub-marcador.destaque`, `.sub-nome` e `.sub-seta`.
+  - Disparo de eventos GA4 via `analytics.js` preservado para a categoria `Flashcards`.
+- **Validação de Laboratório:**
+  - Parser formal de árvore HTML executado com sucesso (0 tags desbalanceadas, 100% de integridade estrutural).
+
 ## 2026-10-18 — Atualização do Link do Flashcard de TFC Cirúrgico no Portal Medhelp (index.html)
 - **Arquivos:** [`index.html`](file:///home/vvgfilhos/medhelp/index.html) (raiz do repositório / GitHub Pages), [`research.md`](file:///home/vvgfilhos/medhelp/research.md), [`task.md`](file:///home/vvgfilhos/medhelp/task.md)
 - **Descrição da Alteração:**
