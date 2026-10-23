@@ -20,7 +20,7 @@ $servers = @{
     "github-mcp-server" = [PSCustomObject]@{
         command = "docker"
         args = @("run", "-i", "--rm", "-e", "GITHUB_PERSONAL_ACCESS_TOKEN", "ghcr.io/github/github-mcp-server")
-        env = [PSCustomObject]@{ GITHUB_PERSONAL_ACCESS_TOKEN = "GITHUB_PAT_REMOVIDO" }
+        env = [PSCustomObject]@{ GITHUB_PERSONAL_ACCESS_TOKEN = $env:GITHUB_PERSONAL_ACCESS_TOKEN }
     }
     "pubmed" = [PSCustomObject]@{
         command = "npx.cmd"

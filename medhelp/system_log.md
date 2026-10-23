@@ -597,3 +597,12 @@
   2. **Estrutura Macro:** 1 Capa temática + 5 Subcapas (com texto integral das perguntas sem cortes) + 10 Slides de Conteúdo essenciais (2 por pergunta norteadora).
   3. **Síntese Textual:** Bullets telegráficos de suporte verbal (6 a 10 palavras), tabelas comparativas consolidadas e mnemônico FACIL preservado.
 - **Validação:** Validação visual e estrutural concluída com sucesso.
+
+## [2026-10-22] Vazamento de credenciais (divulgação responsável via gitleaks)
+- **Origem:** `scripts/sync_mcp.ps1` (linha 23), `.agents/mcp.json` (já limpo), Apps Script (Gemini API key, 2026-07-07 a 2026-08-01).
+- **Comportamento:** GitHub PAT (`ghp_...`) hardcoded e commitado em repositório público; Gemini API key exposta em arquivos Apps Script.
+- **Causa-raiz:** Segredos escritos literalmente em scripts de sincronização/configuração em vez de variáveis de ambiente / PropertiesService.
+- **Correção aplicada:** `sync_mcp.ps1` agora lê `$env:GITHUB_PERSONAL_ACCESS_TOKEN`.
+- **Pendente (manual do usuário):** revogar PAT e Gemini key nos consoles; reescrever histórico (git filter-repo) + force-push; auditar logs.
+- **Nota:** raiz do repositório git é `/home/vvgfilhos` (HOME inteiro, com .bash_history, .claude.json etc. como untracked) — risco de commit acidental de outros segredos.
+- **[2026-10-22] Histórico reescrito (preparado, NÃO enviado):** `git filter-repo --replace-text` em clone espelho (`scratch/mirror`); 132 commits preservados, 0 ocorrências de PAT/Gemini key. Backup pré-reescrita: `scratch/backup-pre-rewrite.bundle`. Falta: force-push e realinhamento do repositório local.
