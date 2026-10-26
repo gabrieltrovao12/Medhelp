@@ -443,5 +443,33 @@ O usuário determinou a limpeza de todos os links e nomes previamente presentes 
    - Registro analítico em `system_log.md`.
    - Commit e deploy via push para `origin main`.
 
+---
+
+## 17. Especificação: Atualização do Bloco Flashcards com Cognitiva (NotebookLM) no Portal Medhelp (index.html)
+
+### 17.1 Contexto e Objetivos
+O usuário solicitou a remoção do caderno de flashcards de **Lacuna Zero** e a inserção do caderno de flashcards de **Cognitiva**:
+- **Novo Link Exclusivo:** `https://notebooklm.link.google/FZj81DdprGxO`
+- **Nome do Item:** `Cognitiva` (Flashcards - Cognitiva)
+- **Item Removido:** `Lacuna Zero` (`https://notebooklm.link.google/aOaQN6cI1NYQ`)
+
+### 17.2 Ciclo V.L.A.E.G.
+1. **Visão (V):**
+   - Entrada: URL pública `https://notebooklm.link.google/FZj81DdprGxO` para flashcards de Cognitiva.
+   - Saída: Item de ancoragem `<a class="sub-item" target="_blank">` dentro de `.subpastas-lista` do bloco Flashcards (`data-categoria="flashcards"`).
+2. **Link (L):**
+   - Validação do link curto do Google NotebookLM.
+   - Compatibilidade com o evento GA4 `click_sub_item` no `analytics.js` (`item_category: 'Flashcards'`, `item_name: 'Cognitiva'`).
+3. **Arquitetura (A):**
+   - Modificação cirúrgica em `index.html` (alvo `/home/vvgfilhos/index.html` via symlink).
+4. **Estilo (E):**
+   - Preservação da estética padrão com `.sub-marcador.destaque`, `.sub-nome` ("Cognitiva") e `.sub-seta` ("→").
+   - Acessibilidade: `aria-label="Acessar Flashcards de Cognitiva no NotebookLM"`.
+5. **Gatilho (G):**
+   - Validação sintática da árvore HTML com parser estrito.
+   - Registro analítico em `system_log.md`.
+   - Deploy via commit e push para `origin main`.
+
+
 
 

@@ -1,6 +1,16 @@
 # Tarefas do Projeto - Medhelp
 
-## FASE ATUAL: Unificação do Bloco Flashcards em Lacuna Zero no Portal (index.html) - Concluído & Validado
+## FASE ATUAL: Atualização do Bloco Flashcards com Cognitiva (NotebookLM) no Portal (index.html) - Concluído & Validado
+- [x] Especificação técnica e ciclo V.L.A.E.G. documentados em `research.md`.
+- [x] Substituir o item Lacuna Zero pelo caderno de flashcards de Cognitiva (`https://notebooklm.link.google/FZj81DdprGxO`) no bloco Flashcards de `index.html`.
+- [x] Validar compatibilidade semântica, acessibilidade (`aria-label`), integridade da árvore HTML e rastreamento em `analytics.js`.
+- [x] Registrar histórico analítico de alterações em `system_log.md`.
+- [x] Criar commit semântico e realizar push para `origin main` (GitHub Pages).
+
+## FASE ANTERIOR: Slides de Tutoria — ITU, Pielonefrite e Sepse (Gemini Canvas) - Concluído (Versão Resumida)
+- [x] Mapear 4 Perguntas Norteadoras e gerar 14 slides objetivos (Tipos A–G) em `pessoal/geral/slides_tutoria_itu_pielonefrite_sepse.md`.
+
+## FASE ANTERIOR: Unificação do Bloco Flashcards em Lacuna Zero no Portal (index.html) - Concluído & Validado
 - [x] Especificação técnica e ciclo V.L.A.E.G. documentados em `research.md`.
 - [x] Substituir o conteúdo de `.subpastas-lista` do bloco Flashcards em `index.html` deixando exclusivamente o link de Lacuna Zero (`https://notebooklm.link.google/aOaQN6cI1NYQ`).
 - [x] Validar compatibilidade semântica, acessibilidade (`aria-label`), integridade da árvore HTML e rastreamento em `analytics.js`.

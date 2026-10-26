@@ -1,5 +1,18 @@
 # Log de Sistema - Medhelp
 
+## 2026-10-26 — Atualização do Bloco Flashcards com Cognitiva no Portal Medhelp (index.html)
+- **Arquivos:** [`index.html`](file:///home/vvgfilhos/medhelp/index.html) (raiz do repositório / GitHub Pages), [`research.md`](file:///home/vvgfilhos/medhelp/research.md), [`task.md`](file:///home/vvgfilhos/medhelp/task.md)
+- **Descrição da Alteração:**
+  - Remoção do link de **Lacuna Zero** e inclusão do caderno interativo de flashcards de **Cognitiva** via Google NotebookLM:
+    - **Link Exclusivo:** `https://notebooklm.link.google/FZj81DdprGxO`
+    - **Nome do Item:** `Cognitiva`
+    - **Acessibilidade:** `aria-label="Acessar Flashcards de Cognitiva no NotebookLM"`
+- **Conformidade V.L.A.E.G. & Analytics:**
+  - Preservados os seletores visuais (`.sub-item`, `.sub-marcador.destaque`, `.sub-nome`, `.sub-seta`) e atributos semânticos (`target="_blank"`).
+  - O rastreador GA4 em [`analytics.js`](file:///home/vvgfilhos/medhelp/analytics.js) captura automaticamente o clique disparando o evento `click_sub_item` com `item_category: 'Flashcards'` e `item_name: 'Cognitiva'`.
+- **Validação de Laboratório:**
+  - Validação da árvore sintática HTML com parser formal estrito (0 tags desbalanceadas, 100% de integridade estrutural).
+
 ## 2026-10-20 — Unificação do Bloco Flashcards em Lacuna Zero no Portal Medhelp (index.html)
 - **Arquivos:** [`index.html`](file:///home/vvgfilhos/medhelp/index.html) (raiz do repositório / GitHub Pages), [`research.md`](file:///home/vvgfilhos/medhelp/research.md), [`task.md`](file:///home/vvgfilhos/medhelp/task.md)
 - **Descrição da Alteração:**
