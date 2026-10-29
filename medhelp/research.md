@@ -470,6 +470,39 @@ O usuário solicitou a remoção do caderno de flashcards de **Lacuna Zero** e a
    - Registro analítico em `system_log.md`.
    - Deploy via commit e push para `origin main`.
 
+---
+
+## 18. Especificação: Transição para o Módulo de Dor e Adição de OSCE em Habilidades Médicas no Portal Medhelp (index.html)
+
+### 18.1 Contexto e Objetivos
+O ecossistema acadêmico do Medhelp iniciou o novo módulo temático: **Módulo de Dor**. O portal de apoio (`index.html`) deve ser atualizado com as novas pastas do Google Drive correspondentes à Tutoria e seus Problemas, além de incorporar o subgrupo **OSCE** na seção de Habilidades Médicas:
+- **Módulo Atual (Badge & Meta):** Transição de "Febre, Inflamação e Infecção" para "Módulo de Dor".
+- **Tutoria (Módulo de Dor - Pasta Principal):** `https://drive.google.com/drive/u/0/folders/1GWZTVYpt8oQ4BLntAtYOxsG9Dg2zYomY`
+- **Problema 01:** `https://drive.google.com/drive/u/0/folders/1c_cHqCV4Q0wF8k5aufQU47ncHMsUwp9k`
+- **Problema 02:** `https://drive.google.com/drive/u/0/folders/1mg8umfNdWWpZTwkYMP9ETA18vgHTlXm2`
+- **Problema 03:** `https://drive.google.com/drive/u/0/folders/1JNGHigprmKrR9hHuS50o7XK7ZobQI1BU`
+- **Habilidades Médicas - Subgrupo OSCE:** `https://drive.google.com/drive/u/0/folders/1hSHeViOuDporaY1QleBkXSJ92mc5bjbI`
+
+### 18.2 Ciclo V.L.A.E.G.
+1. **Visão (V):**
+   - Mapeamento de entradas: URLs das 4 pastas de Tutoria/Problemas e 1 pasta de OSCE.
+   - Mapeamento de saídas: Elementos em `index.html` (meta description, modulo-badge, bloco `.pasta-bloco[data-categoria="tutoria"]` e novo item em `.pasta-bloco[data-categoria="habilidades"]`).
+2. **Link (L):**
+   - Validação da conectividade dos links do Drive.
+   - Garantia de captura e rastreamento automático de cliques pelo `analytics.js` (`item_category: 'Módulo de Dor - Tutoria'` e `'Habilidades Médicas'`).
+3. **Arquitetura (A):**
+   - Modificação em `index.html` (alvo físico `/home/vvgfilhos/index.html` via symlink).
+   - Remoção do Problema 04 legado (o Módulo de Dor inicia com 3 problemas ativos).
+   - Inserção do subitem OSCE no grupo de Habilidades Médicas.
+4. **Estilo (E):**
+   - Preservação da hierarquia visual elegante, micro-animações, badges e ícones (`📚`, `🩺`).
+   - Acessibilidade consistente com atributos `aria-label`.
+5. **Gatilho (G):**
+   - Validação automatizada da árvore HTML com parser estrito.
+   - Registro detalhado em `system_log.md`.
+   - Deploy automático via git commit e push para `origin main` (GitHub Pages).
+
+
 
 
 

@@ -1,6 +1,15 @@
 # Tarefas do Projeto - Medhelp
 
-## FASE ATUAL: Atualização do Bloco Flashcards com Cognitiva (NotebookLM) no Portal (index.html) - Concluído & Validado
+## FASE ATUAL: Transição para o Módulo de Dor e Adição de OSCE em Habilidades Médicas (index.html) - Concluído & Validado
+- [x] Especificação técnica e ciclo V.L.A.E.G. documentados em `research.md`.
+- [x] Atualizar badge do módulo e meta description no `index.html` para "Módulo de Dor".
+- [x] Atualizar bloco Tutoria com a pasta principal do Módulo de Dor e os Problemas 01, 02 e 03.
+- [x] Adicionar o subgrupo OSCE com seu link do Drive no bloco de Habilidades Médicas.
+- [x] Validar compatibilidade semântica, acessibilidade (`aria-label`), integridade da árvore HTML e rastreamento em `analytics.js`.
+- [x] Registrar histórico analítico de alterações em `system_log.md`.
+- [x] Criar commit semântico e realizar push para `origin main` (GitHub Pages).
+
+## FASE ANTERIOR: Atualização do Bloco Flashcards com Cognitiva (NotebookLM) no Portal (index.html) - Concluído & Validado
 - [x] Especificação técnica e ciclo V.L.A.E.G. documentados em `research.md`.
 - [x] Substituir o item Lacuna Zero pelo caderno de flashcards de Cognitiva (`https://notebooklm.link.google/FZj81DdprGxO`) no bloco Flashcards de `index.html`.
 - [x] Validar compatibilidade semântica, acessibilidade (`aria-label`), integridade da árvore HTML e rastreamento em `analytics.js`.

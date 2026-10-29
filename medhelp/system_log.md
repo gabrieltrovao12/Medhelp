@@ -1,5 +1,24 @@
 # Log de Sistema - Medhelp
 
+## 2026-10-29 — Transição para o Módulo de Dor e Adição de OSCE em Habilidades Médicas (index.html)
+- **Arquivos:** [`index.html`](file:///home/vvgfilhos/medhelp/index.html) (raiz do repositório / GitHub Pages), [`research.md`](file:///home/vvgfilhos/medhelp/research.md), [`task.md`](file:///home/vvgfilhos/medhelp/task.md)
+- **Descrição da Alteração:**
+  - Atualização do cabeçalho de módulo no `meta description` e no `.modulo-badge` de "Febre, Inflamação e Infecção" para "Módulo de Dor".
+  - Atualização integral do bloco de Tutoria (`.pasta-bloco[data-categoria="tutoria"]`):
+    - Pasta principal: `https://drive.google.com/drive/u/0/folders/1GWZTVYpt8oQ4BLntAtYOxsG9Dg2zYomY` ("Módulo de Dor - Tutoria").
+    - Problema 01: `https://drive.google.com/drive/u/0/folders/1c_cHqCV4Q0wF8k5aufQU47ncHMsUwp9k`
+    - Problema 02: `https://drive.google.com/drive/u/0/folders/1mg8umfNdWWpZTwkYMP9ETA18vgHTlXm2`
+    - Problema 03: `https://drive.google.com/drive/u/0/folders/1JNGHigprmKrR9hHuS50o7XK7ZobQI1BU`
+    - Removido Problema 04 legado do módulo anterior.
+  - Inclusão do subgrupo **OSCE** na seção de Habilidades Médicas (`.pasta-bloco[data-categoria="habilidades"]`):
+    - Link: `https://drive.google.com/drive/u/0/folders/1hSHeViOuDporaY1QleBkXSJ92mc5bjbI`
+    - Nome: `OSCE`
+- **Conformidade V.L.A.E.G. & Analytics:**
+  - Preservados os estilos padrão (`.sub-item`, `.sub-marcador`, `.sub-nome`, `.sub-seta`) e atributos de acessibilidade (`aria-label`).
+  - O script [`analytics.js`](file:///home/vvgfilhos/medhelp/analytics.js) captura automaticamente as novas subpastas e o cabeçalho via Beacon API do GA4.
+- **Validação de Laboratório:**
+  - Árvore HTML validada com parser formal estrito (0 tags desbalanceadas, 100% de integridade sintática).
+
 ## 2026-10-26 — Atualização do Bloco Flashcards com Cognitiva no Portal Medhelp (index.html)
 - **Arquivos:** [`index.html`](file:///home/vvgfilhos/medhelp/index.html) (raiz do repositório / GitHub Pages), [`research.md`](file:///home/vvgfilhos/medhelp/research.md), [`task.md`](file:///home/vvgfilhos/medhelp/task.md)
 - **Descrição da Alteração:**
