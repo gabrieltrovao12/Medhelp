@@ -1,6 +1,14 @@
 # Tarefas do Projeto - Medhelp
 
-## FASE ATUAL: Transição para o Módulo de Dor e Adição de OSCE em Habilidades Médicas (index.html) - Concluído & Validado
+## FASE ATUAL: Atualização de Conferências e Remoção de TBL no Portal (index.html) - Concluído & Validado
+- [x] Especificação técnica e ciclo V.L.A.E.G. documentados em `research.md`.
+- [x] Atualizar o link da pasta de Conferências para `https://drive.google.com/drive/u/0/folders/12d8cwaMFHzbPBJrMBJK4Mo1xfuLnOE0j` no bloco Outros de `index.html`.
+- [x] Remover o subitem de TBL da lista de subpastas do bloco Outros, ajustando filtros e meta description.
+- [x] Validar compatibilidade semântica, acessibilidade (`aria-label`), integridade da árvore HTML e rastreamento em `analytics.js`.
+- [x] Registrar histórico analítico de alterações em `system_log.md`.
+- [x] Criar commit semântico e realizar push para `origin main` (GitHub Pages).
+
+## FASE ANTERIOR: Transição para o Módulo de Dor e Adição de OSCE em Habilidades Médicas (index.html) - Concluído & Validado
 - [x] Especificação técnica e ciclo V.L.A.E.G. documentados em `research.md`.
 - [x] Atualizar badge do módulo e meta description no `index.html` para "Módulo de Dor".
 - [x] Atualizar bloco Tutoria com a pasta principal do Módulo de Dor e os Problemas 01, 02 e 03.

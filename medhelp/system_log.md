@@ -1,5 +1,17 @@
 # Log de Sistema - Medhelp
 
+## 2026-10-29 — Atualização da Pasta de Conferências e Remoção de TBL (index.html)
+- **Arquivos:** [`index.html`](file:///home/vvgfilhos/medhelp/index.html) (raiz do repositório / GitHub Pages), [`research.md`](file:///home/vvgfilhos/medhelp/research.md), [`task.md`](file:///home/vvgfilhos/medhelp/task.md)
+- **Descrição da Alteração:**
+  - Atualização do link da pasta de **Conferências** para `https://drive.google.com/drive/u/0/folders/12d8cwaMFHzbPBJrMBJK4Mo1xfuLnOE0j` dentro de `.pasta-bloco[data-categoria="outros"]`.
+  - Remoção completa do item e link de **TBL** da lista de subpastas.
+  - Ajuste na legenda do botão de filtro de categoria (`🗂️ Outros (Lacuna & Conf)`) e no `meta description` para refletir a saída de TBL da grade ativa.
+- **Conformidade V.L.A.E.G. & Analytics:**
+  - Preservados os estilos visuais padrão (`.sub-marcador.destaque`, `.sub-nome`, `.sub-seta`) e atributos de acessibilidade (`aria-label`).
+  - O script [`analytics.js`](file:///home/vvgfilhos/medhelp/analytics.js) captura automaticamente o clique em Conferências com `item_category: 'Outros'`.
+- **Validação de Laboratório:**
+  - Validação da árvore sintática HTML com parser formal estrito (0 tags desbalanceadas, 100% íntegro).
+
 ## 2026-10-29 — Transição para o Módulo de Dor e Adição de OSCE em Habilidades Médicas (index.html)
 - **Arquivos:** [`index.html`](file:///home/vvgfilhos/medhelp/index.html) (raiz do repositório / GitHub Pages), [`research.md`](file:///home/vvgfilhos/medhelp/research.md), [`task.md`](file:///home/vvgfilhos/medhelp/task.md)
 - **Descrição da Alteração:**

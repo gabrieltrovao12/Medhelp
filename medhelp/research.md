@@ -502,6 +502,36 @@ O ecossistema acadêmico do Medhelp iniciou o novo módulo temático: **Módulo 
    - Registro detalhado em `system_log.md`.
    - Deploy automático via git commit e push para `origin main` (GitHub Pages).
 
+---
+
+## 19. Especificação: Atualização de Conferências e Remoção de TBL no Portal Medhelp (index.html)
+
+### 19.1 Contexto e Objetivos
+O usuário solicitou a atualização do link da pasta de **Conferências** no Google Drive e a remoção definitiva do item **TBL**:
+- **Novo Link de Conferências:** `https://drive.google.com/drive/u/0/folders/12d8cwaMFHzbPBJrMBJK4Mo1xfuLnOE0j`
+- **Link Anterior de Conferências:** `https://drive.google.com/drive/u/0/folders/1biDGwPJ_efPUeG72ltTvQk7J9bXGa4WW`
+- **Item Removido:** `TBL` (`https://drive.google.com/drive/u/0/folders/1RE5uK-9Y9qGf73gmerAhBCY6T2egSzPD`)
+- **Ajustes de UI:** Atualização da legenda do botão de filtro de categoria (`🗂️ Outros (Lacuna & Conf)`) e do `meta description`.
+
+### 19.2 Ciclo V.L.A.E.G.
+1. **Visão (V):**
+   - Entrada: Nova URL da pasta de Conferências.
+   - Saída: `index.html` com o novo `href` em Conferências e a remoção da tag `<a>` de TBL dentro de `.subpastas-lista` do bloco Outros.
+2. **Link (L):**
+   - Validação do link do Drive.
+   - Rastreamento analítico do evento `click_sub_item` no `analytics.js` para `item_name: 'Conferências'` e `item_category: 'Outros'`.
+3. **Arquitetura (A):**
+   - Modificação cirúrgica em `index.html` (alvo físico `/home/vvgfilhos/index.html` via symlink).
+   - Preservação da tag de ancoragem de Lacuna Zero no bloco Outros.
+4. **Estilo (E):**
+   - Manutenção do padrão visual com `.sub-marcador.destaque`, `.sub-nome` ("Conferências") e `.sub-seta` ("→").
+   - Acessibilidade: `aria-label="Acessar pasta de Conferências no Drive"`.
+5. **Gatilho (G):**
+   - Validação sintática da árvore HTML com parser formal estrito.
+   - Registro analítico em `system_log.md`.
+   - Deploy via commit e push para `origin main`.
+
+
 
 
 
