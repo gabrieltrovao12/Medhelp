@@ -1,5 +1,23 @@
 # Log de Sistema - Medhelp
 
+## 2026-10-31 — Implementação do Guia de Alto Rendimento / Foco Radical em Prova (2 Páginas Reversível)
+- **Arquivos:** [`Prompt.js`](file:///home/vvgfilhos/medhelp/scripts/apps-script/automacao-transcricoes/Prompt.js), [`Config.js`](file:///home/vvgfilhos/medhelp/scripts/apps-script/automacao-transcricoes/Config.js), [`Main.js`](file:///home/vvgfilhos/medhelp/scripts/apps-script/automacao-transcricoes/Main.js), [`research.md`](file:///home/vvgfilhos/medhelp/research.md), [`task.md`](file:///home/vvgfilhos/medhelp/task.md)
+- **Contexto e Motivação:**
+  - O formato legado de resumos teóricos em tópicos densos (5 a 6 páginas em PDF) vinha sofrendo rejeição pelos estudantes, que priorizam estudar pelos slides de aula.
+  - Implementou-se a estratégia "Cavalo de Troia": o resumo agora é um **Guia de Alto Rendimento (Foco Radical em Prova)** de exatamente 2 páginas, projetado para servir como abertura/capa antes dos slides da aula.
+- **Arquitetura de Dupla Camada de Reversão:**
+  - **Camada Git:** Criada e ativada a branch dedicada `teste-guia-alto-rendimento`. A qualquer momento, o usuário pode retornar ao estado anterior com `git checkout main`.
+  - **Camada de Configuração (Feature Flag):** Em `Config.js`, adicionada a chave `MODO_RESUMO: 'GUIA_PROVA'`. Para voltar ao resumo legado de 6 páginas, basta alterar para `'TEORIA_COMPLETA'`.
+- **Engenharia de Prompt (Framework OCANES):**
+  - Prompt clássico preservado em `SYSTEM_INSTRUCTION_TEORIA_LEGADO`.
+  - Novo prompt `SYSTEM_INSTRUCTION_GUIA_PROVA` implementado com teto rígido de 2 páginas:
+    - **Página 1:** Foco Avaliativo & Probabilidade de Cobrança, Modelos de Questão & Pegadinhas do Docente, e Caso Clínico da Aula / Erro Prático.
+    - **Página 2:** Tabela Comparativa / Diagnóstico Diferencial, Tabela de Resolução Rápida (Se/Então), e Armadilhas Fatais (*Conceito A NÃO É Conceito B*).
+  - Marcador de quebra física de página injetado: `<div style="page-break-before: always;"></div>` e `---`.
+- **Validação de Laboratório:**
+  - Simulação realizada com a transcrição real da aula de Dengue (1h 05m), gerando o artefato de teste [`Conferencia_Dengue_Guia_Laboratorio.md`](file:///home/vvgfilhos/medhelp/scratch/Conferencia_Dengue_Guia_Laboratorio.md).
+  - Resultado: Redução de ~65% nos tokens de saída, resposta rápida e enquadramento cirúrgico em 2 páginas.
+
 ## 2026-10-29 — Atualização da Pasta de Conferências e Remoção de TBL (index.html)
 - **Arquivos:** [`index.html`](file:///home/vvgfilhos/medhelp/index.html) (raiz do repositório / GitHub Pages), [`research.md`](file:///home/vvgfilhos/medhelp/research.md), [`task.md`](file:///home/vvgfilhos/medhelp/task.md)
 - **Descrição da Alteração:**
@@ -650,3 +668,16 @@
 - **Pendente (manual do usuário):** revogar PAT e Gemini key nos consoles; reescrever histórico (git filter-repo) + force-push; auditar logs.
 - **Nota:** raiz do repositório git é `/home/vvgfilhos` (HOME inteiro, com .bash_history, .claude.json etc. como untracked) — risco de commit acidental de outros segredos.
 - **[2026-10-22] Histórico reescrito (preparado, NÃO enviado):** `git filter-repo --replace-text` em clone espelho (`scratch/mirror`); 132 commits preservados, 0 ocorrências de PAT/Gemini key. Backup pré-reescrita: `scratch/backup-pre-rewrite.bundle`. Falta: force-push e realinhamento do repositório local.
+
+## 2026-10-30 — Padronização Obrigatória do Sufixo "(resumo)" nos PDFs Premium (`colab_gerador_pdf_premium.ipynb`)
+- **Arquivos alterados:** [`colab_gerador_pdf_premium.ipynb`](file:///home/vvgfilhos/medhelp/scripts/colab/pdf-premium/colab_gerador_pdf_premium.ipynb) (Células 0, 1 e 4)
+- **Descrição:** O usuário solicitou que todo arquivo PDF gerado pelo notebook passe a receber obrigatoriamente o sufixo `(resumo)` ao final de seu nome de arquivo.
+- **Causa Raiz & Correções:**
+  1. **Nomenclatura Direta sem Normalização:** Previamente, o notebook utilizava `pdf_filename = filename.replace(".md", ".pdf")`. Arquivos de entrada sem o sufixo `(resumo)` geravam PDFs sem a chancela canônica do Medhelp.
+  2. **Normalização com Regex Desduplicadora:** Implementada extração do nome-base com remoção defensiva de qualquer ocorrência preexistente de `(resumo)` ao final (`re.sub(r'\s*\([Rr]esumo\)$', '', nome_base, flags=re.IGNORECASE)`), forçando a saída padronizada `f"{nome_limpo} (resumo).pdf"`.
+  3. **Self-Healing FUSE no Arquivamento:** Substituída a chamada `shutil.move` direta pós-geração por `mover_arquivo_com_retry(filepath, arquivo_path)`, garantindo repetição com Exponential Backoff contra travamentos de I/O no Google Drive montado via FUSE.
+  4. **Guardião de Versões:** Timestamp `VERSAO_LOCAL` atualizado na Célula 0.
+- **Validação de Laboratório:**
+  - Validação sintática AST de todas as células de código (`ast.parse`) com 100% de sucesso.
+  - Teste unitário sintético em diretório temporário cobrindo múltiplos formatos de entrada (`Sem sufixo`, `(resumo)`, `(Resumo)`, `(RESUMO)`, `sem espaço`), comprovando terminação unívoca em ` (resumo).pdf` sem duplicações.
+

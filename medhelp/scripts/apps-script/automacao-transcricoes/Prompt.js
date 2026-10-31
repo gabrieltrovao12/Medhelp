@@ -2,7 +2,92 @@
  * Prompt.js
  * Centraliza a instrução de sistema (System Instruction) baseada no framework OCANES.
  */
-const SYSTEM_INSTRUCTION_TEORIA = `**OBJETIVO:**
+// ============================================================================
+// 1. NOVO FORMATO: GUIA DE ALTO RENDIMENTO / FOCO RADICAL EM PROVA (MÁX 2 PÁGS)
+// ============================================================================
+const SYSTEM_INSTRUCTION_GUIA_PROVA = `**OBJETIVO:**
+Sintetizar a transcrição de uma aula médica e seus slides de apoio em um **Guia de Alto Rendimento / Foco Radical em Prova** ultracondensado, rigorosamente dimensionado para ocupar **exatamente até 2 páginas impressas** (ou em PDF). O material é desenhado especificamente como abertura/capa de alta densidade antes dos slides da aula ("Cavalo de Troia"), eliminando resumos textuais prolixos e destacando exclusivamente o que define aprovação em avaliações e condutas clínicas críticas.
+
+**CONTEXTO:**
+A análise baseia-se exclusivamente no cruzamento entre a fala literal do docente e o conteúdo dos slides (caso fornecidos).
+O público-alvo são acadêmicos de medicina e internos que buscam retenção tática rápida, detecção de pegadinhas de bancas e condutas imediatas de emergência e ambulatório, rejeitando parágrafos densos de livro-texto.
+
+**TRANSCRIÇÃO_DA_AULA_EM_TEXTO_BRUTO:**
+\`[COLE AQUI A TRANSCRIÇÃO COMPLETA DA AULA]\`
+
+**CONTEÚDO_DOS_SLIDES_EM_TEXTO:**
+\`[COLE AQUI O CONTEÚDO DOS SLIDES OU UMA DESCRIÇÃO DETALHADA]\`
+
+**PROTOCOLO DE RENDERIZAÇÃO E DENSIDADE MÁXIMA:**
+1. **Teto Físico Rígido de 2 Páginas:** O documento é composto de 2 páginas obrigatórias separadas pelo marcador de quebra \`<div style="page-break-before: always;"></div>\` e \`---\`. É terminantemente proibido ultrapassar esse limite.
+2. **Linguagem Telegráfica e Cirúrgica:** Proibido o uso de introduções, floreios ou parágrafos corridos. Cada linha deve carregar alto valor informacional.
+3. **Cascatas com Seta Inline:** Substitua explicações fisiopatológicas longas por setas inline simples \`->\` (ex: "Permeabilidade vascular aumentada -> Extravasamento plasmático -> Choque hipovolêmico").
+4. **Sem Arte ASCII:** Não utilize caixas desenhadas com caracteres ou blocos de código (\`\`\`). Utilize tabelas Markdown nativas e tópicos limpos.
+
+**AÇÕES:**
+
+1. **Varredura e Hierarquia de Prova (Página 1):** Rastreie a transcrição para identificar os conceitos que o docente expressamente enfatizou, repetiu ou alertou que "vai cair na prova" / "sempre cai em residência". Classifique-os em prioridade ALTA ou MÉDIA na Tabela de Foco Avaliativo.
+2. **Modelos de Cobrança & Pegadinhas do Docente (Página 1):** Extraia como a banca/docente formula as questões: quais termos induzem ao erro, quais valores de corte exatos são cobrados e quais exceções são usadas como pegadinha de alternativa.
+3. **Caso Clínico da Aula & Erro Fatal (Página 1):** Se o professor relatou um caso clínico, óbito investigado ou história de atendimento real, extraia de forma telegráfica: Apresentação -> O erro cometido -> A conduta correta ensinada. Se o professor não trouxe caso clínico real, aplique a Norma de Omissão Dinâmica.
+4. **Tabela Comparativa / Diagnóstico Diferencial (Página 2):** Construa uma tabela comparando lado a lado as patologias, marcadores ou fármacos discutidos na aula (ex: Dengue vs Zika vs Chikungunya; AST vs ALT). As colunas devem focar nos sinais discriminadores decisivos.
+5. **Tabela de Resolução Rápida - Se / Então (Página 2):** Mapeie a árvore de decisão clínica em formato tabular: \`Gatilho Clínico / Achado | Diagnóstico / Grupo de Risco | Conduta Imediata Obrigatória\` (com volumes de hidratação, medicações ou encaminhamentos prescritos em aula).
+6. **Armadilhas Fatais - Conceito A NÃO É Conceito B (Página 2):** Liste de 3 a 5 distinções conceituais onde alunos e profissionais erram na prova ou na emergência (ex: "Leucocitose normal ou alta NÃO descarta dengue grave").
+
+**NORMAS:**
+1. **Contenção Estrita:** Proibido inventar dados ausentes na transcrição. Se uma conduta ou dosagem não foi citada pelo docente, não invente.
+2. **Omissão Dinâmica:** Caso a aula não possua caso clínico relatado, omita a seção do caso clínico sem deixar textos genéricos como "não citado".
+3. **Formatação Imutável:** Entregue exclusivamente o Markdown estipulado na seção SAÍDA, sem saudações ou preâmbulos.
+
+**SAÍDA:**
+Apresentar a saída rigorosamente no formato Markdown abaixo:
+
+## 🎯 PÁGINA 1: O QUE CAI NA PROVA E COMO CAI
+
+### 1. Foco Avaliativo & Probabilidade de Cobrança
+| Prioridade | Conceito-Chave | Como o Docente Enfatizou / Evidência |
+| :---: | :--- | :--- |
+| 🔥 ALTA | **[Conceito 1]** | [Frase curta de contexto sobre a ênfase do professor] |
+| 🔥 ALTA | **[Conceito 2]** | [Frase curta de contexto] |
+| ⚡ MÉDIA | **[Conceito 3]** | [Frase curta de contexto] |
+
+### 2. Modelos de Questão & Pegadinhas de Prova
+- **[Tema / Ponto Crítico 1]:** [Como a questão cobra, alternativa distratora clássica ou casca de banana].
+- **[Tema / Ponto Crítico 2]:** [Como a questão cobra].
+- **[Tema / Ponto Crítico 3]:** [Como a questão cobra].
+
+### 3. Caso Clínico da Aula & Análise de Erro Prático
+> **Apresentação:** [Resumo em 1 linha do paciente apresentado pelo professor]  
+> **Erro Cometido:** [O erro de diagnóstico ou conduta que causou complicação/óbito]  
+> **Conduta Correta:** [O manejo que o professor ensinou que deveria ter sido feito]
+
+<div style="page-break-before: always;"></div>
+---
+
+## 📊 PÁGINA 2: TABELAS & ARMADILHAS CONCEITUAIS PURAS
+
+### 1. Tabela Comparativa / Diagnóstico Diferencial
+| Parâmetro / Critério | [Entidade A] | [Entidade B] | [Entidade C] |
+| :--- | :--- | :--- | :--- |
+| **[Critério 1]** | [Dado objetivo] | [Dado objetivo] | [Dado objetivo] |
+| **[Critério 2]** | [Dado objetivo] | [Dado objetivo] | [Dado objetivo] |
+| **[Critério 3]** | [Dado objetivo] | [Dado objetivo] | [Dado objetivo] |
+
+### 2. Tabela de Resolução Rápida (Se / Então)
+| Gatilho Clínico / Achado | Diagnóstico / Grupo de Risco | Conduta Imediata Obrigatória |
+| :--- | :--- | :--- |
+| [Cenário 1] | [Classificação / Grupo] | [Conduta exata prescrita em aula] |
+| [Cenário 2] | [Classificação / Grupo] | [Conduta exata prescrita em aula] |
+| [Cenário 3] | [Classificação / Grupo] | [Conduta exata prescrita em aula] |
+
+### 3. Armadilhas Fatais (Cascas de Banana)
+- **[Conceito A] NÃO É [Conceito B]:** [Diferenciação precisa que a banca explora para induzir ao erro].
+- **[Conceito C] NÃO É [Conceito D]:** [Diferenciação precisa].
+- **[Conceito E] NÃO É [Conceito F]:** [Diferenciação precisa].`;
+
+// ============================================================================
+// 2. FORMATO LEGADO: RESUMO TEÓRICO COMPLETO EM TÓPICOS (5 A 6 PÁGINAS)
+// ============================================================================
+const SYSTEM_INSTRUCTION_TEORIA_LEGADO = `**OBJETIVO:**
 Realizar a análise cruzada entre a transcrição de uma aula e o material visual de apoio (slides) para sintetizar um relatório de estudo tático, estruturado e otimizado para avaliações acadêmicas na área médica. O design do PDF será de altíssimo padrão (estilo eBook Premium).
 
 **CONTEXTO:**
@@ -93,6 +178,21 @@ Apresentar a saída exclusivamente no formato Markdown abaixo, sem qualquer text
 
 ## 5. Erros Comuns e Armadilhas
 * **[Conceito A] NÃO É [Conceito B]:** [Fator determinante segundo o docente].`;
+
+/**
+ * Seletor inteligente de instrução de sistema teórica.
+ * Respeita a flag CONFIG.MODO_RESUMO ('GUIA_PROVA' ou 'TEORIA_COMPLETA').
+ * @returns {string}
+ */
+function obterSystemInstructionTeoria() {
+  if (typeof CONFIG !== 'undefined' && CONFIG.MODO_RESUMO === 'TEORIA_COMPLETA') {
+    return SYSTEM_INSTRUCTION_TEORIA_LEGADO;
+  }
+  return SYSTEM_INSTRUCTION_GUIA_PROVA;
+}
+
+// Mantém retrocompatibilidade para referências estáticas diretas
+const SYSTEM_INSTRUCTION_TEORIA = obterSystemInstructionTeoria();
 
 const SYSTEM_INSTRUCTION_OSCE = `**OBJETIVO:**
 Sintetize os múltiplos materiais de referência anexados (PDFs, transcrições e imagens) em um roteiro prático, algorítmico e de auto-instrução detalhada sobre o exame clínico abordado. O roteiro deve guiar a execução passo a passo para provas práticas (OSCE) e atendimento real, facilitando a memorização ativa e a visualização mental, e extrair o foco avaliativo.

@@ -531,6 +531,74 @@ O usuário solicitou a atualização do link da pasta de **Conferências** no Go
    - Registro analítico em `system_log.md`.
    - Deploy via commit e push para `origin main`.
 
+---
+
+## 20. Especificação: Padronização Obrigatória do Sufixo "(resumo)" nos PDFs Premium (`colab_gerador_pdf_premium.ipynb`)
+
+### 20.1 Contexto e Diagnóstico
+- **Demanda do Usuário:** No notebook `colab_gerador_pdf_premium.ipynb`, os arquivos `.md` da pasta `Resumos_Prontos` podiam ser convertidos diretamente com `pdf_filename = filename.replace(".md", ".pdf")`. Quando um arquivo vinha sem o sufixo `(resumo)` ou com capitalizações divergentes, o PDF gerado ficava sem a chancela padrão de nomenclatura do Medhelp.
+- **Voz do Usuário (Transcrição e Áudio):** *"Eu quero que todo PDF gerado coloque sempre no final do PDF o parêntese resumo, lá no nome do arquivo."*
+- **Objetivo Determinístico:** Garantir que 100% dos PDFs gerados pelo `colab_gerador_pdf_premium.ipynb` terminem obrigatoriamente com o padrão `[Título Limpo] (resumo).pdf`, eliminando redundâncias (`(resumo) (resumo).pdf`) e normalizando variações de caixa alta/baixa (`(Resumo)`, `(RESUMO)`).
+
+### 20.2 Ciclo V.L.A.E.G.
+1. **Visão (V):**
+   - **Entrada:** Arquivos Markdown (`.md`) da pasta `Resumos_Prontos` (ex: `Hipertensão Arterial.md`, `Semiologia Pulmonar (resumo).md`, `Cardiologia (Resumo).md`).
+   - **Saída:** PDFs gravados em `PDFs_Premium` com o padrão unificado `Nome do Tema (resumo).pdf`.
+   - **Fluxo:** Detecção do arquivo `.md` → Extração da raiz do nome → Sanitização regex para remover qualquer `(resumo)` já existente → Concatenação de `(resumo).pdf` → Verificação de existência prévia no Drive → Renderização WeasyPrint → Arquivamento resiliente.
+2. **Link (L):**
+   - Caminhos resolvidos no Google Drive montado via FUSE (`/content/drive/MyDrive/...`).
+   - Uso de `mover_arquivo_com_retry` para o arquivamento pós-processamento, evitando falhas FUSE.
+3. **Arquitetura (A):**
+   - Modificação da Célula 4 de `scripts/colab/pdf-premium/colab_gerador_pdf_premium.ipynb`.
+   - Utilização de `re.sub(r'\s*\([Rr]esumo\)$', '', nome_base, flags=re.IGNORECASE).strip()` para desduplicação elegante.
+   - Refatoração da chamada `shutil.move` na linha de arquivamento para `mover_arquivo_com_retry(filepath, arquivo_path)`.
+4. **Estilo (E):**
+   - Nomenclatura consistente com a especificação canônica do Medhelp (`(resumo)` em minúsculas com espaço precedente, matching exato com `automacao-transcricoes/Main.js`).
+5. **Gatilho (G):**
+   - Teste de laboratório sintético validando múltiplos formatos de entrada (`Sem sufixo`, `Com (resumo)`, `Com (Resumo)`, `Com (RESUMO)`, `Sem espaço`).
+   - Validação da árvore AST do notebook via Python.
+   - Atualização do Guardião de Versões e registro analítico em `system_log.md`.
+
+---
+
+## 21. Brainstorming & Decision Log: Guia de Alto Rendimento / Foco Radical em Prova (Item 21)
+
+### 21.1 Diagnóstico do Problema & Hipótese Central
+- **Problema Observado:** Os resumos teóricos gerados a partir de transcrições de aulas (formato atual em PDF com 5 a 6 páginas) não estão sendo consumidos pelos alunos. A turma possui forte apego visual aos slides de aula e rejeita textos longos ou listas extensas de tópicos.
+- **Hipótese Solucionadora ("Cavalo de Troia"):** O aluno sempre procurará e abrirá os slides da aula. Ao posicionar um **Guia Ultracondensado de 2 Páginas (Foco Radical em Prova)** como a capa/abertura obrigatória desse PDF de slides, o aluno consome a síntese da aula e o direcionamento de prova imediatamente antes de ver os slides.
+- **Independência de Slides:** A IA não depende de arquivos de slides para produzir o Guia de 2 páginas. Quando a aula não tiver slides, o Guia funciona de forma autônoma e completa.
+
+### 21.2 Decision Log (Brainstorming Validado)
+- **Decisão 1 (Formato do Material):** Adoção do **Guia Visual Ultracondensado (1 a 2 páginas)** em substituição ao resumo teórico denso de 6 páginas.
+  - *Alternativas consideradas:* Deck completo de Flash-Slides Sintéticos 16:9 gerados por IA; Baralhos puros de Flashcards do professor; Resumo tradicional com novo estilo visual.
+  - *Motivo da escolha:* O Guia Ultracondensado consome 65% menos tokens de saída, gera menos risco de timeout no GAS, lê-se em menos de 2 minutos e é versátil para qualquer matéria.
+- **Decisão 2 (Estratégia de Merge e Distribuição):** Geração do Guia de 2 páginas como PDF independente e **merge manual** subsequente com os slides da aula (via iLovePDF ou similar).
+  - *Alternativas consideradas:* Merge automatizado via bibliotecas PDF em Apps Script (rejeitado por alto risco de quebra, limites de memória e dependência de formato dos slides).
+  - *Motivo da escolha:* Mantém a automação leve e robusta, e dá controle total ao usuário sobre slides em PPTX, PDF ou fotos.
+- **Decisão 3 (Abordagem de Conteúdo — Foco Radical em Prova):**
+  - **Página 1 ("Tudo o que pode cair na prova e como cai"):**
+    - Mapeamento hierárquico dos temas por probabilidade de cobrança (com ênfase expressa do professor).
+    - Modelos de questão e pegadinhas de cobrança.
+    - O caso clínico real ou discussão trazida pelo professor em sala (com lição de conduta e erro cometido).
+  - **Página 2 ("Tabelas & Armadilhas Conceituais Puras"):**
+    - Tabelas comparativas/diferenciais (diferença entre patologias, marcadores ou fármacos lado a lado).
+    - Seção de armadilhas conceituais: *"Conceito A NÃO É Conceito B"*.
+  - *Motivo da escolha:* Responde diretamente à dor do estudante de medicina (passar na prova e fixar condutas clínicas cruciais sem perda de tempo).
+- **Decisão 4 (Métricas de Performance e Custos):**
+  - Tokens de entrada: ~14.000 tokens (1h de áudio).
+  - Tokens de saída: ~800 a 1.200 tokens (redução drástica frente aos 3.500 anteriores).
+  - Tempo de resposta da API Gemini: 5 a 8 segundos.
+  - Custo por aula: < R$ 0,01.
+
+### 21.3 Estado Atual do Ciclo
+- **Understanding Lock:** Aprovado e travado pelo usuário em 30/10/2026.
+- **Status:** Pausado a pedido do usuário ("Sim, mas não avance ainda, vou continuar com isso posteriormente").
+- **Próximos Passos (Para Retomada Futura):**
+  1. Desenho da nova `SYSTEM_INSTRUCTION_PROVA` (Framework OCANES) em substituição a `SYSTEM_INSTRUCTION_TEORIA` em `scripts/apps-script/automacao-transcricoes/Prompt.js`.
+  2. Ajuste de formatação e limites no gerador de PDF / Markdown para respeitar o teto físico de 2 páginas.
+  3. Teste em laboratório com a transcrição da aula de Dengue.
+
+
 
 
 

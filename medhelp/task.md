@@ -1,6 +1,35 @@
 # Tarefas do Projeto - Medhelp
 
-## FASE ATUAL: Atualização de Conferências e Remoção de TBL no Portal (index.html) - Concluído & Validado
+## FASE ATUAL: Implementação do Guia de Alto Rendimento / Foco Radical em Prova — Concluído (Em Teste / Reversível)
+- [x] Conduzir entrevista de brainstorming orientada a objetivos (`medhelp-brainstorming`).
+- [x] Análise técnica e econômica de tokens, latência e compatibilidade com aulas sem slides.
+- [x] Apresentação e validação de previews comparativos (Flash-Slides vs Guia Ultracondensado).
+- [x] Definição da estratégia de distribuição: Guia Ultracondensado de 2 Páginas anexado na abertura dos slides da aula ("Cavalo de Troia").
+- [x] Definição do escopo de conteúdo: Foco Radical em Prova (Pág 1: O que cai e como cai + Pág 2: Tabelas e armadilhas puras).
+- [x] Executar e aprovar o Understanding Lock com o usuário.
+- [x] Registrar especificação e Decision Log na Seção 21 de [research.md](file:///home/vvgfilhos/medhelp/research.md).
+- [x] Criar branch de teste segura no Git: `teste-guia-alto-rendimento`.
+- [x] Implementar chave `MODO_RESUMO` em [Config.js](file:///home/vvgfilhos/medhelp/scripts/apps-script/automacao-transcricoes/Config.js) para alternância instantânea entre `'GUIA_PROVA'` e `'TEORIA_COMPLETA'`.
+- [x] Desenhar o novo prompt `SYSTEM_INSTRUCTION_GUIA_PROVA` (Framework OCANES) em [Prompt.js](file:///home/vvgfilhos/medhelp/scripts/apps-script/automacao-transcricoes/Prompt.js), preservando o prompt clássico em `SYSTEM_INSTRUCTION_TEORIA_LEGADO`.
+- [x] Atualizar [Main.js](file:///home/vvgfilhos/medhelp/scripts/apps-script/automacao-transcricoes/Main.js) para despachar via `obterSystemInstructionTeoria()`.
+- [x] Simulação de laboratório executada com dados reais da aula de Dengue, gerando [Conferencia_Dengue_Guia_Laboratorio.md](file:///home/vvgfilhos/medhelp/scratch/Conferencia_Dengue_Guia_Laboratorio.md) com teto estrito de 2 páginas.
+- [x] Registrar log analítico em [system_log.md](file:///home/vvgfilhos/medhelp/system_log.md).
+
+## FASE ANTERIOR: Padronização Obrigatória do Sufixo "(resumo)" nos PDFs Premium (`colab_gerador_pdf_premium.ipynb`) - Concluído & Validado
+- [x] Especificação técnica e ciclo V.L.A.E.G. documentados em `research.md`.
+- [x] Refatorar a Célula 4 de `scripts/colab/pdf-premium/colab_gerador_pdf_premium.ipynb`:
+  - [x] Implementar extração e normalização resiliente de nome (`re.sub` para desduplicar `(resumo)` existente).
+  - [x] Forçar concatenação unívoca de ` (resumo).pdf` no `pdf_filename`.
+  - [x] Substituir chamada `shutil.move` direta por `mover_arquivo_com_retry` com backoff no arquivamento.
+  - [x] Atualizar descrição em markdown na Célula 1 documentando a padronização.
+- [x] Validação de laboratório:
+  - [x] Executar script de teste unitário sintético com casos de borda (arquivos sem sufixo, com sufixo em minúsculas, com sufixo maiúsculo, sem espaço antes dos parênteses).
+  - [x] Validar sintaxe AST do código gerado no notebook `.ipynb`.
+- [x] Atualizar Guardião de Versões (`VERSAO_LOCAL`).
+- [x] Registrar histórico analítico de alterações em `system_log.md`.
+
+
+## FASE ANTERIOR: Atualização de Conferências e Remoção de TBL no Portal (index.html) - Concluído & Validado
 - [x] Especificação técnica e ciclo V.L.A.E.G. documentados em `research.md`.
 - [x] Atualizar o link da pasta de Conferências para `https://drive.google.com/drive/u/0/folders/12d8cwaMFHzbPBJrMBJK4Mo1xfuLnOE0j` no bloco Outros de `index.html`.
 - [x] Remover o subitem de TBL da lista de subpastas do bloco Outros, ajustando filtros e meta description.
