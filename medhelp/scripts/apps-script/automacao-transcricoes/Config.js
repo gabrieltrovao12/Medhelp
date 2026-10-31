@@ -7,11 +7,6 @@
  */
 
 const CONFIG = {
-  // Modo de síntese teórica:
-  // 'GUIA_PROVA'       -> Novo Guia Visual Ultracondensado (máx 2 págs, foco radical em prova)
-  // 'TEORIA_COMPLETA'  -> Resumo Clássico Legado (formato extenso em tópicos de 5-6 págs)
-  MODO_RESUMO:          'GUIA_PROVA',
-
   // Modelo primário do LLM (pinado em versão estável — NÃO usar aliases "-latest")
   MODELO_GEMINI:        'gemini-3.5-flash',
 

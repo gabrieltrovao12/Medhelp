@@ -592,11 +592,40 @@ O usuário solicitou a atualização do link da pasta de **Conferências** no Go
 
 ### 21.3 Estado Atual do Ciclo
 - **Understanding Lock:** Aprovado e travado pelo usuário em 30/10/2026.
-- **Status:** Pausado a pedido do usuário ("Sim, mas não avance ainda, vou continuar com isso posteriormente").
-- **Próximos Passos (Para Retomada Futura):**
-  1. Desenho da nova `SYSTEM_INSTRUCTION_PROVA` (Framework OCANES) em substituição a `SYSTEM_INSTRUCTION_TEORIA` em `scripts/apps-script/automacao-transcricoes/Prompt.js`.
-  2. Ajuste de formatação e limites no gerador de PDF / Markdown para respeitar o teto físico de 2 páginas.
-  3. Teste em laboratório com a transcrição da aula de Dengue.
+- **Status:** Substituído pelo modelo de Resumo Enxuto (Item 22).
+
+---
+
+## 22. Especificação: Refatoração do Prompt de Transcrições para Formato Enxuto (Item 22)
+
+### 22.1 Diagnóstico & Solicitação do Usuário
+- **Feedback:** O usuário rejeitou a divisão rígida em "Página 1 e Página 2" do experimento anterior e solicitou o retorno à estrutura base do resumo clássico com podas severas para torná-lo significativamente mais enxuto e visual.
+- **Diretrizes Exatas do Usuário:**
+  1. **Seção 1:** Substituir "Foco Principal da Aula" por **"1. Assuntos que vão cair na prova"**.
+  2. **Eliminação de Exclusões:** Remover integralmente a seção **"O que NÃO priorizar"**.
+  3. **Resumo Teórico Estruturado:** Focar o texto puramente nos **conceitos-chave** e converter todo o restante (mecanismos, fisiopatologia, parâmetros e diferenciais) em **Tabelas Markdown de fácil leitura**.
+  4. **Conduta Direta:** Remover a seção prolixa de "Correlação clínica" e manter exclusivamente uma seção direta de **"3. Conduta"** (com Conduta Geral e Tabela Se/Então).
+  5. **Eliminação de Armadilhas Acessórias:** Remover integralmente a seção **"Erros Comuns e Armadilhas"**.
+- **Resultado Estrutural:** O resumo reduz-se estritamente a 3 seções magnas de altíssimo rendimento visual.
+
+### 22.2 Ciclo V.L.A.E.G.
+1. **Visão (V):**
+   - Entrada: `TRANSCRIÇÃO_DA_AULA_EM_TEXTO_BRUTO` e `CONTEÚDO_DOS_SLIDES_EM_TEXTO` (opcional).
+   - Saída: Markdown canônico estruturado em apenas 3 blocos:
+     - `## 1. Assuntos que vão cair na prova`
+     - `## 2. Resumo Teórico` (Subtópicos com `- **Conceito-chave:**` + Tabelas Markdown de mecanismos/fisiopatologia)
+     - `## 3. Conduta` (`**Conduta Geral:**` + `### Tabela de Resolução Rápida (Se/Então)`)
+2. **Link (L):**
+   - Invocação da Gemini API em Google Apps Script mantendo total resiliência via `GeminiClient.js` e Exponential Backoff.
+3. **Arquitetura (A):**
+   - `scripts/apps-script/automacao-transcricoes/Prompt.js`: `SYSTEM_INSTRUCTION_TEORIA` reescrito sob o framework OCANES eliminando seções mortas e forçando o modelo mental de "Conceito em 1 linha + Todo o resto em tabela".
+   - `Main.js`: Despacho direto `const promptAplicado = ehPratica ? SYSTEM_INSTRUCTION_OSCE : SYSTEM_INSTRUCTION_TEORIA`.
+   - `Config.js`: Retorno à configuração canônica limpa.
+4. **Estilo (E):**
+   - Altíssima escaneabilidade visual: erradicação de listas intermináveis de sub-bullets aninhados.
+   - Uso de tabelas Markdown limpas, negrito para termos técnicos centrais e setas inline (`->`) para cascatas fisiológicas rápidas dentro de células.
+5. **Gatilho (G):**
+   - Validação sintática local e atualização de `task.md` e `system_log.md`.
 
 
 

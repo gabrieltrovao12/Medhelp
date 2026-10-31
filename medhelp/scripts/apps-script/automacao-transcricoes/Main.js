@@ -113,7 +113,7 @@ function processarArquivoIndividual(arquivo, contexto) {
   }
 
   const ehPratica = /osce|prática|pratica/i.test(nomeOriginal);
-  const promptAplicado = ehPratica ? SYSTEM_INSTRUCTION_OSCE : obterSystemInstructionTeoria();
+  const promptAplicado = ehPratica ? SYSTEM_INSTRUCTION_OSCE : SYSTEM_INSTRUCTION_TEORIA;
   const promptUsuario = construirPromptTranscricao(textoBruto, nomeOriginal);
   const resumoGerado = chamarGemini(promptUsuario, apiKey, promptAplicado);
 

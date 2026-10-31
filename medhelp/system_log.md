@@ -1,5 +1,18 @@
 # Log de Sistema - Medhelp
 
+## 2026-10-31 — Refatoração do Prompt de Transcrições para Formato Enxuto (Conceitos + Tabelas + Conduta)
+- **Arquivos:** [`Prompt.js`](file:///home/vvgfilhos/medhelp/scripts/apps-script/automacao-transcricoes/Prompt.js), [`Config.js`](file:///home/vvgfilhos/medhelp/scripts/apps-script/automacao-transcricoes/Config.js), [`Main.js`](file:///home/vvgfilhos/medhelp/scripts/apps-script/automacao-transcricoes/Main.js), [`research.md`](file:///home/vvgfilhos/medhelp/research.md), [`task.md`](file:///home/vvgfilhos/medhelp/task.md)
+- **Contexto e Motivação:**
+  - Após revisão do usuário, abandonou-se a divisão rígida em "Páginas 1 e 2" e retornou-se à topologia do resumo clássico com podas severas para deixá-lo enxuto e estritamente visual.
+- **Modificações Pontuais Realizadas:**
+  1. **Seção 1:** Título alterado para `## 1. Assuntos que vão cair na prova`.
+  2. **Remoção de "O que NÃO priorizar":** Extirpado completamente da instrução e da saída.
+  3. **Resumo Teórico Focado em Conceitos e Tabelas:** Texto descritivo limitado ao `Conceito-chave` em bullets curtos; todo o desdobramento mecânico/fisiopatológico foi forçado obrigatoriamente para **Tabelas Markdown de fácil leitura**.
+  4. **Seção de Conduta Direta:** Removida a introdução de "Correlação clínica", mantendo a seção `## 3. Conduta` com `Conduta Geral` e a `Tabela de Resolução Rápida (Se/Então)`.
+  5. **Remoção de "Erros Comuns e Armadilhas":** Extirpado completamente da instrução e da saída.
+- **Validação:**
+  - Sintaxe JS validada, compatibilidade garantida com o ecossistema Google Apps Script.
+
 ## 2026-10-31 — Implementação do Guia de Alto Rendimento / Foco Radical em Prova (2 Páginas Reversível)
 - **Arquivos:** [`Prompt.js`](file:///home/vvgfilhos/medhelp/scripts/apps-script/automacao-transcricoes/Prompt.js), [`Config.js`](file:///home/vvgfilhos/medhelp/scripts/apps-script/automacao-transcricoes/Config.js), [`Main.js`](file:///home/vvgfilhos/medhelp/scripts/apps-script/automacao-transcricoes/Main.js), [`research.md`](file:///home/vvgfilhos/medhelp/research.md), [`task.md`](file:///home/vvgfilhos/medhelp/task.md)
 - **Contexto e Motivação:**

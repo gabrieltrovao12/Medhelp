@@ -1,19 +1,16 @@
 # Tarefas do Projeto - Medhelp
 
-## FASE ATUAL: Implementação do Guia de Alto Rendimento / Foco Radical em Prova — Concluído (Em Teste / Reversível)
-- [x] Conduzir entrevista de brainstorming orientada a objetivos (`medhelp-brainstorming`).
-- [x] Análise técnica e econômica de tokens, latência e compatibilidade com aulas sem slides.
-- [x] Apresentação e validação de previews comparativos (Flash-Slides vs Guia Ultracondensado).
-- [x] Definição da estratégia de distribuição: Guia Ultracondensado de 2 Páginas anexado na abertura dos slides da aula ("Cavalo de Troia").
-- [x] Definição do escopo de conteúdo: Foco Radical em Prova (Pág 1: O que cai e como cai + Pág 2: Tabelas e armadilhas puras).
-- [x] Executar e aprovar o Understanding Lock com o usuário.
-- [x] Registrar especificação e Decision Log na Seção 21 de [research.md](file:///home/vvgfilhos/medhelp/research.md).
-- [x] Criar branch de teste segura no Git: `teste-guia-alto-rendimento`.
-- [x] Implementar chave `MODO_RESUMO` em [Config.js](file:///home/vvgfilhos/medhelp/scripts/apps-script/automacao-transcricoes/Config.js) para alternância instantânea entre `'GUIA_PROVA'` e `'TEORIA_COMPLETA'`.
-- [x] Desenhar o novo prompt `SYSTEM_INSTRUCTION_GUIA_PROVA` (Framework OCANES) em [Prompt.js](file:///home/vvgfilhos/medhelp/scripts/apps-script/automacao-transcricoes/Prompt.js), preservando o prompt clássico em `SYSTEM_INSTRUCTION_TEORIA_LEGADO`.
-- [x] Atualizar [Main.js](file:///home/vvgfilhos/medhelp/scripts/apps-script/automacao-transcricoes/Main.js) para despachar via `obterSystemInstructionTeoria()`.
-- [x] Simulação de laboratório executada com dados reais da aula de Dengue, gerando [Conferencia_Dengue_Guia_Laboratorio.md](file:///home/vvgfilhos/medhelp/scratch/Conferencia_Dengue_Guia_Laboratorio.md) com teto estrito de 2 páginas.
-- [x] Registrar log analítico em [system_log.md](file:///home/vvgfilhos/medhelp/system_log.md).
+## FASE ATUAL: Refatoração do Prompt de Resumo Enxuto (Conceitos + Tabelas + Conduta) — Concluído
+- [x] Especificação e ciclo V.L.A.E.G. documentados na Seção 22 de [research.md](file:///home/vvgfilhos/medhelp/research.md).
+- [x] Refatorar [Prompt.js](file:///home/vvgfilhos/medhelp/scripts/apps-script/automacao-transcricoes/Prompt.js) com as diretrizes do usuário:
+  - [x] Substituir título inicial por `## 1. Assuntos que vão cair na prova`.
+  - [x] Remover completamente a seção `2. O que NÃO priorizar`.
+  - [x] No Resumo Teórico, restringir o texto descritivo exclusivamente a `- **Conceito-chave:**` e estruturar todo o restante em **Tabelas Markdown de fácil leitura**.
+  - [x] Substituir "Correlação clínica e conduta" por `## 3. Conduta` direta (`**Conduta Geral:**` + Tabela Se/Então).
+  - [x] Remover completamente a seção `Erros Comuns e Armadilhas`.
+- [x] Atualizar [Main.js](file:///home/vvgfilhos/medhelp/scripts/apps-script/automacao-transcricoes/Main.js) para apontar diretamente para `SYSTEM_INSTRUCTION_TEORIA`.
+- [x] Restaurar [Config.js](file:///home/vvgfilhos/medhelp/scripts/apps-script/automacao-transcricoes/Config.js) removendo flags temporárias.
+- [x] Registrar histórico analítico em [system_log.md](file:///home/vvgfilhos/medhelp/system_log.md).
 
 ## FASE ANTERIOR: Padronização Obrigatória do Sufixo "(resumo)" nos PDFs Premium (`colab_gerador_pdf_premium.ipynb`) - Concluído & Validado
 - [x] Especificação técnica e ciclo V.L.A.E.G. documentados em `research.md`.

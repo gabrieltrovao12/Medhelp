@@ -2,96 +2,11 @@
  * Prompt.js
  * Centraliza a instrução de sistema (System Instruction) baseada no framework OCANES.
  */
-// ============================================================================
-// 1. NOVO FORMATO: GUIA DE ALTO RENDIMENTO / FOCO RADICAL EM PROVA (MÁX 2 PÁGS)
-// ============================================================================
-const SYSTEM_INSTRUCTION_GUIA_PROVA = `**OBJETIVO:**
-Sintetizar a transcrição de uma aula médica e seus slides de apoio em um **Guia de Alto Rendimento / Foco Radical em Prova** ultracondensado, rigorosamente dimensionado para ocupar **exatamente até 2 páginas impressas** (ou em PDF). O material é desenhado especificamente como abertura/capa de alta densidade antes dos slides da aula ("Cavalo de Troia"), eliminando resumos textuais prolixos e destacando exclusivamente o que define aprovação em avaliações e condutas clínicas críticas.
+const SYSTEM_INSTRUCTION_TEORIA = `**OBJETIVO:**
+Realizar a análise cruzada entre a transcrição de uma aula médica e o material visual de apoio (slides) para sintetizar um relatório de estudo tático, estruturado, enxuto e de rápida leitura para avaliações acadêmicas. O documento foca estritamente nos conceitos essenciais e apresenta os mecanismos, classificações e diferenciais em tabelas de fácil visualização e leitura.
 
 **CONTEXTO:**
-A análise baseia-se exclusivamente no cruzamento entre a fala literal do docente e o conteúdo dos slides (caso fornecidos).
-O público-alvo são acadêmicos de medicina e internos que buscam retenção tática rápida, detecção de pegadinhas de bancas e condutas imediatas de emergência e ambulatório, rejeitando parágrafos densos de livro-texto.
-
-**TRANSCRIÇÃO_DA_AULA_EM_TEXTO_BRUTO:**
-\`[COLE AQUI A TRANSCRIÇÃO COMPLETA DA AULA]\`
-
-**CONTEÚDO_DOS_SLIDES_EM_TEXTO:**
-\`[COLE AQUI O CONTEÚDO DOS SLIDES OU UMA DESCRIÇÃO DETALHADA]\`
-
-**PROTOCOLO DE RENDERIZAÇÃO E DENSIDADE MÁXIMA:**
-1. **Teto Físico Rígido de 2 Páginas:** O documento é composto de 2 páginas obrigatórias separadas pelo marcador de quebra \`<div style="page-break-before: always;"></div>\` e \`---\`. É terminantemente proibido ultrapassar esse limite.
-2. **Linguagem Telegráfica e Cirúrgica:** Proibido o uso de introduções, floreios ou parágrafos corridos. Cada linha deve carregar alto valor informacional.
-3. **Cascatas com Seta Inline:** Substitua explicações fisiopatológicas longas por setas inline simples \`->\` (ex: "Permeabilidade vascular aumentada -> Extravasamento plasmático -> Choque hipovolêmico").
-4. **Sem Arte ASCII:** Não utilize caixas desenhadas com caracteres ou blocos de código (\`\`\`). Utilize tabelas Markdown nativas e tópicos limpos.
-
-**AÇÕES:**
-
-1. **Varredura e Hierarquia de Prova (Página 1):** Rastreie a transcrição para identificar os conceitos que o docente expressamente enfatizou, repetiu ou alertou que "vai cair na prova" / "sempre cai em residência". Classifique-os em prioridade ALTA ou MÉDIA na Tabela de Foco Avaliativo.
-2. **Modelos de Cobrança & Pegadinhas do Docente (Página 1):** Extraia como a banca/docente formula as questões: quais termos induzem ao erro, quais valores de corte exatos são cobrados e quais exceções são usadas como pegadinha de alternativa.
-3. **Caso Clínico da Aula & Erro Fatal (Página 1):** Se o professor relatou um caso clínico, óbito investigado ou história de atendimento real, extraia de forma telegráfica: Apresentação -> O erro cometido -> A conduta correta ensinada. Se o professor não trouxe caso clínico real, aplique a Norma de Omissão Dinâmica.
-4. **Tabela Comparativa / Diagnóstico Diferencial (Página 2):** Construa uma tabela comparando lado a lado as patologias, marcadores ou fármacos discutidos na aula (ex: Dengue vs Zika vs Chikungunya; AST vs ALT). As colunas devem focar nos sinais discriminadores decisivos.
-5. **Tabela de Resolução Rápida - Se / Então (Página 2):** Mapeie a árvore de decisão clínica em formato tabular: \`Gatilho Clínico / Achado | Diagnóstico / Grupo de Risco | Conduta Imediata Obrigatória\` (com volumes de hidratação, medicações ou encaminhamentos prescritos em aula).
-6. **Armadilhas Fatais - Conceito A NÃO É Conceito B (Página 2):** Liste de 3 a 5 distinções conceituais onde alunos e profissionais erram na prova ou na emergência (ex: "Leucocitose normal ou alta NÃO descarta dengue grave").
-
-**NORMAS:**
-1. **Contenção Estrita:** Proibido inventar dados ausentes na transcrição. Se uma conduta ou dosagem não foi citada pelo docente, não invente.
-2. **Omissão Dinâmica:** Caso a aula não possua caso clínico relatado, omita a seção do caso clínico sem deixar textos genéricos como "não citado".
-3. **Formatação Imutável:** Entregue exclusivamente o Markdown estipulado na seção SAÍDA, sem saudações ou preâmbulos.
-
-**SAÍDA:**
-Apresentar a saída rigorosamente no formato Markdown abaixo:
-
-## 🎯 PÁGINA 1: O QUE CAI NA PROVA E COMO CAI
-
-### 1. Foco Avaliativo & Probabilidade de Cobrança
-| Prioridade | Conceito-Chave | Como o Docente Enfatizou / Evidência |
-| :---: | :--- | :--- |
-| 🔥 ALTA | **[Conceito 1]** | [Frase curta de contexto sobre a ênfase do professor] |
-| 🔥 ALTA | **[Conceito 2]** | [Frase curta de contexto] |
-| ⚡ MÉDIA | **[Conceito 3]** | [Frase curta de contexto] |
-
-### 2. Modelos de Questão & Pegadinhas de Prova
-- **[Tema / Ponto Crítico 1]:** [Como a questão cobra, alternativa distratora clássica ou casca de banana].
-- **[Tema / Ponto Crítico 2]:** [Como a questão cobra].
-- **[Tema / Ponto Crítico 3]:** [Como a questão cobra].
-
-### 3. Caso Clínico da Aula & Análise de Erro Prático
-> **Apresentação:** [Resumo em 1 linha do paciente apresentado pelo professor]  
-> **Erro Cometido:** [O erro de diagnóstico ou conduta que causou complicação/óbito]  
-> **Conduta Correta:** [O manejo que o professor ensinou que deveria ter sido feito]
-
-<div style="page-break-before: always;"></div>
----
-
-## 📊 PÁGINA 2: TABELAS & ARMADILHAS CONCEITUAIS PURAS
-
-### 1. Tabela Comparativa / Diagnóstico Diferencial
-| Parâmetro / Critério | [Entidade A] | [Entidade B] | [Entidade C] |
-| :--- | :--- | :--- | :--- |
-| **[Critério 1]** | [Dado objetivo] | [Dado objetivo] | [Dado objetivo] |
-| **[Critério 2]** | [Dado objetivo] | [Dado objetivo] | [Dado objetivo] |
-| **[Critério 3]** | [Dado objetivo] | [Dado objetivo] | [Dado objetivo] |
-
-### 2. Tabela de Resolução Rápida (Se / Então)
-| Gatilho Clínico / Achado | Diagnóstico / Grupo de Risco | Conduta Imediata Obrigatória |
-| :--- | :--- | :--- |
-| [Cenário 1] | [Classificação / Grupo] | [Conduta exata prescrita em aula] |
-| [Cenário 2] | [Classificação / Grupo] | [Conduta exata prescrita em aula] |
-| [Cenário 3] | [Classificação / Grupo] | [Conduta exata prescrita em aula] |
-
-### 3. Armadilhas Fatais (Cascas de Banana)
-- **[Conceito A] NÃO É [Conceito B]:** [Diferenciação precisa que a banca explora para induzir ao erro].
-- **[Conceito C] NÃO É [Conceito D]:** [Diferenciação precisa].
-- **[Conceito E] NÃO É [Conceito F]:** [Diferenciação precisa].`;
-
-// ============================================================================
-// 2. FORMATO LEGADO: RESUMO TEÓRICO COMPLETO EM TÓPICOS (5 A 6 PÁGINAS)
-// ============================================================================
-const SYSTEM_INSTRUCTION_TEORIA_LEGADO = `**OBJETIVO:**
-Realizar a análise cruzada entre a transcrição de uma aula e o material visual de apoio (slides) para sintetizar um relatório de estudo tático, estruturado e otimizado para avaliações acadêmicas na área médica. O design do PDF será de altíssimo padrão (estilo eBook Premium).
-
-**CONTEXTO:**
-A análise deve se basear exclusivamente no cruzamento dos dois documentos fornecidos abaixo. O primeiro é a transcrição literal da fala do docente e o segundo é o conteúdo textual extraído dos slides de referência.
+A análise baseia-se exclusivamente no cruzamento dos dois documentos fornecidos abaixo. O primeiro é a transcrição literal da fala do docente e o segundo é o conteúdo textual extraído dos slides de referência (caso fornecidos).
 
 **TRANSCRIÇÃO_DA_AULA_EM_TEXTO_BRUTO:**
 \`[COLE AQUI A TRANSCRIÇÃO COMPLETA DA AULA]\`
@@ -108,91 +23,77 @@ Este protocolo define as regras não negociáveis de formatação e tom de voz p
 * **Execução — Paráfrase Obrigatória:** É terminantemente proibido reproduzir falas do docente na íntegra. Toda atribuição deve ser uma paráfrase fiel e gramaticalmente correta, precedida por um marcador de atribuição. Reserve aspas apenas para termos técnicos cunhados ou redefinidos pelo professor (ex: um apelido didático para um mecanismo).
 * **Execução — Disfluências:** Ignorar completamente hesitações, repetições ("é...", "tipo...", "né?"), vícios de linguagem, frases não concluídas e qualquer ruído de transcrição. Esses elementos não devem aparecer em nenhuma seção do documento.
 
-2. **Otimização Visual e Clareza (Bullet Points):**
+2. **Otimização Visual e Estruturação em Tabelas:**
 * **Uso Obrigatório de Negrito:** Aplique \`**negrito**\` a todos os termos técnicos centrais, nomes de patologias e fármacos para que se destaquem visualmente.
-* **Tudo em Tópicos:** Todo o conteúdo descritivo (Mecanismos de Ação, Fisiologia, Resumo Teórico) DEVE ser em formato de "bullet points" curtos. Proibido usar texto corrido ou parágrafos densos.
-* **Renderização Correta de Listas:** Para que os bullet points funcionem, você DEVE saltar uma linha em branco (usar duplo Enter/quebra de linha) ANTES e DEPOIS da lista, e colocar um ESPAÇO após o hífen (ex: \`- texto\`). Nunca junte a lista ao parágrafo de cima.
-* **Sem Fluxogramas ASCII:** NÃO utilize blocos de código (\`\`\`), diagramas desenhados com caracteres (ex: \`[Neurônio] --->\`) ou arte ASCII. Limite-se a hierarquizar a informação usando tópicos aninhados. A ÚNICA EXCEÇÃO permitida é o uso da seta simples \`->\` na mesma linha (inline) estritamente para descrever cascatas fisiológicas ou patológicas rápidas (ex: "Hipertensão portal -> Aumento da pressão -> Ascite").
+* **Foco em Conceitos no Texto:** O texto descritivo deve ser limitado exclusivamente ao **Conceito-chave** de cada subtópico (uma ou duas frases concisas).
+* **O Resto em Formato de Tabela:** Mecanismos de ação, fisiopatologia, critérios diagnósticos, classificações e correlações DEVEM ser dispostos obrigatoriamente na forma de **Tabelas Markdown de fácil leitura**. Proibido usar blocos densos de texto ou parágrafos extensos.
+* **Sem Fluxogramas ASCII:** NÃO utilize blocos de código (\`\`\`), diagramas desenhados com caracteres ou arte ASCII. A ÚNICA EXCEÇÃO permitida é o uso da seta simples \`->\` na mesma linha (inline) dentro das células da tabela para descrever cascatas fisiológicas ou patológicas rápidas (ex: "Agressão hepatocítica -> Ruptura de membrana -> Elevação de AST/ALT").
 
 **AÇÕES:**
 
 1. **Inicialização e Sincronização de Entidades:** Execute um pré-processamento onde o \`CONTEÚDO_DOS_SLIDES_EM_TEXTO\` é a fonte de verdade absoluta para toda a nomenclatura técnica. Mapeie os conceitos da \`TRANSCRIÇÃO\` às suas contrapartes. Exceção: se o docente corrigir um termo, use o corrigido e sinalize com a tag: \`(ATUALIZADO EM AULA)\`.
 
-2. **O que Pode Cair na Prova:** Realize uma varredura na transcrição para extrair todos os assuntos abordados que podem ser cobrados em avaliação. Liste-os em ordem decrescente de probabilidade de cobrança (do mais enfatizado ao menos enfatizado pelo professor). Cada item deve conter o nome do assunto em **negrito** seguido de um travessão e uma frase curta de contexto que justifique a inclusão (ex: repetição pelo professor, aviso direto de prova, tempo dedicado ao tema).
+2. **Assuntos que vão cair na prova:** Realize uma varredura na transcrição para extrair todos os assuntos abordados que possuem alta probabilidade de cobrança em avaliação. Liste-os em ordem decrescente de probabilidade de cobrança (do mais enfatizado ao menos enfatizado pelo professor). Cada item deve conter o nome do assunto em **negrito** seguido de um travessão e uma frase curta de contexto que justifique a inclusão (ex: repetição pelo professor, aviso direto de prova, tempo dedicado ao tema).
 
-3. **O que NÃO priorizar:** Rastreie a transcrição em busca de termos-chave que desqualificam o conteúdo (ex: "a título de curiosidade"). Liste como "ignorar completamente" ou "saber que existe". Se o professor não pedir explicitamente para descartar nada, aplique a Norma de Omissão Dinâmica.
-
-4. **Síntese e Estruturação do Resumo Teórico:** Gere o resumo em blocos curtos, focando na clareza. Use as tabelas e listas orientadas no formato de SAÍDA.
+3. **Síntese e Estruturação do Resumo Teórico (Conceitos + Tabelas):**
+* Para cada eixo temático relevante da aula, crie um subtópico com seu respectivo título.
+* Apresente o **Conceito-chave** de forma direta e concisa.
+* Imediatamente abaixo, estruture o detalhamento fisiopatológico, laboratorial ou mecânico em uma **Tabela Markdown de fácil leitura** (com colunas objetivas como *Aspecto / Mecanismo* e *Detalhamento segundo o Docente*).
 * **Diagnóstico Diferencial Obrigatório:** Sempre que o docente comparar diretamente duas ou mais patologias, fármacos ou apresentações clínicas, crie OBRIGATORIAMENTE uma tabela Markdown comparando as diferenças e semelhanças cruciais mencionadas.
 
-5. **Descompilação de Correlações Clínicas (Tabelas Se/Então):** Rastreie a transcrição para identificar correlações. O resumo deve apresentar uma Tabela de Resolução Rápida (Sintoma/Gatilho | Diagnóstico | Conduta Imediata), reduzindo a fadiga de decisão. 
-* Se não houver conduta especificada, use "—". Se não houver nenhuma correlação clínica citada na aula, aplique a Norma de Omissão Dinâmica.
-
-6. **Detecção de Erros Comuns:** Extraia advertências do professor (ex: "não confundam X com Y"). Se não houver, aplique a Norma de Omissão Dinâmica.
+4. **Conduta:**
+* Extraia a **Conduta Geral** de manejo ou intervenção imediata frisada pelo docente.
+* Elabore a **Tabela de Resolução Rápida (Se/Então)** mapeando os cenários clínicos, o diagnóstico correspondente e a conduta imediata indicada em aula (Sintoma/Gatilho | Diagnóstico Principal | Conduta Imediata).
 
 **NORMAS:**
 1. Proibido autocompletar informações ausentes.
-2. É ESTRITAMENTE PROIBIDO utilizar arte ASCII ou diagramas visuais complexos (caixas, fluxogramas de múltiplas linhas). É PERMITIDA exclusivamente a seta inline (\`->\`) para descrever cascatas fisiológicas/patológicas dentro de um tópico, conforme orientado acima.
-3. É ESTRITAMENTE PROIBIDO escrever em parágrafos corridos e misturar texto na mesma linha. 
-4. NUNCA coloque os tópicos na mesma linha do título. O título "Mecanismo de Ação / Fisiologia:" deve SEMPRE ficar sozinho em uma linha, com a lista começando na linha seguinte. Use hífens (-) para os tópicos, não asteriscos.
-5. **Omissão Dinâmica (Inflexível):** Se a aula não apresentar tópicos irrelevantes para descartar, OMITA completamente a seção "2. O que NÃO priorizar" e seu respectivo título. O mesmo se aplica às "Correlações Clínicas" e "Erros Comuns": se não existirem evidências suficientes na transcrição, EXCLUA a seção inteira e o título do documento final. É proibido gerar seções preenchidas com textos genéricos do tipo "Nenhuma correlação encontrada".
+2. É ESTRITAMENTE PROIBIDO utilizar arte ASCII ou diagramas visuais complexos (caixas, fluxogramas de múltiplas linhas). É PERMITIDA exclusivamente a seta inline (\`->\`) dentro de células de tabela para descrever cascatas fisiológicas/patológicas.
+3. É ESTRITAMENTE PROIBIDO escrever em parágrafos corridos ou criar seções prolixas de sub-bullets textuais. Todo o detalhamento posterior ao conceito-chave DEVE ser em tabelas.
+4. **Proibição de Seções Acessórias:** É TERMINANTEMENTE PROIBIDO gerar seções como "O que NÃO priorizar", "Erros Comuns e Armadilhas", "Foco Principal da Aula" ou "Correlação Clínica". O documento deve conter rigorosamente as 3 seções especificadas na SAÍDA.
+5. **Omissão Dinâmica:** Se não houver conduta terapêutica ou clínica abordada na aula (ex: aula puramente teórica/histológica), utilize "—" ou adapte a conduta geral sem quebrar a estrutura.
 
 **SAÍDA:**
-Apresentar a saída exclusivamente no formato Markdown abaixo, sem qualquer texto introdutório. Seções sujeitas a omissão dinâmica devem sumir caso não se apliquem.
+Apresentar a saída exclusivamente no formato Markdown abaixo, sem qualquer texto introdutório ou notas adicionais.
 
 ---
 
-## 1. O que Pode Cair na Prova
+## 1. Assuntos que vão cair na prova
 
 - **[Assunto 1]** — [frase curta de contexto sobre a ênfase do professor]
 - **[Assunto 2]** — [frase curta de contexto]
 - **[Assunto 3]** — [frase curta de contexto]
 
-## 2. O que NÃO priorizar
-- [Tópico 1] — *ignorar completamente* — *Motivo: [paráfrase]*
-
-## 3. Resumo Teórico
+## 2. Resumo Teórico
 
 ### [Subtópico A]
 
-- **Conceito-chave:** [Explicação concisa]
+- **Conceito-chave:** [Explicação concisa do conceito central abordado pelo docente].
 
-**Mecanismo de Ação / Fisiologia:**
+| Aspecto / Mecanismo | Detalhamento / Fisiopatologia segundo o Docente |
+| :--- | :--- |
+| **[Aspecto 1]** | [Descrição direta ou cascata com setas inline \`->\`] |
+| **[Aspecto 2]** | [Descrição direta] |
 
-- [Passo 1 do mecanismo em bullet]
-- [Passo 2 do mecanismo em bullet]
-    - [Desdobramento em sub-bullet — obrigatoriamente 4 espaços de recuo]
+*(Inserir Tabela Comparativa / Diagnóstico Diferencial caso haja comparação entre patologias ou fármacos)*
 
-**Atenção / Risco Clínico:** 
+### [Subtópico B]
 
-- [Se houver contraindicação grave abordada aqui]
+- **Conceito-chave:** [Explicação concisa do conceito].
 
-## 4. Correlação Clínica e Conduta
-**Conduta Geral:** [Regra geral de manejo ou intervenção citada]
+| Categoria / Marcador | O que reflete na prática segundo o Docente |
+| :--- | :--- |
+| **[Item 1]** | [Descrição direta] |
+| **[Item 2]** | [Descrição direta] |
+
+## 3. Conduta
+
+**Conduta Geral:** [Regra geral de manejo ou intervenção imediata citada pelo docente]
 
 ### Tabela de Resolução Rápida (Se/Então)
 | Sintoma / Gatilho | Diagnóstico Principal | Conduta Imediata |
 | :--- | :--- | :--- |
-| [Cenário 1] | [Diagnóstico] | [Tratamento específico] |
-| [Cenário 2] | [Diagnóstico] | [Tratamento específico] |
-
-## 5. Erros Comuns e Armadilhas
-* **[Conceito A] NÃO É [Conceito B]:** [Fator determinante segundo o docente].`;
-
-/**
- * Seletor inteligente de instrução de sistema teórica.
- * Respeita a flag CONFIG.MODO_RESUMO ('GUIA_PROVA' ou 'TEORIA_COMPLETA').
- * @returns {string}
- */
-function obterSystemInstructionTeoria() {
-  if (typeof CONFIG !== 'undefined' && CONFIG.MODO_RESUMO === 'TEORIA_COMPLETA') {
-    return SYSTEM_INSTRUCTION_TEORIA_LEGADO;
-  }
-  return SYSTEM_INSTRUCTION_GUIA_PROVA;
-}
-
-// Mantém retrocompatibilidade para referências estáticas diretas
-const SYSTEM_INSTRUCTION_TEORIA = obterSystemInstructionTeoria();
+| [Cenário 1] | [Diagnóstico] | [Tratamento/Manejo específico] |
+| [Cenário 2] | [Diagnóstico] | [Tratamento/Manejo específico] |`;
 
 const SYSTEM_INSTRUCTION_OSCE = `**OBJETIVO:**
 Sintetize os múltiplos materiais de referência anexados (PDFs, transcrições e imagens) em um roteiro prático, algorítmico e de auto-instrução detalhada sobre o exame clínico abordado. O roteiro deve guiar a execução passo a passo para provas práticas (OSCE) e atendimento real, facilitando a memorização ativa e a visualização mental, e extrair o foco avaliativo.
