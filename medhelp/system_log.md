@@ -20,7 +20,12 @@
   4. **Resiliência e Dependências:**
      - Injeção de `@import url(...)` do Google Fonts no CSS.
      - Adição do pacote `fonts-inter` via `apt-get` no Colab para garantir renderização local.
-     - Bump do Guardião de Versões para `2026-10-31T17:30:00Z`.
+     - Bump do Guardião de Versões sincronizado com GitHub.
+  5. **Refatoração Cirúrgica & Self-Healing (Refactor / Medhelp-Developer-Core):**
+     - `os.makedirs(RESUMOS_DIR, exist_ok=True)` adicionado na Célula 3 para evitar `FileNotFoundError`.
+     - Guarda de diretório injetada em `processar_diretorio` com criação automática caso o diretório não exista.
+     - `mover_arquivo_com_retry`: remoção preventiva de arquivo de destino pré-existente antes de `shutil.move`, blindando contra falhas de `FileExistsError` no Google Drive FUSE.
+     - Regex de desduplicação de nome aprimorada para `re.sub(r'(\.[Pp][Dd][Ff])?\.[Mm][Dd]$', '', filename)` para evitar artefatos em arquivos renomeados.
 - **Validação de Laboratório:**
   - Validação de integridade sintática Python AST em todas as células de código do notebook.
   - Verificação de parsing do formato JSON do notebook.

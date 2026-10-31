@@ -1,13 +1,17 @@
 # Tarefas do Projeto - Medhelp
 
-## FASE ATUAL: Redesign Visual dos PDFs Premium (Editorial Contemporâneo) — Concluído & Validado
+## FASE ATUAL: Redesign Visual dos PDFs Premium (Editorial Contemporâneo) & Refactoring Defensivo — Concluído & Validado
 - [x] Brainstorming e alinhamento de design concluídos via `/medhelp-brainstorming` com Understanding Lock aprovado pelo usuário.
 - [x] Especificação e ciclo V.L.A.E.G. documentados na Seção 23 de [research.md](file:///home/vvgfilhos/medhelp/research.md).
 - [x] Refatorar [`colab_gerador_pdf_premium.ipynb`](file:///home/vvgfilhos/medhelp/scripts/colab/pdf-premium/colab_gerador_pdf_premium.ipynb):
-  - [x] Célula 0: Atualizar Guardião de Versões (`VERSAO_LOCAL = "2026-10-31T17:30:00Z"`).
+  - [x] Célula 0: Atualizar Guardião de Versões sincronizado com GitHub.
   - [x] Célula 1: Atualizar Markdown com catálogo dos novos recursos do design editorial.
   - [x] Célula 2: Adicionar pacote de fontes `fonts-inter` no comando `apt-get`.
+  - [x] Célula 3: Adicionar criação defensiva de `RESUMOS_DIR` (`os.makedirs(RESUMOS_DIR, exist_ok=True)`).
   - [x] Célula 4: Reformular `CSS_PREMIUM_TEMPLATE` com Playfair Display, Inter, tabelas executivas Verde Musgo (`#556B2F`) e blockquotes firmes.
+  - [x] Célula 4: Aplicar refatoração defensiva em `mover_arquivo_com_retry` (remoção preventiva de destino existente para evitar `FileExistsError` no Google Drive FUSE).
+  - [x] Célula 4: Injetar guarda de diretório em `processar_diretorio` caso `resumos_dir` não exista.
+  - [x] Célula 4: Aprimorar regex de normalização para evitar duplicações de extensão (`.pdf.md`).
 - [x] Validação de laboratório:
   - [x] Validação sintática AST em todas as células de código do notebook.
   - [x] Verificação de integridade do JSON do notebook.
