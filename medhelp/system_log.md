@@ -1,5 +1,30 @@
 # Log de Sistema - Medhelp
 
+## 2026-10-31 — Redesign Visual Editorial Contemporâneo dos PDFs Premium (WeasyPrint)
+- **Arquivos:** [`colab_gerador_pdf_premium.ipynb`](file:///home/vvgfilhos/medhelp/scripts/colab/pdf-premium/colab_gerador_pdf_premium.ipynb), [`research.md`](file:///home/vvgfilhos/medhelp/research.md), [`task.md`](file:///home/vvgfilhos/medhelp/task.md)
+- **Contexto e Motivação:**
+  - Após brainstorming e aprovação via Understanding Lock, os PDFs de resumos de transcrições ganharam uma identidade editorial contemporânea inspirada em periódicos médicos modernos.
+  - O estilo anterior (Roboto com bordas de tabela pretas simples) foi substituído por uma tipografia serifada de alto padrão e tabelas executivas que combinam com os novos resumos focados em conceitos e tabelas.
+- **Modificações Pontuais Realizadas:**
+  1. **Tipografia Editorial:**
+     - Títulos (`h1`, `h2`, `h3`, `h4`): Playfair Display com serifa acadêmica e imponente.
+     - Corpo e Tabelas: Inter geométrica moderna em 10pt/line-height 1.6 para máxima legibilidade.
+     - Título principal (`h1`): 20pt `#1a1a1a` com linha de destaque em Verde Musgo (`1.5pt solid #556B2F`).
+     - Títulos secundários (`h2`): 13.5pt em Verde Musgo (`#556B2F`) com linha base sutil `#e2e8f0`.
+  2. **Tabelas Executivas de Alto Contraste:**
+     - Cabeçalho (`th`): Fundo sólido em Verde Musgo (`#556B2F`), tipografia Inter 9pt sem serifa, texto em branco puro (`#ffffff`) com padding confortável `7pt 10pt`.
+     - Zebra Striping: Linhas pares em `#f9faf8` e ímpares em `#ffffff` para conforto visual ao ler tabelas densas.
+     - Divisórias: Linhas suaves `#e2e8f0` entre linhas (`td`).
+  3. **Box de Conduta Clínica (`blockquote`):**
+     - Borda esquerda encorpada de `3pt solid #556B2F`, fundo pastel suave `#f8faf7`, cantos `0 4pt 4pt 0` e texto regular sem itálico apagado.
+  4. **Resiliência e Dependências:**
+     - Injeção de `@import url(...)` do Google Fonts no CSS.
+     - Adição do pacote `fonts-inter` via `apt-get` no Colab para garantir renderização local.
+     - Bump do Guardião de Versões para `2026-10-31T17:30:00Z`.
+- **Validação de Laboratório:**
+  - Validação de integridade sintática Python AST em todas as células de código do notebook.
+  - Verificação de parsing do formato JSON do notebook.
+
 ## 2026-10-31 — Refatoração do Prompt de Transcrições para Formato Enxuto (Conceitos + Tabelas + Conduta)
 - **Arquivos:** [`Prompt.js`](file:///home/vvgfilhos/medhelp/scripts/apps-script/automacao-transcricoes/Prompt.js), [`Config.js`](file:///home/vvgfilhos/medhelp/scripts/apps-script/automacao-transcricoes/Config.js), [`Main.js`](file:///home/vvgfilhos/medhelp/scripts/apps-script/automacao-transcricoes/Main.js), [`research.md`](file:///home/vvgfilhos/medhelp/research.md), [`task.md`](file:///home/vvgfilhos/medhelp/task.md)
 - **Contexto e Motivação:**

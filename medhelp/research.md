@@ -627,6 +627,44 @@ O usuário solicitou a atualização do link da pasta de **Conferências** no Go
 5. **Gatilho (G):**
    - Validação sintática local e atualização de `task.md` e `system_log.md`.
 
+---
+
+## 23. Especificação: Redesign Visual dos PDFs Premium (Editorial Contemporâneo com WeasyPrint)
+
+### 23.1 Diagnóstico & Oportunidade
+- **Contexto:** Com a migração do prompt para um formato mais enxuto e fortemente fundamentado em tabelas e conceitos, o visual padrão em Roboto com tabelas simples de borda preta carecia de distinção editorial.
+- **Objetivo Visual:** Elevar o nível estético dos PDFs gerados no Colab (`colab_gerador_pdf_premium.ipynb`) para um visual de revista científica / editorial médico contemporâneo de alto impacto.
+
+### 23.2 Ciclo V.L.A.E.G.
+1. **Visão (V):**
+   - Entrada: Arquivos Markdown gerados pelo pipeline de transcrições com títulos H1/H2/H3, tabelas conceituais e boxes de conduta (`blockquote`).
+   - Saída: PDFs diagramados em tamanho A4 com tipografia hierarquizada e tabelas executivas de alto contraste.
+2. **Link (L):**
+   - Importação remota segura do Google Fonts via `@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&display=swap')`.
+   - Pacote `fonts-inter` adicionado preventivamente ao comando `apt-get` no Colab para resiliência local.
+3. **Arquitetura (A):**
+   - `colab_gerador_pdf_premium.ipynb`:
+     - Célula 0: Atualização do `VERSAO_LOCAL = "2026-10-31T17:30:00Z"`.
+     - Célula 1: Atualização da descrição em Markdown catalogando os novos recursos de design.
+     - Célula 2: Inclusão de `fonts-inter` na instalação do sistema operacional.
+     - Célula 4: Reformulação completa do `CSS_PREMIUM_TEMPLATE`.
+4. **Estilo (E):**
+   - **Tipografia:**
+     - Títulos (`h1`, `h2`, `h3`, `h4`): Playfair Display com serifa editorial elegante.
+     - Corpo do texto (`body`, `p`, `li`, `table`): Inter geométrica moderna, tamanho 10pt, entrelinha 1.6, cor `#2c3e50`.
+     - Título principal (`h1`): 20pt `#1a1a1a`, com destaque sublinhado em Verde Musgo (`1.5pt solid #556B2F`).
+     - Títulos de seção (`h2`): 13.5pt `#556B2F` (Verde Musgo) com linha divisória sutil `#e2e8f0`.
+   - **Tabelas Executivas de Alto Contraste:**
+     - Cabeçalhos (`th`): Fundo sólido em Verde Musgo (`#556B2F`), texto em branco puro (`#ffffff`), padding confortável `7pt 10pt` e cantos executivos.
+     - Células (`td`): Padding `7pt 10pt`, borda inferior suave `#e2e8f0`.
+     - Zebra Striping: Linhas pares com fundo pastel `#f9faf8` e linhas ímpares com fundo branco.
+   - **Box de Conduta Clínica (`blockquote`):**
+     - Borda esquerda de destaque em Verde Musgo (`3pt solid #556B2F`), fundo pastel areia/oliva (`#f8faf7`), padding `10pt 14pt`, cantos `0 4pt 4pt 0` e texto em peso normal sem itálico apagado.
+5. **Gatilho (G):**
+   - Validação da árvore sintática AST das células Python do notebook.
+   - Sincronização via Git commit e push para o GitHub.
+
+
 
 
 
