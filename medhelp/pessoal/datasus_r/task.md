@@ -1,12 +1,21 @@
-# Checklist de Estudos - R DATASUS (Pessoal)
+# Checklist de Estudos - R DATASUS (Morbimortalidade K55 no MA)
 
-- [ ] Configuração do Ambiente R
-  - [x] Instalar R e dependências no Linux (Sistema)
+- [x] Configuração do Ambiente R
+  - [x] Instalar R e dependências no Linux (R 4.3.3)
   - [x] Instalar pacotes R (`tidyverse`, `microdatasus`, `geobr`, `languageserver`)
-  - [x] Validar funcionamento com script de teste `teste_datasus.R`
-- [ ] Primeiro Estudo de Caso (A definir)
-  - [ ] Visão: Definir base de dados (ex: SIM, SINAN, SINASC) e tema
-  - [ ] Link: Obter dados via microdatasus
-  - [ ] Arquitetura: Limpar dados e estruturar tabelas
-  - [ ] Estilo: Gerar gráficos e mapas de calor com geobr
-  - [ ] Gatilho: Automatizar pipeline de geração de relatórios
+  - [x] Validar funcionamento do ecossistema
+- [ ] Estudo Ecológico: Morbimortalidade por Transtornos Vasculares do Intestino (K55) no Maranhão
+  - [x] **Passo 1 (Visão)**: Delineamento ecológico misto, recorte 2014-2023 (Opção A)
+  - [x] **Passo 2 (Link)**: `k55_ma/01_extracao.R` — 532 AIHs K55 (MA+PI+TO, residentes MA) e 448 óbitos K55 causa básica (SIM), 0 falhas
+  - [x] **Passo 3 (Arquitetura)**: Mapeamento de Macrorregiões de Saúde (Norte, Leste, Sul), cruzamento de Residência vs Ocorrência e cálculo de taxas
+    - [x] 3.1 `02_referencias.R` — tabela territorial oficial DATASUS (217 mun → 19 RS → 3 macros) + população POPSVS 2014-2023 por faixa etária
+    - [x] 3.2 `03_tratamento.R` — limpeza SIH/SIM, idade, sexo, subcategoria K55, macro de residência/hospital/ocorrência, flags de deslocamento
+    - [x] 3.3 `04_indicadores.R` — tabelas por macro (período e ano): internações, caráter, TMP, mortalidade institucional (IC95%), taxas/100 mil (bruta e padronizada), matriz residência × ocorrência → 14 CSVs em `k55_ma/resultados/tabelas/`
+  - [x] **Passo 4 (Estatística e Estilo)**: Análise temporal (Prais-Winsten/APC), cartografia temática (`geobr` + `ggplot2`), taxas institucionais e gráficos de dispersão/evasão
+    - [x] 4.1 `05_prais_winsten.R` — modelagem Prais-Winsten (AR-1/Durbin-Watson) das taxas de internação e mortalidade (brutas e padronizadas OMS) 2014-2023 por macro + APC com IC95% (tabela `E1_prais_winsten_apc.csv`)
+    - [x] 4.2 `06_mapas_espaciais.R` — cartografia temática (`geobr` + `ggplot2` + `sf` métrico UTM) com divisão por 19 Regiões de Saúde e 3 Macrorregiões do MA (Figura 1: Polos e evasão interestadual para PI; Figura 2: Taxas padronizadas OMS; Tabela F1 consolidada) em 300 DPI
+    - [x] 4.3 `07_graficos_estilo.R` — dispersão municipal de distância vs evasão de óbitos e letalidade hospitalar por nível de deslocamento (Figura 3: OR = 2,45 [1,32-4,55], p=0,0045) e painel temporal (Figura 4) em 300 DPI
+  - [x] **Passo 5 (Gatilho)**: Redação estruturada do Resumo Expandido (6 páginas ABNT, formato IMRAD/STROBE) + Estrutura e HTML do Banner científico
+    - [x] 5.1 `k55_ma/resumo_expandido_k55_ma.md`: Resumo Expandido de 6 páginas ABNT/IMRAD/STROBE rigoroso, com salvaguarda expressa contra falácia ecológica, cálculo de OR, Prais-Winsten e recomendações de gestão pública.
+    - [x] 5.2 `k55_ma/banner_cientifico_k55_ma.md`: Roteiro e estrutura do Banner de 90x120cm em 3 colunas para congresso/defesa.
+    - [x] 5.3 `k55_ma/banner_apresentacao_visual.html`: Pôster científico cinematográfico pronto para exibição/impressão em alta resolução incorporando as 4 figuras.
